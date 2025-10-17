@@ -124,14 +124,27 @@ button:hover { background: #0056b3; }
 <script>
 const CLAVE_CORRECTA = "sara";
 
-// Mostrar panel activador si la clave es correcta
-function verificarClave() {
-  const clave = document.getElementById('clave').value;
-  if (clave === CLAVE_CORRECTA) {
-    document.getElementById('activador').style.display = 'block';
-    document.getElementById('claveAcceso').style.display = 'none';
-  } else {
-    alert("Clave incorrecta ❌");
+async function verificarClave() {
+  const clave = document.getElementById('clave').value.trim();
+
+  try {
+    const resp = await fetch("/.netlify/functions/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clave }),
+    });
+
+    const data = await resp.json();
+
+    if (data.ok) {
+      document.getElementById('activador').style.display = 'block';
+      document.getElementById('claveAcceso').style.display = 'none';
+    } else {
+      alert("Clave incorrecta ❌");
+    }
+  } catch (e) {
+    alert("Error al verificar la clave");
+    console.error(e);
   }
 }
 
