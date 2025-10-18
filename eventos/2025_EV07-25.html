@@ -122,28 +122,16 @@ button:hover { background: #0056b3; }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-async function verificarClave() {
-  const clave = document.getElementById('clave').value.trim();
-  if (!clave) return alert("Ingrese la clave");
+const CLAVE_CORRECTA = "sara";
 
-  try {
-    const resp = await fetch("/.netlify/functions/auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clave })
-    });
-
-    const data = await resp.json();
-
-    if (data.autorizado) {
-      document.getElementById('activador').style.display = 'block';
-      document.getElementById('claveAcceso').style.display = 'none';
-    } else {
-      alert("❌ Clave incorrecta");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión con el servidor 🔒");
+// Mostrar panel activador si la clave es correcta
+function verificarClave() {
+  const clave = document.getElementById('clave').value;
+  if (clave === CLAVE_CORRECTA) {
+    document.getElementById('activador').style.display = 'block';
+    document.getElementById('claveAcceso').style.display = 'none';
+  } else {
+    alert("Clave incorrecta ❌");
   }
 }
 
@@ -185,8 +173,7 @@ function cargarADIFAdmin() {
       const contactos = parseADIF(e.target.result, activador);
       todos.push(...contactos);
       localStorage.setItem("adifDatos", JSON.stringify(todos));
-      document.getElementById("infoAdmin").innerText = 
-        `Se guardaron ${contactos.length} contactos. Total: ${todos.length}`;
+      document.getElementById("infoAdmin").innerText = `Se guardaron ${contactos.length} contactos. Total: ${todos.length}`;
     };
     reader.readAsText(file);
   });
@@ -218,9 +205,7 @@ function verMisQSL() {
       <div class="qsl">
         <div class="dato activador">${c.owner}</div>
         <div class="dato contacto">Contacto: ${c.call}</div>
-        <div class="dato detalle">
-          Fecha: ${c.date || '-'} · Hora: ${c.time || '-'} · Banda: ${c.band || '-'} · Modo: ${c.mode || '-'}
-        </div>
+        <div class="dato detalle">Fecha: ${c.date || '-'}  Hora: ${c.time || '-'}  Banda: ${c.band || '-'}  Modo: ${c.mode || '-'}</div>
       </div>
       <button class="guardar-btn" onclick="descargarQSL(this)">Guardar QSL</button>
     `;
@@ -244,6 +229,5 @@ function descargarQSL(btn) {
   });
 }
 </script>
-
 </body>
 </html>
