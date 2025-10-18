@@ -136,11 +136,12 @@ footer {
 <body>
 
 <header>
+ 
   <img src="logos/logo_armada.png" alt="Logo Armada">
   <div style="display:inline-block; vertical-align:middle;">
     <h1>Servicio Auxiliar de Radioaficionados de la Armada (SARA)</h1>
-    <img src="logos/logo_sara.PNG" alt="Logo SARA">
-    <p>Eventos Anuales · Armada Argentina organizados por SARA</p>
+<img src="logos/logo_sara.PNG" alt="Logo SARA">
+    <p>Eventos Anuales · Armada Argentina organizados por SARA </p>
   </div>
 </header>
 
@@ -149,11 +150,11 @@ footer {
 
   <div class="evento-lista">
     <h2>📅 Eventos disponibles</h2>
-    <a href="eventos/2025_EV07-25.html" target="_blank">📡 EV07-25 - Activación Especial 2025</a>
+    <a href="eventos/2025_EV07-25.html" target="_blank">📡 EV07-25 - Activación Especial  2025</a>
     <a href="eventos/2026_certmalvinas.html" target="_blank">🇦🇷 Certificado Islas Malvinas 2026</a>
-    <a href="eventos/2026_diaarmada.html" target="_blank">🌎 Concurso Día de la Armada 2026</a>
-    <a href="eventos/2025_qslespecial.html" target="_blank">🌎 QSL especial 2025</a>
-    <a href="eventos/2026_diasara.html" target="_blank">🌎 Certificado Día del SARA 2026</a>
+    <a href="eventos/2026_diaarmada.html" target="_blank">🌎 Concurso dia de la armada  2026</a>
+<a href="eventos/2025_qslespecial.html" target="_blank">🌎 QSL especial 2025</a>
+<a href="eventos/2026_diasara.html" target="_blank">🌎 Certificado dia del SARA 2026 </a>
   </div>
 </main>
 
@@ -184,26 +185,13 @@ btn.onclick = () => { modal.style.display = "block"; };
 window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 function cerrarModal() { modal.style.display = "none"; }
 
-async function verificarClave() {
+function verificarClave() {
   const clave = document.getElementById("clavePrivada").value.trim();
-  
-  try {
-    const resp = await fetch("/.netlify/functions/auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clave }),
-    });
-
-    const data = await resp.json();
-
-    if (data.ok) {
-      window.location.href = "https://sites.google.com/view/saraturnos/inicio";
-    } else {
-      alert("Clave incorrecta ❌");
-    }
-  } catch (e) {
-    alert("Error al verificar la clave");
-    console.error(e);
+  // 🔐 Cambiar "SARAtoga" por la clave real que desees
+  if (clave === "SARAtoga") {
+    window.location.href = "privado/sara_panel.html";
+  } else {
+    alert("Clave incorrecta ❌");
   }
 }
 </script>
