@@ -1,24 +1,19 @@
 // netlify/functions/auth.js
-export async function handler(event) {
-  const body = JSON.parse(event.body || "{}");
-  const inputClave = body.clave?.trim();
-  const claveReal = process.env.AUTH_PASSWORD;
 
-  if (!inputClave) {
-    return { statusCode: 400, body: "Falta clave" };
-  }
+export async function handler(event, context) {
+  const CLAVE_CORRECTA = process.env.CLAVE_SECRETA; // ✅ ahora se toma del entorno seguro
 
-  if (inputClave === claveReal) {
+  const { clave } = JSON.parse(event.body || "{}");
+
+  if (clave === CLAVE_CORRECTA) {
     return {
       statusCode: 200,
-      body: JSON.stringify({ ok: true }),
-      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ autorizado: true }),
     };
   } else {
     return {
       statusCode: 401,
-      body: JSON.stringify({ ok: false, msg: "Clave incorrecta" }),
-      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ autorizado: false }),
     };
   }
 }
