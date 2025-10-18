@@ -185,16 +185,32 @@ btn.onclick = () => { modal.style.display = "block"; };
 window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 function cerrarModal() { modal.style.display = "none"; }
 
-function verificarClave() {
+async function verificarClave() {
   const clave = document.getElementById("clavePrivada").value.trim();
-  // 🔐 Cambiar "SARAtoga" por la clave real que desees
-  if (clave === "SARAtoga") {
-    window.location.href = "https://sites.google.com/view/saraturnos/inicio";
-  } else {
-    alert("Clave incorrecta ❌");
+  if (!clave) return alert("Por favor ingrese una clave.");
+
+  try {
+    const respuesta = await fetch('/.netlify/functions/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clave })
+    });
+
+    const resultado = await respuesta.json();
+
+    if (resultado.autorizado) {
+      alert("✅ Acceso autorizado");
+      window.location.href = "https://sites.google.com/view/saraturnos/inicio";
+    } else {
+      alert("❌ Clave incorrecta");
+    }
+  } catch (error) {
+    alert("Error al verificar la clave 🔒");
+    console.error(error);
   }
 }
 </script>
+
 
 </body>
 </html>
