@@ -51,11 +51,13 @@
 
   <div class="msg" id="status"></div>
 
+  <!-- Carga de la API de Google -->
   <script src="https://apis.google.com/js/api.js"></script>
+
   <script>
     const CLIENT_ID = "579631306771-oqelv0m55ronmkgqem6a85ko5jt0afkb.apps.googleusercontent.com";
-    const API_KEY = "AIzaSyB6UMOmEwiOsavCc93fW_Gx7mGJr84eJM4"; // ⚠️ Reemplaza con tu propia API Key
-    const FOLDER_ID = "1YJdk8Ymc77F5Nbgd8uWldlxgqNppkLys"; // ⚠️ Reemplaza con el ID de tu carpeta Drive
+    const API_KEY = "AIzaSyB6UMOmEwiOsavCc93fW_Gx7mGJr84eJM4";
+    const FOLDER_ID = "1YJdk8Ymc77F5Nbgd8uWldlxgqNppkLys";
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
     function showMessage(msg, color="#80ff80") {
@@ -64,62 +66,86 @@
       s.textContent = msg;
     }
 
+    // Inicializar librería Google
     function handleClientLoad() {
       gapi.load('client:auth2', initClient);
     }
 
-    function initClient() {
-      gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        scope: SCOPES
-      }).then(() => {
-gapi.auth2.getAuthInstance();
+    async function initClient() {
+      try {
+        await gapi.client.init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+          scope: SCOPES
+        });
+        gapi.auth2.getAuthInstance();
+
         document.getElementById("auth-button").onclick = handleAuthClick;
         document.getElementById("upload-button").onclick = uploadFile;
-        showMessage("Listo para autenticar y subir archivos.");
-      });
+
+        showMessage("✅ Listo para autenticar y subir archivos.");
+      } catch (error) {
+        showMessage("❌ Error inicializando cliente: " + error.message, "red");
+      }
     }
 
-    function handleAuthClick() {
-      gapi.auth2.getAuthInstance().signIn().then(() => {
+    async function handleAuthClick() {
+      try {
+        await gapi.auth2.getAuthInstance().signIn();
         showMessage("✅ Autenticado correctamente. Ya podés subir tu ADIF.");
-      }).catch(err => {
+      } catch (err) {
         showMessage("❌ Error de autenticación: " + err.message, "red");
-      });
+      }
     }
 
-    function uploadFile() {
+    async function uploadFile() {
       const file = document.getElementById("file-input").files[0];
       if (!file) {
         showMessage("⚠️ Primero selecciona un archivo ADIF.", "yellow");
         return;
       }
 
+      const token = gapi.client.getToken();
+      if (!token) {
+        showMessage("⚠️ Primero conectate con Google.", "yellow");
+        return;
+      }
+
       showMessage("⏳ Subiendo archivo...");
 
       const metadata = {
-        'name': file.name,
-        'mimeType': file.type || 'text/plain',
-        'parents': [FOLDER_ID]
+        name: file.name,
+        mimeType: file.type || 'text/plain',
+        parents: [FOLDER_ID]
       };
 
       const form = new FormData();
       form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
       form.append('file', file);
 
-      fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: new Headers({
-          'Authorization': 'Bearer ' + gapi.auth.getToken().access_token
-        }),
-        body: form,
-      }).then(response => response.json())
-        .then(file => showMessage('✅ Archivo subido correctamente: ' + file.name))
-        .catch(err => showMessage('❌ Error al subir: ' + err.message, 'red'));
+      try {
+        const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+          method: 'POST',
+          headers: new Headers({
+            'Authorization': 'Bearer ' + token.access_token
+          }),
+          body: form,
+        });
+
+        const data = await res.json();
+        if (data.id) {
+          showMessage('✅ Archivo subido correctamente: ' + data.name);
+        } else {
+          throw new Error(data.error?.message || "Error desconocido");
+        }
+      } catch (err) {
+        showMessage('❌ Error al subir: ' + err.message, 'red');
+      }
     }
 
     handleClientLoad();
   </script>
+
 </body>
 </html>
