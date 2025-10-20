@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cargar ADIF – Panel Activador</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #eef2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+h1 { margin-top: 20px; color: #333; }
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  margin: 15px;
+  padding: 15px;
+  width: 90%;
+  max-width: 500px;
+}
+
+#claveAcceso { border-left: 5px solid #007bff; }
+#panelActivador { border-left: 5px solid #28a745; display: none; }
+
+input, button {
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 80%;
+}
+
+button {
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  border: none;
+}
+
+button:hover { background: #0056b3; }
+
+a.volver {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+a.volver:hover { text-decoration: underline; }
+
+p#infoAdmin {
+  background: #e8f5e9;
+  padding: 10px;
+  border-radius: 6px;
+  color: #1b5e20;
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<h1>🔑 Panel Activador – EV07-25</h1>
+
+<!-- CLAVE DE ACCESO -->
+<div id="claveAcceso" class="card">
+  <h2>Ingreso seguro</h2>
+  <p>Ingresá la clave de activador:</p>
+  <input type="password" id="clave" placeholder="Clave de acceso">
+  <button onclick="verificarClave()">Ingresar</button>
+</div>
+
+<!-- PANEL DE CARGA -->
+<div id="panelActivador" class="card">
+  <h2>Cargar archivos ADIF</h2>
+  <input type="text" id="indicativoActivador" placeholder="Indicativo (ej: LU1XYZ)">
+  <input type="file" id="archivoAdif" accept=".adi,.adif" multiple>
+  <button onclick="cargarADIF()">Generar adif.json</button>
+  <p id="infoAdmin"></p>
+</div>
+
+<a href="index.html" class="volver">⬅ Volver al inicio</a>
+
+<script>
+const CLAVE_CORRECTA = "sara";
+
+// ✅ Verificación de clave
+function verificarClave() {
+  const clave = document.getElementById('clave').value.trim();
+  if (clave === CLAVE_CORRECTA) {
+    document.getElementById('panelActivador').style.display = 'block';
+    document.getElementById('claveAcceso').style.display = 'none';
+  } else {
+    alert("❌ Clave incorrecta");
+  }
+}
+
+// ✅ Leer ADIF y generar JSON
+function parseADIF(texto, activador) {
+  const qsos = texto.split(/<eor>/i).filter(x => x.trim().length);
+  return qsos.map(qso => {
+    const get = (tag) => {
+      const regex = new RegExp(`<${tag}:\\d+>(.*?)<`, 'i');
+      const m = qso.match(regex);
+      return m ? m[1].trim() : '';
+    };
+    return {
+      owner: activador,
+      call: get('CALL').toUpperCase(),
+      date: get('QSO_DATE'),
+      time: get('TIME_ON'),
+      band: get('BAND'),
+      mode: get('MODE')
+    };
+  }).filter(x => x.call);
+}
+
+// ✅ Cargar ADIF y generar archivo JSON
+function cargarADIF() {
+  const activador = document.getElementById('indicativoActivador').value.trim().toUpperCase();
+  if (!activador) return alert("Ingrese su indicativo de activador");
+  const files = document.getElementById('archivoAdif').files;
+  if (!files.length) return alert("Seleccione uno o más archivos ADIF");
+
+  let todos = [];
+
+  Array.from(files).forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const contactos = parseADIF(e.target.result, activador);
+      todos.push(...contactos);
+
+      if (idx === files.length - 1) {
+        const blob = new Blob([JSON.stringify(todos, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'adif.json';
+        a.click();
+
+        const info = document.getElementById('infoAdmin');
+        info.style.display = 'block';
+        info.textContent = "✅ adif.json generado. Súbelo al repositorio del evento en GitHub.";
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+</script>
+</body>
+</html>
+
