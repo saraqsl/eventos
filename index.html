@@ -3,46 +3,228 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eventos Anuales SARA</title>
+<title>Eventos Anuales SARA ⚓ Radar Naval</title>
 <style>
-body { font-family: 'Segoe UI', Arial, sans-serif; background: #eef3f8; margin:0; text-align:center; }
-header { background:#002b5c; color:white; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
-header img { height:60px; vertical-align:middle; margin-right:10px; }
-header h1 { display:inline-block; font-size:1.6em; margin:0; vertical-align:middle; }
-header p { font-size:0.9em; margin:0; opacity:0.9; }
-.evento-lista { display:inline-block; margin:40px auto; text-align:left; background:white; padding:30px 40px; border-radius:16px; box-shadow:0 4px 10px rgba(0,0,0,0.1); min-width:280px; }
-.evento-lista h2 { color:#004080; border-bottom:2px solid #004080; padding-bottom:6px; margin-bottom:15px; }
-.evento-lista a { display:block; padding:10px 0; text-decoration:none; color:#0066cc; font-weight:600; transition:0.2s; }
-.evento-lista a:hover { color:#003366; transform:translateX(5px); }
-footer { margin-top:60px; padding:15px; font-size:0.9em; color:#555; }
-#btnPrivado { position:fixed; bottom:15px; right:15px; background:#004080; color:white; border:none; border-radius:30px; padding:10px 16px; font-size:0.85em; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.2); transition:0.3s; }
-#btnPrivado:hover { background:#0066cc; }
-.modal { display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.4); }
-.modal-content { background:white; margin:15% auto; padding:20px; border-radius:12px; width:300px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
-.modal-content input { width:80%; padding:8px; margin-top:10px; border:1px solid #ccc; border-radius:6px; }
-.modal-content button { margin-top:12px; background:#004080; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
-.modal-content button:hover { background:#0066cc; }
+/* --- ESTILO GENERAL --- */
+body {
+  font-family: 'Segoe UI', 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #00111d 0%, #000a12 100%);
+  color: #e6edf5;
+  margin: 0;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+/* --- FONDO RADAR ANIMADO --- */
+.radar-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at center, rgba(0,255,0,0.2) 0%, transparent 70%),
+              repeating-radial-gradient(circle at center, rgba(0,255,0,0.1) 0 1px, transparent 1px 100px);
+  overflow: hidden;
+  z-index: -1;
+}
+.radar-line {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100vmax;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0,255,0,0.6), transparent);
+  transform-origin: left center;
+  animation: radar-scan 6s linear infinite;
+  border-radius: 50%;
+}
+@keyframes radar-scan {
+  from { transform: rotate(0deg) translateX(-50%); }
+  to { transform: rotate(360deg) translateX(-50%); }
+}
+
+/* --- CABECERA --- */
+header {
+  background: linear-gradient(90deg, #001d3d, #003566);
+  color: #f8f9fa;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  border-bottom: 3px solid #0d6efd;
+}
+header img { height: 60px; vertical-align: middle; margin: 0 10px; }
+header h1 {
+  display: inline-block;
+  font-size: 1.6em;
+  margin: 0;
+  vertical-align: middle;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(13,110,253,0.7);
+}
+header p { font-size: 0.9em; margin: 0; opacity: 0.85; }
+
+/* --- LISTA DE EVENTOS --- */
+.evento-lista {
+  display: inline-block;
+  margin: 60px auto;
+  text-align: left;
+  background: rgba(0, 30, 60, 0.85);
+  padding: 30px 40px;
+  border-radius: 16px;
+  border: 1px solid rgba(13,110,253,0.3);
+  box-shadow: 0 0 20px rgba(0,255,0,0.15);
+  min-width: 320px;
+  backdrop-filter: blur(4px);
+}
+.evento-lista h2 {
+  color: #00ff99;
+  border-bottom: 2px solid #0077b6;
+  padding-bottom: 6px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  text-shadow: 0 0 5px #00ff99;
+}
+.evento-item { margin-bottom: 15px; }
+.evento-item a {
+  display: inline-block;
+  padding: 10px 0;
+  text-decoration: none;
+  color: #caf0f8;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.evento-item a:hover {
+  color: #00ffcc;
+  transform: translateX(5px);
+}
+
+/* --- BADGES --- */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-left: 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-proximo { background:#ffb703; color:black; }
+.badge-curso { background:#00b4d8; color:white; }
+.badge-finalizado { background:#6c757d; color:white; }
+.fecha { font-size:0.85em; color:#adb5bd; margin-left:10px; }
+
+/* --- BOTÓN PRIVADO --- */
+#btnPrivado {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: #003566;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 18px;
+  font-size: 0.9em;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  transition: 0.3s;
+}
+#btnPrivado:hover {
+  background: #0077b6;
+  transform: scale(1.05);
+}
+
+/* --- MODAL --- */
+.modal { display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
+.modal-content {
+  background: #012a4a;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0,150,255,0.3);
+  border: 1px solid rgba(0,150,255,0.5);
+}
+.modal-content input {
+  width: 80%;
+  padding: 8px;
+  margin-top: 10px;
+  border: 1px solid #468faf;
+  border-radius: 6px;
+  background: #001d3d;
+  color: #caf0f8;
+}
+.modal-content button {
+  margin-top: 12px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal-content button:hover { background: #00b4d8; }
+
+/* --- PIE --- */
+footer {
+  margin-top: 60px;
+  padding: 15px;
+  font-size: 0.9em;
+  color: #adb5bd;
+  border-top: 1px solid #0d3b66;
+}
+#btnBases {
+  float: right;
+  font-size: 0.85em;
+  padding: 4px 8px;
+  margin-left: 10px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#btnBases:hover { background: #00b4d8; }
 </style>
 </head>
 <body>
 
+<!-- RADAR ANIMADO -->
+<div class="radar-bg">
+  <div class="radar-line"></div>
+</div>
+
 <header>
   <img src="logos/logo_armada.png" alt="Logo Armada">
   <div style="display:inline-block; vertical-align:middle;">
-    <h1>SARA - Servicio Auxiliar de Radioaficionados</h1>
+    <h1>Servicio Auxiliar de Radioaficionados - SARA</h1>
     <img src="logos/logo_sara.PNG" alt="Logo SARA">
-    <p>Eventos Anuales · Armada Argentina</p>
+    <p>“Voz y Misión de la Armada Argentina”</p>
   </div>
 </header>
 
 <main>
-  <p style="margin-top:40px;">Selecciona el evento para ver tus QSLs registradas recorda bajarlas guardarlas pasado un tiempo no estaran disponibles :</p>
+  <p style="margin-top:40px;">Selecciona el evento para ver tus QSLs registradas o participar ⚓</p>
 
   <div class="evento-lista">
-    <h2>📅 Eventos disponibles</h2>
-    <a href="eventos/2025_EV07-25/evento.html" target="_blank">📡 EV07-25 Queridos LU 2025</a>
-    <a href="eventos/2026_certmalvinas/evento.html" target="_blank">🇦🇷 proximo 2026</a>
-    <a href="eventos/diaarmada/evento.html" target="_blank">🌎 mas proximo 2026</a>
+    <h2>📡 Eventos disponibles
+      <button id="btnBases" onclick="window.open('bases.html','_blank')">Bases</button>
+    </h2>
+
+    <div class="evento-item" data-fecha-inicio="2025-10-20" data-fecha-fin="2025-10-25">
+      <a href="eventos/2025_EV07-25/evento.html" target="_blank">🛰️ EV07-25 Queridos LU 2025</a>
+      <span class="badge"></span>
+      <span class="fecha">20–25 Oct 2025</span>
+    </div>
+
+    <div class="evento-item" data-fecha-inicio="2026-03-10" data-fecha-fin="2026-03-15">
+      <a href="eventos/2026_certmalvinas/evento.html" target="_blank">🇦🇷 Certamen Malvinas 2026</a>
+      <span class="badge"></span>
+      <span class="fecha">10–15 Mar 2026</span>
+    </div>
+
+    <div class="evento-item" data-fecha-inicio="2026-02-02" data-fecha-fin="2026-02-02">
+      <a href="eventos/diaarmada/evento.html" target="_blank">⚓ Día de la Armada 2026</a>
+      <span class="badge"></span>
+      <span class="fecha">2 Feb 2026</span>
+    </div>
   </div>
 </main>
 
@@ -66,19 +248,38 @@ footer { margin-top:60px; padding:15px; font-size:0.9em; color:#555; }
 </div>
 
 <script>
+// Modal acceso privado
 const modal = document.getElementById("modalPrivado");
 const btn = document.getElementById("btnPrivado");
 btn.onclick = () => { modal.style.display = "block"; };
 window.onclick = e => { if(e.target===modal) modal.style.display="none"; };
 function cerrarModal(){ modal.style.display="none"; }
-
 function verificarClave(){
   const clave = document.getElementById("clavePrivada").value.trim();
-  const CLAVE_REAL = "SARAtoga"; // 🔐 aquí pones tu clave
+  const CLAVE_REAL = "SARAtoga";
   if(clave===CLAVE_REAL){
     window.location.href = "https://sites.google.com/view/saraturnos/inicio";
   } else { alert("Clave incorrecta ❌"); }
 }
+
+// Actualizar badges según fecha
+document.querySelectorAll('.evento-item').forEach(item => {
+  const inicio = new Date(item.dataset.fechaInicio);
+  const fin = new Date(item.dataset.fechaFin);
+  const hoy = new Date();
+  const badge = item.querySelector('.badge');
+
+  if(hoy < inicio) {
+    badge.textContent = "Próximamente";
+    badge.className = "badge badge-proximo";
+  } else if(hoy >= inicio && hoy <= fin) {
+    badge.textContent = "En curso";
+    badge.className = "badge badge-curso";
+  } else {
+    badge.textContent = "Finalizada";
+    badge.className = "badge badge-finalizado";
+  }
+});
 </script>
 
 </body>
