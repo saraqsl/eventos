@@ -25,8 +25,6 @@ h1 { margin-top: 20px; color: #333; }
   max-width: 500px;
 }
 #visitante { border-left: 5px solid #007bff; }
-#activador { border-left: 5px solid #28a745; display: none; }
-#claveAcceso { margin: 15px; }
 input, button {
   padding: 8px;
   margin: 6px 0;
@@ -101,89 +99,19 @@ button:hover { background: #0056b3; }
   <div id="galeria"></div>
 </div>
 
-<!-- CLAVE ACTIVADOR -->
-<div id="claveAcceso" class="card">
-  <h2>Activador</h2>
-  <p>Si sos activador del evento, ingresá tu clave:</p>
-  <input type="password" id="clave" placeholder="Clave de acceso">
-  <button onclick="verificarClave()">Ingresar</button>
-</div>
-
-<!-- PANEL ACTIVADOR -->
-<div id="activador" class="card">
-  <h2>Panel Activador</h2>
-  <input type="text" id="indicativoActivador" placeholder="Indicativo del activador (ej: LU1XYZ)">
-  <input type="file" id="archivoAdif" accept=".adi,.adif" multiple>
-  <button onclick="cargarADIFAdmin()">Cargar ADIF</button>
-  <p id="infoAdmin"></p>
+<!-- 🔒 BOTÓN PARA ACTIVADOR -->
+<div class="card">
+  <p style="text-align:center;">
+    <a href="cargar_adif.html" style="display:inline-block;padding:10px 20px;background:#007bff;color:white;border-radius:6px;text-decoration:none;">
+      🔑 Panel Activador
+    </a>
+  </p>
 </div>
 
 <div id="resultados"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-const CLAVE_CORRECTA = "sara";
-
-// ✅ Verificación de clave
-function verificarClave() {
-  const clave = document.getElementById('clave').value.trim();
-  if (clave === CLAVE_CORRECTA) {
-    document.getElementById('activador').style.display = 'block';
-    document.getElementById('claveAcceso').style.display = 'none';
-  } else {
-    alert("Clave incorrecta ❌");
-  }
-}
-
-// ✅ Leer ADIF y generar JSON
-function parseADIF(texto, activador) {
-  const qsos = texto.split(/<eor>/i).filter(x => x.trim().length);
-  return qsos.map(qso => {
-    const get = (tag) => {
-      const regex = new RegExp(`<${tag}:\\d+>(.*?)<`, 'i');
-      const m = qso.match(regex);
-      return m ? m[1].trim() : '';
-    };
-    return {
-      owner: activador,
-      call: get('CALL').toUpperCase(),
-      date: get('QSO_DATE'),
-      time: get('TIME_ON'),
-      band: get('BAND'),
-      mode: get('MODE')
-    };
-  }).filter(x => x.call);
-}
-
-// ✅ Cargar ADIF y descargar JSON
-function cargarADIFAdmin() {
-  const activador = document.getElementById('indicativoActivador').value.trim().toUpperCase();
-  if (!activador) return alert("Ingrese su indicativo de activador");
-  const files = document.getElementById('archivoAdif').files;
-  if (!files.length) return alert("Seleccione archivos ADIF");
-
-  let todos = [];
-
-  Array.from(files).forEach((file, idx) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const contactos = parseADIF(e.target.result, activador);
-      todos.push(...contactos);
-
-      if (idx === files.length - 1) {
-        const blob = new Blob([JSON.stringify(todos, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'adif.json';
-        a.click();
-        alert("✅ Archivo adif.json generado. Súbelo a GitHub dentro de la carpeta del evento.");
-      }
-    };
-    reader.readAsText(file);
-  });
-}
-
-// ✅ Consultar QSL desde el JSON
 async function verMisQSL() {
   const sd = document.getElementById('sdVisitante').value.trim();
   if (!sd) return alert("Ingresa tu SD");
@@ -221,7 +149,6 @@ async function verMisQSL() {
   }
 }
 
-// ✅ Descargar imagen de la QSL
 function descargarQSL(btn) {
   const tarjeta = btn.previousElementSibling;
   btn.style.display = 'none';
@@ -238,3 +165,5 @@ function descargarQSL(btn) {
 </script>
 </body>
 </html>
+
+
