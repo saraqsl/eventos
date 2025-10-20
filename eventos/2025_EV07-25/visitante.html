@@ -45,7 +45,7 @@ canvas { margin-top: 20px; border: 1px solid #ccc; }
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAs6TK4k4RpTKFzv57Kw40utVTbWc59IS9hsW8ub8FmN9mRNiJ93hJqsFZYQtNvMgPFw/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvYR1PcFL5MLz1vQ0h2OqGjsVYs_kIhkHBWn7ebq6epAplz1v8s7X04woHFuBawbC-pg/exec";
 const IMG_QSL = "QSL.jpg"; // imagen base del evento
 let canvasesGenerados = [];
 
@@ -61,27 +61,29 @@ function generarQSL(activador, contacto) {
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    // Activador
-    ctx.font = 'bold 42px Arial';
-    ctx.fillStyle = '#c00';
+    // SD del activador en grande
+    ctx.font = 'bold 40px Arial';
+    ctx.fillStyle = 'red';
     ctx.textAlign = 'center';
     ctx.fillText(activador, canvas.width / 2, 80);
 
     // Datos del contacto
     ctx.font = '20px Arial';
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = 'black';
     ctx.textAlign = 'left';
+    const yBase = 150;
+    const lineHeight = 30;
     const datos = [
-      `Visitante: ${contacto.call}`,
+      `SD Visitante: ${contacto.call}`,
       `Fecha: ${contacto.date}`,
       `Hora: ${contacto.time}`,
       `Banda: ${contacto.band}`,
       `Modo: ${contacto.mode}`
     ];
-    datos.forEach((d, i) => ctx.fillText(d, 50, 150 + i * 30));
+    datos.forEach((d, i) => ctx.fillText(d, 50, yBase + i * lineHeight));
 
     document.getElementById('qslContainer').appendChild(canvas);
-    canvasesGenerados.push({canvas, activador, visitante: contacto.call});
+    canvasesGenerados.push({ canvas, activador, visitante: contacto.call });
   };
 }
 
@@ -90,29 +92,29 @@ async function verQSL() {
   const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
   if (!sdVisitante) return alert("Ingrese su SD");
 
-  const cont = document.getElementById('qslContainer');
-  cont.innerHTML = "Cargando...";
+  const container = document.getElementById('qslContainer');
+  container.innerHTML = "⏳ Cargando...";
   canvasesGenerados = [];
   document.getElementById('btnDescargarTodas').style.display = 'none';
 
   try {
     const res = await fetch(SCRIPT_URL);
     const data = await res.json();
-    cont.innerHTML = '';
 
-    data.forEach(contacto => {
-      if (contacto.call === sdVisitante) {
-        generarQSL(contacto.owner, contacto);
-      }
-    });
+    const contactos = data.filter(c => c.call === sdVisitante);
+    container.innerHTML = '';
 
-    if (canvasesGenerados.length > 0)
-      document.getElementById('btnDescargarTodas').style.display = 'inline-block';
-    else
-      cont.textContent = "No se encontraron QSLs para este SD.";
+    if (!contactos.length) {
+      container.textContent = "No se encontraron QSLs para este SD.";
+      return;
+    }
+
+    contactos.forEach(c => generarQSL(c.owner, c));
+    document.getElementById('btnDescargarTodas').style.display = 'inline-block';
+
   } catch (err) {
     console.error(err);
-    cont.textContent = "❌ Error al cargar datos del evento.";
+    container.textContent = "❌ Error al cargar QSLs.";
   }
 }
 
@@ -120,12 +122,12 @@ async function verQSL() {
 async function descargarTodas() {
   if (!canvasesGenerados.length) return;
   const zip = new JSZip();
-  canvasesGenerados.forEach((c, idx) => {
+  canvasesGenerados.forEach((c) => {
     const dataUrl = c.canvas.toDataURL('image/png');
     const base64 = dataUrl.split(',')[1];
-    zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
+    zip.file(`${c.activador}_${c.visitante}.png`, base64, { base64: true });
   });
-  const content = await zip.generateAsync({type:"blob"});
+  const content = await zip.generateAsync({ type: "blob" });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(content);
   link.download = 'mis_qsls.zip';
@@ -133,7 +135,7 @@ async function descargarTodas() {
 }
 </script>
 
-
 </body>
 </html>
+
 
