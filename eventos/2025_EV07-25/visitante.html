@@ -45,25 +45,9 @@ canvas { margin-top: 20px; border: 1px solid #ccc; }
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
 
 <script>
-const ACCESS_TOKEN = "579631306771-oqelv0m55ronmkgqem6a85ko5jt0afkb.apps.googleusercontent.com"; // tu token válido
-const FOLDER_ID = "1YJdk8Ymc77F5Nbgd8uWldlxgqNppkLys"; // carpeta de Drive con JSON de activadores
-const IMG_QSL = "QSL.jpg"; // imagen de fondo
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAs6TK4k4RpTKFzv57Kw40utVTbWc59IS9hsW8ub8FmN9mRNiJ93hJqsFZYQtNvMgPFw/exec"; 
+const IMG_QSL = "QSL.jpg"; // imagen base del evento
 let canvasesGenerados = [];
-
-// Listar ADIFs en Drive
-async function listarADIFs() {
-  const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&fields=files(id,name)&access_token=${ACCESS_TOKEN}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  return data.files || [];
-}
-
-// Leer archivo JSON desde Drive
-async function leerADIF(fileId) {
-  const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&access_token=${ACCESS_TOKEN}`;
-  const res = await fetch(url);
-  return res.json();
-}
 
 // Generar QSL en canvas
 function generarQSL(activador, contacto) {
@@ -77,26 +61,24 @@ function generarQSL(activador, contacto) {
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    // SD del activador en grande
-    ctx.font = 'bold 40px Arial';
-    ctx.fillStyle = 'red';
+    // Activador
+    ctx.font = 'bold 42px Arial';
+    ctx.fillStyle = '#c00';
     ctx.textAlign = 'center';
     ctx.fillText(activador, canvas.width / 2, 80);
 
     // Datos del contacto
     ctx.font = '20px Arial';
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = '#000';
     ctx.textAlign = 'left';
-    const yBase = 150;
-    const lineHeight = 30;
     const datos = [
-      `SD Visitante: ${contacto.call}`,
+      `Visitante: ${contacto.call}`,
       `Fecha: ${contacto.date}`,
       `Hora: ${contacto.time}`,
       `Banda: ${contacto.band}`,
       `Modo: ${contacto.mode}`
     ];
-    datos.forEach((d, i) => ctx.fillText(d, 50, yBase + i*lineHeight));
+    datos.forEach((d, i) => ctx.fillText(d, 50, 150 + i * 30));
 
     document.getElementById('qslContainer').appendChild(canvas);
     canvasesGenerados.push({canvas, activador, visitante: contacto.call});
@@ -108,33 +90,29 @@ async function verQSL() {
   const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
   if (!sdVisitante) return alert("Ingrese su SD");
 
-  const container = document.getElementById('qslContainer');
-  container.innerHTML = "Cargando...";
+  const cont = document.getElementById('qslContainer');
+  cont.innerHTML = "Cargando...";
   canvasesGenerados = [];
   document.getElementById('btnDescargarTodas').style.display = 'none';
 
   try {
-    const files = await listarADIFs();
-    container.innerHTML = '';
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
+    cont.innerHTML = '';
 
-    for (let file of files) {
-      const adifData = await leerADIF(file.id);
-      adifData.forEach(contacto => {
-        if (contacto.call === sdVisitante) {
-          generarQSL(contacto.owner, contacto);
-        }
-      });
-    }
+    data.forEach(contacto => {
+      if (contacto.call === sdVisitante) {
+        generarQSL(contacto.owner, contacto);
+      }
+    });
 
-    if (canvasesGenerados.length > 0) {
+    if (canvasesGenerados.length > 0)
       document.getElementById('btnDescargarTodas').style.display = 'inline-block';
-    } else {
-      container.textContent = "No se encontraron QSLs para este SD.";
-    }
-
+    else
+      cont.textContent = "No se encontraron QSLs para este SD.";
   } catch (err) {
     console.error(err);
-    container.textContent = "Error al cargar QSLs desde Drive.";
+    cont.textContent = "❌ Error al cargar datos del evento.";
   }
 }
 
@@ -155,5 +133,7 @@ async function descargarTodas() {
 }
 </script>
 
+
 </body>
 </html>
+
