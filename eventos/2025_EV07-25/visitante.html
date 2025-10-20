@@ -54,7 +54,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwGheoFenZr8EfbrZ3H2SNw
 const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
 let canvasesGenerados = [];
 
-// 🧩 Generar QSL en canvas
+// 🧩 Generar QSL en canvas (dos líneas de datos, negrita)
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
@@ -74,12 +74,14 @@ function generarQSL(activador, contacto) {
       ctx.textAlign = 'left';
       ctx.fillText(activador, 20, 70);
 
-      // Datos del contacto abajo, en una sola fila
-      ctx.font = '20px Arial';
+      // Datos del contacto en dos líneas, centrados abajo
+      ctx.font = 'bold 20px Arial';
       ctx.fillStyle = 'black';
       ctx.textAlign = 'center';
-      const filaDatos = `QSO con ${contacto.call}  Fecha: ${contacto.date}  Hora: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
-      ctx.fillText(filaDatos, canvas.width / 2, canvas.height - 30);
+      const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
+      const linea2 = `Hora: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
+      ctx.fillText(linea1, canvas.width / 2, canvas.height - 60);
+      ctx.fillText(linea2, canvas.width / 2, canvas.height - 30);
 
       document.getElementById('qslContainer').appendChild(canvas);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
@@ -87,6 +89,7 @@ function generarQSL(activador, contacto) {
     };
   });
 }
+
 
 
 // 🧩 Ver QSLs del visitante
@@ -144,6 +147,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
