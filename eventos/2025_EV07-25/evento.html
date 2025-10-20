@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador QSL Local EV07-25</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f3f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+h1 { margin-top: 20px; color: #333; }
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  margin: 15px;
+  padding: 15px;
+  width: 90%;
+  max-width: 500px;
+}
+#visitante { border-left: 5px solid #007bff; }
+input, button {
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 80%;
+}
+button {
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  border: none;
+}
+button:hover { background: #0056b3; }
+
+.qsl {
+  position: relative;
+  display: inline-block;
+  width: 420px;
+  height: 270px;
+  background-image: url("qsl_fondo.jpg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  margin: 10px;
+  border: 2px solid #000;
+  border-radius: 6px;
+}
+.qsl .dato {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #000;
+  text-shadow: 1px 1px 2px white;
+}
+.qsl .activador {
+  top: 40px;
+  font-size: 30px;
+  font-weight: bold;
+}
+.qsl .contacto {
+  bottom: 60px;
+  font-size: 18px;
+}
+.qsl .detalle {
+  bottom: 30px;
+  font-size: 14px;
+}
+.guardar-btn {
+  display: block;
+  margin: 8px auto 20px auto;
+  padding: 6px 12px;
+  background: #28a745;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.guardar-btn:hover { background: #1e7e34; }
+</style>
+</head>
+<body>
+
+<h1>QSL SARA Armada Argentina – EV07-25</h1>
+
+<!-- VISITANTE -->
+<div id="visitante" class="card">
+  <h2>Visitante</h2>
+  <p>Ingresa tu (SD) para ver tus QSL:</p>
+  <input type="text" id="sdVisitante" placeholder="Ej: LU1ABC">
+  <button onclick="verMisQSL()">Ver mis QSL</button>
+  <div id="galeria"></div>
+</div>
+
+<!-- 🔒 BOTÓN PARA ACTIVADOR -->
+<div class="card">
+  <p style="text-align:center;">
+    <a href="cargar_adif.html" style="display:inline-block;padding:10px 20px;background:#007bff;color:white;border-radius:6px;text-decoration:none;">
+      🔑 Panel Activador
+    </a>
+  </p>
+</div>
+
+<div id="resultados"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+async function verMisQSL() {
+  const sd = document.getElementById('sdVisitante').value.trim();
+  if (!sd) return alert("Ingresa tu SD");
+
+  try {
+    const resp = await fetch("adif.json");
+    const todos = await resp.json();
+
+    const sdNorm = sd.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const filtrados = todos.filter(c => c.call === sdNorm);
+
+    const galeria = document.getElementById('galeria');
+    galeria.innerHTML = "";
+
+    if (!filtrados.length) {
+      galeria.innerHTML = "<p>No se encontraron QSL para esta SD.</p>";
+      return;
+    }
+
+    filtrados.forEach(c => {
+      const contenedor = document.createElement('div');
+      contenedor.innerHTML = `
+        <div class="qsl">
+          <div class="dato activador">${c.owner}</div>
+          <div class="dato contacto">Contacto: ${c.call}</div>
+          <div class="dato detalle">Fecha: ${c.date || '-'} Hora: ${c.time || '-'} Banda: ${c.band || '-'} Modo: ${c.mode || '-'}</div>
+        </div>
+        <button class="guardar-btn" onclick="descargarQSL(this)">Guardar QSL</button>
+      `;
+      galeria.appendChild(contenedor);
+    });
+  } catch (err) {
+    alert("Error al cargar adif.json");
+    console.error(err);
+  }
+}
+
+function descargarQSL(btn) {
+  const tarjeta = btn.previousElementSibling;
+  btn.style.display = 'none';
+  html2canvas(tarjeta).then(canvas => {
+    canvas.toBlob(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `QSL_${Date.now()}.png`;
+      a.click();
+      btn.style.display = 'block';
+    });
+  });
+}
+</script>
+</body>
+</html>
