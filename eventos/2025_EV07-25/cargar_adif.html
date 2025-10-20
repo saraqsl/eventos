@@ -17,6 +17,7 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   display: inline-block;
   padding: 20px 40px;
+  margin-bottom: 20px;
 }
 input, button {
   margin: 8px;
@@ -30,24 +31,52 @@ button {
   cursor: pointer;
 }
 button:hover { background: #0056b3; }
+h1 { margin-bottom: 30px; }
 </style>
 </head>
 <body>
 
 <h1>📡 Subir archivo ADIF a Drive</h1>
 
-<div class="card">
+<!-- 🔐 CLAVE DE ACTIVADOR -->
+<div id="login" class="card">
+  <h2>Ingreso activador</h2>
+  <input type="password" id="clave" placeholder="Clave de acceso">
+  <br>
+  <button onclick="verificarClave()">Ingresar</button>
+  <p id="msgClave"></p>
+</div>
+
+<!-- 📂 PANEL DE SUBIDA -->
+<div id="panel" class="card" style="display:none;">
   <input type="text" id="indicativo" placeholder="Indicativo (ej: LU9MAH)">
   <input type="file" id="archivo" accept=".adi,.adif">
   <br>
-  <button onclick="subirAdif()">Subir</button>
+  <button onclick="subirAdif()">Subir ADIF</button>
   <p id="resultado"></p>
 </div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAs6TK4k4RpTKFzv57Kw40utVTbWc59IS9hsW8ub8FmN9mRNiJ93hJqsFZYQtNvMgPFw/exec";
+const CLAVE_CORRECTA = "sara"; // 🔑 Clave de activador
+let accesoPermitido = false;
 
-// Parsear ADIF a JSON
+// 🔒 Verificar clave
+function verificarClave() {
+  const clave = document.getElementById('clave').value.trim();
+  const msg = document.getElementById('msgClave');
+
+  if (clave === CLAVE_CORRECTA) {
+    accesoPermitido = true;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('panel').style.display = 'inline-block';
+  } else {
+    msg.textContent = "❌ Clave incorrecta";
+    msg.style.color = "red";
+  }
+}
+
+// 📑 Parsear ADIF a JSON
 function parseADIF(texto, activador) {
   const qsos = texto.split(/<eor>/i).filter(x => x.trim().length);
   return qsos.map(qso => {
@@ -67,7 +96,13 @@ function parseADIF(texto, activador) {
   }).filter(x => x.call);
 }
 
+// ☁️ Subir ADIF a Drive
 async function subirAdif() {
+  if (!accesoPermitido) {
+    alert("⚠️ Ingresá la clave de activador primero.");
+    return;
+  }
+
   const activador = document.getElementById('indicativo').value.trim().toUpperCase();
   const fileInput = document.getElementById('archivo');
   const salida = document.getElementById('resultado');
@@ -105,9 +140,5 @@ async function subirAdif() {
 
 </body>
 </html>
-
-
-
-
 
 
