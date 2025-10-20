@@ -3,110 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cargar ADIF – Panel Activador</title>
+<title>Cargar ADIF a Drive</title>
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #eef2f5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  padding: 0;
+  background: #f3f6fa;
+  text-align: center;
+  padding: 30px;
 }
-h1 { margin-top: 20px; color: #333; }
 .card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  margin: 15px;
-  padding: 15px;
-  width: 90%;
-  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: inline-block;
+  padding: 20px 40px;
 }
-#claveAcceso { border-left: 5px solid #007bff; }
-#panelActivador { border-left: 5px solid #28a745; display: none; }
 input, button {
-  padding: 8px;
-  margin: 6px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 80%;
-}
-button {
-  cursor: pointer;
-  background: #007bff;
-  color: white;
-  border: none;
-}
-button:hover { background: #0056b3; }
-p#infoAdmin {
-  background: #e8f5e9;
+  margin: 8px;
   padding: 10px;
   border-radius: 6px;
-  color: #1b5e20;
-  display: none;
+  border: 1px solid #ccc;
 }
-a.volver {
-  display: inline-block;
-  margin-top: 20px;
-  text-decoration: none;
-  color: #007bff;
-  font-weight: bold;
+button {
+  background: #007bff;
+  color: white;
+  cursor: pointer;
 }
-a.volver:hover { text-decoration: underline; }
+button:hover { background: #0056b3; }
 </style>
 </head>
 <body>
 
-<h1>🔑 Panel Activador – EV07-25</h1>
+<h1>📡 Subir archivo ADIF a Drive</h1>
 
-<!-- CLAVE DE ACCESO -->
-<div id="claveAcceso" class="card">
-  <h2>Ingreso seguro</h2>
-  <p>Ingresá la clave de activador:</p>
-  <input type="password" id="clave" placeholder="Clave de acceso">
-  <button onclick="verificarClave()">Ingresar</button>
+<div class="card">
+  <input type="text" id="indicativo" placeholder="Indicativo (ej: LU9MAH)">
+  <input type="file" id="archivo" accept=".adi,.adif">
+  <br>
+  <button onclick="subirAdif()">Subir</button>
+  <p id="resultado"></p>
 </div>
-
-<!-- PANEL DE CARGA -->
-<div id="panelActivador" class="card">
-  <h2>Cargar archivos ADIF</h2>
-  <input type="text" id="indicativoActivador" placeholder="Indicativo (ej: LU1XYZ)">
-  <input type="file" id="archivoAdif" accept=".adi,.adif" multiple>
-  <button onclick="cargarADIF()">Subir ADIF a Drive</button>
-  <p id="infoAdmin"></p>
-</div>
-
-<a href="index.html" class="volver">⬅ Volver al inicio</a>
 
 <script>
-const CLAVE_CORRECTA = "sara";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrCF9unoJxFEBdc9uYYLNkuvIdHRBzGheOxxAs19PBz_AApQ4GaTsVRkm-g_QV9O0p/exec"; // reemplazar con la URL de tu Google Apps Script
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAiJuDxwXp5to5rSEW2qLKwMSHasE66PMWRniGYFrP9h7qPuAXYsoHlwZPHkaFZNnt/exec";
 
-// Verificación de clave
-function verificarClave() {
-  const clave = document.getElementById('clave').value.trim();
-  if (clave === CLAVE_CORRECTA) {
-    document.getElementById('panelActivador').style.display = 'block';
-    document.getElementById('claveAcceso').style.display = 'none';
-  } else {
-    alert("❌ Clave incorrecta");
-  }
-}
-
-// Parsear ADIF y generar array de contactos
+// Parsear ADIF a JSON
 function parseADIF(texto, activador) {
   const qsos = texto.split(/<eor>/i).filter(x => x.trim().length);
   return qsos.map(qso => {
-    const get = tag => {
+    const get = (tag) => {
       const regex = new RegExp(`<${tag}:\\d+>(.*?)<`, 'i');
       const m = qso.match(regex);
       return m ? m[1].trim() : '';
     };
     return {
       owner: activador,
-      call: get('CALL')?.toUpperCase(),
+      call: get('CALL').toUpperCase(),
       date: get('QSO_DATE'),
       time: get('TIME_ON'),
       band: get('BAND'),
@@ -115,63 +67,44 @@ function parseADIF(texto, activador) {
   }).filter(x => x.call);
 }
 
-// Convertir blob a base64
-async function blobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
+async function subirAdif() {
+  const activador = document.getElementById('indicativo').value.trim().toUpperCase();
+  const fileInput = document.getElementById('archivo');
+  const salida = document.getElementById('resultado');
 
-// Cargar ADIF y subir a Drive
-async function cargarADIF() {
-  const activador = document.getElementById('indicativoActivador').value.trim().toUpperCase();
-  if (!activador) return alert("Ingrese su indicativo de activador");
+  if (!activador) return alert("Ingrese su indicativo");
+  if (!fileInput.files.length) return alert("Seleccione un archivo ADIF");
 
-  const files = document.getElementById('archivoAdif').files;
-  if (!files.length) return alert("Seleccione uno o más archivos ADIF");
+  const file = fileInput.files[0];
+  const texto = await file.text();
+  const data = parseADIF(texto, activador);
 
-  let todos = [];
+  if (!data.length) return alert("No se encontraron contactos válidos en el ADIF");
+
+  const nombre = `${activador}_${new Date().toISOString().slice(0,10).replace(/-/g,'')}_evento.json`;
+  const contenidoBase64 = btoa(JSON.stringify(data));
+
+  salida.textContent = "⏳ Subiendo a Drive...";
 
   try {
-    // Leer todos los archivos
-    for (let file of files) {
-      const texto = await file.text();
-      const contactos = parseADIF(texto, activador);
-      todos.push(...contactos);
-    }
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        name: nombre,
+        data: contenidoBase64
+      })
+    });
 
-    // Crear blob JSON
-    const jsonContent = JSON.stringify(todos, null, 2);
-    const blob = new Blob([jsonContent], { type: 'application/json' });
-
-    // Nombre con indicativo y fecha
-    const hoy = new Date();
-    const fechaStr = hoy.toISOString().slice(0,10).replace(/-/g,'');
-    const fileName = `${activador}_${fechaStr}_evento.json`;
-
-    // Convertir a base64 y enviar al Apps Script
-    const base64Data = await blobToBase64(blob);
-    const formData = new FormData();
-    formData.append('data', base64Data);
-    formData.append('name', fileName);
-
-    const res = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
-    const textoRes = await res.text();
-
-    const info = document.getElementById('infoAdmin'); 
-    info.style.display = 'block';
-    info.textContent = textoRes;
-
-  } catch(err) {
-    console.error(err);
-    alert("❌ Error al procesar los archivos ADIF");
+    const text = await response.text();
+    salida.textContent = text;
+  } catch (err) {
+    salida.textContent = "❌ Error al subir: " + err;
   }
 }
 </script>
+
 </body>
 </html>
+
 
 
