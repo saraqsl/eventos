@@ -1,151 +1,144 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subir ADIF a Google Drive - SARAQSL</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0b1520;
-      color: #f2f2f2;
-      text-align: center;
-      padding: 40px;
-    }
-    h1 { color: #4db8ff; }
-    button {
-      background-color: #1a73e8;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #155ab6;
-    }
-    input[type="file"] {
-      margin: 20px 0;
-      background: #111a24;
-      color: #fff;
-      padding: 10px;
-      border-radius: 6px;
-    }
-    .msg {
-      margin-top: 20px;
-      font-size: 15px;
-      color: #80ff80;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cargar ADIF a Drive</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f6fa;
+  text-align: center;
+  padding: 30px;
+}
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: inline-block;
+  padding: 20px 40px;
+  margin-bottom: 20px;
+}
+input, button {
+  margin: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+button {
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+}
+button:hover { background: #0056b3; }
+h1 { margin-bottom: 30px; }
+</style>
 </head>
 <body>
 
-  <h1>📡 Subida de Archivos ADIF</h1>
-  <p>Inicia sesión con tu cuenta autorizada de Google para subir los ADIF del evento.</p>
+<h1>📡 Subir archivo ADIF a Drive</h1>
 
-  <button id="auth-button">🔐 Conectar con Google</button><br>
-  <input type="file" id="file-input" accept=".adi,.adif" /><br>
-  <button id="upload-button">📤 Subir ADIF</button>
+<!-- 🔐 CLAVE DE ACTIVADOR -->
+<div id="login" class="card">
+  <h2>Ingreso activador</h2>
+  <input type="password" id="clave" placeholder="Clave de acceso">
+  <br>
+  <button onclick="verificarClave()">Ingresar</button>
+  <p id="msgClave"></p>
+</div>
 
-  <div class="msg" id="status"></div>
+<!-- 📂 PANEL DE SUBIDA -->
+<div id="panel" class="card" style="display:none;">
+  <input type="text" id="indicativo" placeholder="Indicativo (ej: LU9MAH)">
+  <input type="file" id="archivo" accept=".adi,.adif">
+  <br>
+  <button onclick="subirAdif()">Subir ADIF</button>
+  <p id="resultado"></p>
+</div>
 
-  <!-- Carga de la API de Google -->
-  <script src="https://apis.google.com/js/api.js"></script>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAs6TK4k4RpTKFzv57Kw40utVTbWc59IS9hsW8ub8FmN9mRNiJ93hJqsFZYQtNvMgPFw/exec";
+const CLAVE_CORRECTA = "sara"; // 🔑 Clave de activador
+let accesoPermitido = false;
 
-  <script>
-    const CLIENT_ID = "579631306771-oqelv0m55ronmkgqem6a85ko5jt0afkb.apps.googleusercontent.com";
-    const API_KEY = "AIzaSyB6UMOmEwiOsavCc93fW_Gx7mGJr84eJM4";
-    const FOLDER_ID = "1YJdk8Ymc77F5Nbgd8uWldlxgqNppkLys";
-    const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+// 🔒 Verificar clave
+function verificarClave() {
+  const clave = document.getElementById('clave').value.trim();
+  const msg = document.getElementById('msgClave');
 
-    function showMessage(msg, color="#80ff80") {
-      const s = document.getElementById('status');
-      s.style.color = color;
-      s.textContent = msg;
-    }
+  if (clave === CLAVE_CORRECTA) {
+    accesoPermitido = true;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('panel').style.display = 'inline-block';
+  } else {
+    msg.textContent = "❌ Clave incorrecta";
+    msg.style.color = "red";
+  }
+}
 
-    // Inicializar librería Google
-    function handleClientLoad() {
-      gapi.load('client:auth2', initClient);
-    }
+// 📑 Parsear ADIF a JSON
+function parseADIF(texto, activador) {
+  const qsos = texto.split(/<eor>/i).filter(x => x.trim().length);
+  return qsos.map(qso => {
+    const get = (tag) => {
+      const regex = new RegExp(`<${tag}:\\d+>(.*?)<`, 'i');
+      const m = qso.match(regex);
+      return m ? m[1].trim() : '';
+    };
+    return {
+      owner: activador,
+      call: get('CALL').toUpperCase(),
+      date: get('QSO_DATE'),
+      time: get('TIME_ON'),
+      band: get('BAND'),
+      mode: get('MODE')
+    };
+  }).filter(x => x.call);
+}
 
-    async function initClient() {
-      try {
-        await gapi.client.init({
-          apiKey: API_KEY,
-          clientId: CLIENT_ID,
-          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-          scope: SCOPES
-        });
-        gapi.auth2.getAuthInstance();
+// ☁️ Subir ADIF a Drive
+async function subirAdif() {
+  if (!accesoPermitido) {
+    alert("⚠️ Ingresá la clave de activador primero.");
+    return;
+  }
 
-        document.getElementById("auth-button").onclick = handleAuthClick;
-        document.getElementById("upload-button").onclick = uploadFile;
+  const activador = document.getElementById('indicativo').value.trim().toUpperCase();
+  const fileInput = document.getElementById('archivo');
+  const salida = document.getElementById('resultado');
 
-        showMessage("✅ Listo para autenticar y subir archivos.");
-      } catch (error) {
-        showMessage("❌ Error inicializando cliente: " + error.message, "red");
-      }
-    }
+  if (!activador) return alert("Ingrese su indicativo");
+  if (!fileInput.files.length) return alert("Seleccione un archivo ADIF");
 
-    async function handleAuthClick() {
-      try {
-        await gapi.auth2.getAuthInstance().signIn();
-        showMessage("✅ Autenticado correctamente. Ya podés subir tu ADIF.");
-      } catch (err) {
-        showMessage("❌ Error de autenticación: " + err.message, "red");
-      }
-    }
+  const file = fileInput.files[0];
+  const texto = await file.text();
+  const data = parseADIF(texto, activador);
 
-    async function uploadFile() {
-      const file = document.getElementById("file-input").files[0];
-      if (!file) {
-        showMessage("⚠️ Primero selecciona un archivo ADIF.", "yellow");
-        return;
-      }
+  if (!data.length) return alert("No se encontraron contactos válidos en el ADIF");
 
-      const token = gapi.client.getToken();
-      if (!token) {
-        showMessage("⚠️ Primero conectate con Google.", "yellow");
-        return;
-      }
+  const nombre = `${activador}_${new Date().toISOString().slice(0,10).replace(/-/g,'')}_evento.json`;
+  const contenidoBase64 = btoa(JSON.stringify(data));
 
-      showMessage("⏳ Subiendo archivo...");
+  salida.textContent = "⏳ Subiendo a Drive...";
 
-      const metadata = {
-        name: file.name,
-        mimeType: file.type || 'text/plain',
-        parents: [FOLDER_ID]
-      };
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        name: nombre,
+        data: contenidoBase64
+      })
+    });
 
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
-      form.append('file', file);
-
-      try {
-        const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-          method: 'POST',
-          headers: new Headers({
-            'Authorization': 'Bearer ' + token.access_token
-          }),
-          body: form,
-        });
-
-        const data = await res.json();
-        if (data.id) {
-          showMessage('✅ Archivo subido correctamente: ' + data.name);
-        } else {
-          throw new Error(data.error?.message || "Error desconocido");
-        }
-      } catch (err) {
-        showMessage('❌ Error al subir: ' + err.message, 'red');
-      }
-    }
-
-    handleClientLoad();
-  </script>
+    const text = await response.text();
+    salida.textContent = text;
+  } catch (err) {
+    salida.textContent = "❌ Error al subir: " + err;
+  }
+}
+</script>
 
 </body>
 </html>
+
+
