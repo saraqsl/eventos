@@ -15,7 +15,6 @@ body {
   padding: 0;
 }
 h1 { margin-top: 20px; color: #333; }
-
 .card {
   background: white;
   border-radius: 12px;
@@ -25,10 +24,8 @@ h1 { margin-top: 20px; color: #333; }
   width: 90%;
   max-width: 500px;
 }
-
 #claveAcceso { border-left: 5px solid #007bff; }
 #panelActivador { border-left: 5px solid #28a745; display: none; }
-
 input, button {
   padding: 8px;
   margin: 6px 0;
@@ -36,26 +33,13 @@ input, button {
   border: 1px solid #ccc;
   width: 80%;
 }
-
 button {
   cursor: pointer;
   background: #007bff;
   color: white;
   border: none;
 }
-
 button:hover { background: #0056b3; }
-
-a.volver {
-  display: inline-block;
-  margin-top: 20px;
-  text-decoration: none;
-  color: #007bff;
-  font-weight: bold;
-}
-
-a.volver:hover { text-decoration: underline; }
-
 p#infoAdmin {
   background: #e8f5e9;
   padding: 10px;
@@ -63,6 +47,14 @@ p#infoAdmin {
   color: #1b5e20;
   display: none;
 }
+a.volver {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+a.volver:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -82,7 +74,7 @@ p#infoAdmin {
   <h2>Cargar archivos ADIF</h2>
   <input type="text" id="indicativoActivador" placeholder="Indicativo (ej: LU1XYZ)">
   <input type="file" id="archivoAdif" accept=".adi,.adif" multiple>
-  <button onclick="cargarADIF()">Subir ADIF a Drive</button>
+  <button onclick="cargarADIF()">Generar JSON</button>
   <p id="infoAdmin"></p>
 </div>
 
@@ -90,10 +82,10 @@ p#infoAdmin {
 
 <script>
 const CLAVE_CORRECTA = "sara";
-const ACCESS_TOKEN = "579631306771-oqelv0m55ronmkgqem6a85ko5jt0afkb.apps.googleusercontent.com"; // reemplazar con tu token válido
-const FOLDER_ID = "1YJdk8Ymc77F5Nbgd8uWldlxgqNppkLys"; // reemplazar con tu carpeta de Drive
+const ACCESS_TOKEN = "TU_ACCESS_TOKEN_AQUI"; // reemplazar por token OAuth válido
+const FOLDER_ID = "ID_CARPETA_DRIVE_AQUI";   // reemplazar por ID de carpeta en Drive
 
-// ✅ Verificación de clave
+// Verificación de clave
 function verificarClave() {
   const clave = document.getElementById('clave').value.trim();
   if (clave === CLAVE_CORRECTA) {
@@ -104,18 +96,18 @@ function verificarClave() {
   }
 }
 
-// ✅ Leer ADIF y generar JSON
+// Parsear ADIF y generar array de contactos
 function parseADIF(texto, activador) {
   const qsos = texto.split(/<eor>/i).filter(x => x.trim().length);
   return qsos.map(qso => {
-    const get = (tag) => {
+    const get = tag => {
       const regex = new RegExp(`<${tag}:\\d+>(.*?)<`, 'i');
       const m = qso.match(regex);
       return m ? m[1].trim() : '';
     };
     return {
       owner: activador,
-      call: get('CALL').toUpperCase(),
+      call: get('CALL')?.toUpperCase(),
       date: get('QSO_DATE'),
       time: get('TIME_ON'),
       band: get('BAND'),
@@ -124,7 +116,7 @@ function parseADIF(texto, activador) {
   }).filter(x => x.call);
 }
 
-// ✅ Cargar ADIF y subir a Drive
+// Cargar ADIF y generar JSON
 async function cargarADIF() {
   const activador = document.getElementById('indicativoActivador').value.trim().toUpperCase();
   if (!activador) return alert("Ingrese su indicativo de activador");
@@ -134,32 +126,55 @@ async function cargarADIF() {
 
   let todos = [];
 
-  // Leer todos los archivos
-  for (let file of files) {
-    const texto = await file.text();
-    const contactos = parseADIF(texto, activador);
-    todos.push(...contactos);
+  try {
+    // Leer todos los archivos
+    for (let file of files) {
+      const texto = await file.text();
+      const contactos = parseADIF(texto, activador);
+      todos.push(...contactos);
+    }
+
+    // Crear blob JSON
+    const jsonContent = JSON.stringify(todos, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+
+    // Nombre con indicativo y fecha
+    const hoy = new Date();
+    const fechaStr = hoy.toISOString().slice(0,10).replace(/-/g,'');
+    const fileName = `${activador}_${fechaStr}_evento.json`;
+
+    // Preparar metadata para Drive
+    const metadata = {
+      name: fileName,
+      parents: [FOLDER_ID],
+      mimeType: 'application/json'
+    };
+
+    const formData = new FormData();
+    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    formData.append('file', blob);
+
+    // Subida a Drive (comentada si no hay token válido)
+    /*
+    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+      body: formData
+    });
+    const data = await res.json();
+    */
+
+    // Mostrar mensaje de confirmación
+    const info = document.getElementById('infoAdmin');
+    info.style.display = 'block';
+    info.textContent = `✅ JSON generado: ${fileName} (subida a Drive lista, requiere token válido)`;
+
+  } catch(err) {
+    console.error(err);
+    alert("Error al procesar los archivos ADIF");
   }
-
-  // Crear blob JSON
-  const jsonContent = JSON.stringify(todos, null, 2);
-  const blob = new Blob([jsonContent], { type: 'application/json' });
-
-  // Nombre con indicativo y fecha
-  const hoy = new Date();
-  const fechaStr = hoy.toISOString().slice(0,10).replace(/-/g,'');
-  const fileName = `${activador}_${fechaStr}_evento.json`;
-
-  // Preparar metadata para Drive
-  const metadata = {
-    name: fileName,
-    parents: [FOLDER_ID],
-    mimeType: 'application/json'
-  };
-
-  const formData = new FormData();
-  formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-  formData.append('file', blob);
-
-  try
+}
+</script>
+</body>
+</html>
 
