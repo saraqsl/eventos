@@ -1,1 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ver QSL – EV07-25</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #eef2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 20px;
+}
+h1 { color: #333; }
+input, button {
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 80%;
+  max-width: 300px;
+}
+button {
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  border: none;
+}
+button:hover { background: #0056b3; }
+canvas { 
+  margin-top: 20px; 
+  border: 1px solid #ccc; 
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<h1>🔎 Ver QSL – EV07-25</h1>
+
+<input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
+<button onclick="verQSL()">Ver mis QSLs</button>
+<button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas</button>
+
+<div id="qslContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwGheoFenZr8EfbrZ3H2SNwHX0lgKe45xF_3WIQ-0FL1Q5qc03H_2onSTlD76RHmFxMUA/exec";
+const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
+let canvasesGenerados = [];
+
+// 🧩 Generar QSL en canvas (dos líneas con fondo semitransparente, negrita)
+function generarQSL(activador, contacto) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = IMG_QSL;
+    img.onload = () => {
+      // Dibujar fondo
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // SD principal (activador) a la izquierda
+      ctx.font = 'bold 36px Arial';
+      ctx.fillStyle = 'red';
+      ctx.textAlign = 'left';
+      ctx.fillText(activador, 20, 70);
+
+      // Datos del contacto en dos líneas, centrados abajo
+      ctx.font = 'bold 20px Arial';
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'center';
+      const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
+      const linea2 = `Hora: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
+
+      // Calcular posición del rectángulo semitransparente
+      const rectWidth = canvas.width - 40; // margen de 20px a cada lado
+      const rectHeight = 50;
+      const rectX = 20;
+      const rectY = canvas.height - 65; // un poquito arriba del borde
+
+      // Dibujar rectángulo semitransparente
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // blanco con opacidad
+      ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+      // Dibujar texto encima del rectángulo
+      ctx.fillStyle = 'black';
+      ctx.fillText(linea1, canvas.width / 2, canvas.height - 50);
+      ctx.fillText(linea2, canvas.width / 2, canvas.height - 25);
+
+      document.getElementById('qslContainer').appendChild(canvas);
+      canvasesGenerados.push({canvas, activador, visitante: contacto.call});
+      resolve();
+    };
+  });
+}
+
+
+
+
+// 🧩 Ver QSLs del visitante
+async function verQSL() {
+  const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
+  if (!sdVisitante) return alert("Ingrese su SD");
+
+  const container = document.getElementById('qslContainer');
+  container.innerHTML = "Cargando...";
+  canvasesGenerados = [];
+  document.getElementById('btnDescargarTodas').style.display = 'none';
+
+  try {
+    const res = await fetch(API_URL);
+    const allData = await res.json();
+
+    container.innerHTML = "";
+    let encontrados = 0;
+
+    for (const contacto of allData) {
+      if (contacto.call === sdVisitante) {
+        await generarQSL(contacto.owner, contacto);
+        encontrados++;
+      }
+    }
+
+    if (encontrados === 0) {
+      container.textContent = "No se encontraron QSLs para este SD.";
+    } else {
+      document.getElementById('btnDescargarTodas').style.display = 'inline-block';
+    }
+
+  } catch (err) {
+    console.error(err);
+    container.textContent = "❌ Error al cargar datos del evento.";
+  }
+}
+
+// 🧩 Descargar todas las QSLs como ZIP
+async function descargarTodas() {
+  if (!canvasesGenerados.length) return;
+  const zip = new JSZip();
+  canvasesGenerados.forEach((c) => {
+    const dataUrl = c.canvas.toDataURL('image/png');
+    const base64 = dataUrl.split(',')[1];
+    zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
+  });
+  const content = await zip.generateAsync({type:"blob"});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(content);
+  link.download = 'mis_qsls.zip';
+  link.click();
+}
+</script>
+
+</body>
+</html>
+
 
