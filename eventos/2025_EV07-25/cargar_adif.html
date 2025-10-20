@@ -74,7 +74,7 @@ a.volver:hover { text-decoration: underline; }
   <h2>Cargar archivos ADIF</h2>
   <input type="text" id="indicativoActivador" placeholder="Indicativo (ej: LU1XYZ)">
   <input type="file" id="archivoAdif" accept=".adi,.adif" multiple>
-  <button onclick="cargarADIF()">Generar JSON</button>
+  <button onclick="cargarADIF()">Subir ADIF a Drive</button>
   <p id="infoAdmin"></p>
 </div>
 
@@ -82,8 +82,7 @@ a.volver:hover { text-decoration: underline; }
 
 <script>
 const CLAVE_CORRECTA = "sara";
-const ACCESS_TOKEN = "TU_ACCESS_TOKEN_AQUI"; // reemplazar por token OAuth válido
-const FOLDER_ID = "ID_CARPETA_DRIVE_AQUI";   // reemplazar por ID de carpeta en Drive
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrCF9unoJxFEBdc9uYYLNkuvIdHRBzGheOxxAs19PBz_AApQ4GaTsVRkm-g_QV9O0p/exec"; // reemplazar con la URL de tu Google Apps Script
 
 // Verificación de clave
 function verificarClave() {
@@ -116,7 +115,17 @@ function parseADIF(texto, activador) {
   }).filter(x => x.call);
 }
 
-// Cargar ADIF y generar JSON
+// Convertir blob a base64
+async function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Cargar ADIF y subir a Drive
 async function cargarADIF() {
   const activador = document.getElementById('indicativoActivador').value.trim().toUpperCase();
   if (!activador) return alert("Ingrese su indicativo de activador");
@@ -143,38 +152,26 @@ async function cargarADIF() {
     const fechaStr = hoy.toISOString().slice(0,10).replace(/-/g,'');
     const fileName = `${activador}_${fechaStr}_evento.json`;
 
-    // Preparar metadata para Drive
-    const metadata = {
-      name: fileName,
-      parents: [FOLDER_ID],
-      mimeType: 'application/json'
-    };
-
+    // Convertir a base64 y enviar al Apps Script
+    const base64Data = await blobToBase64(blob);
     const formData = new FormData();
-    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    formData.append('file', blob);
+    formData.append('data', base64Data);
+    formData.append('name', fileName);
 
-    // Subida a Drive (comentada si no hay token válido)
-    /*
-    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
-      body: formData
-    });
-    const data = await res.json();
-    */
+    const res = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
+    const textoRes = await res.text();
 
-    // Mostrar mensaje de confirmación
-    const info = document.getElementById('infoAdmin');
+    const info = document.getElementById('infoAdmin'); 
     info.style.display = 'block';
-    info.textContent = `✅ JSON generado: ${fileName} (subida a Drive lista, requiere token válido)`;
+    info.textContent = textoRes;
 
   } catch(err) {
     console.error(err);
-    alert("Error al procesar los archivos ADIF");
+    alert("❌ Error al procesar los archivos ADIF");
   }
 }
 </script>
 </body>
 </html>
+
 
