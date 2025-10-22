@@ -95,6 +95,13 @@ function generarQSL(activador, contacto) {
 // 🧩 Ver QSLs del visitante
 async function verQSL() {
   const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
+ // Registrar visita en el Apps Script
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tipo: "visita", call: sdVisitante })
+  }).catch(err => console.error("Error registrando visita:", err));
+ 
   if (!sdVisitante) return alert("Ingrese su SD");
 
   const container = document.getElementById('qslContainer');
@@ -147,3 +154,4 @@ async function descargarTodas() {
 
 </body>
 </html>
+
