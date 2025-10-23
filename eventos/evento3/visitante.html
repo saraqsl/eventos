@@ -97,14 +97,6 @@ async function verQSL() {
   const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
   if (!sdVisitante) return alert("Ingrese su SD");
 
-  // Registrar la visita en Google Sheets
-  fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ tipo: "visita", call: sdVisitante })
-  }).then(r => r.text()).then(console.log).catch(console.error);
-
-
   const container = document.getElementById('qslContainer');
   container.innerHTML = "Cargando...";
   canvasesGenerados = [];
@@ -155,5 +147,3 @@ async function descargarTodas() {
 
 </body>
 </html>
-
-
