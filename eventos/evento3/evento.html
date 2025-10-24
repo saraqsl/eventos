@@ -24,7 +24,6 @@ h1 {
   max-width: 900px;
 }
 
-/* 🔰 Loguito oculto (botón activador) */
 #btnActivador {
   position: absolute;
   top: -10px;
@@ -34,21 +33,11 @@ h1 {
   background: transparent;
   border: none;
   cursor: pointer;
-  opacity: 0.20; /* casi invisible */
+  opacity: 0.20;
   transition: opacity 0.3s;
 }
-#btnActivador:hover {
-  opacity: 1; /* aparece si alguien pasa el mouse */
-  transform: scale(1.1);
-}
-
-/* Imagen del logo */
-#btnActivador img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
+#btnActivador:hover { opacity: 1; transform: scale(1.1); }
+#btnActivador img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
 .card {
   background: white;
@@ -72,33 +61,71 @@ a.button {
   text-align: center;
 }
 a.button:hover { background:#0056b3; }
+
+#mensajeEvento {
+  margin-top: 10px;
+  background: #1e2b1e;
+  color: #b7c9a6;
+  border: 2px solid #4a5b3f;
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 600px;
+  width: 90%;
+  font-family: "Courier New", monospace;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+}
+.mensaje-header {
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px dashed #4a5b3f;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  color: #d1d8c4;
+}
+.mensaje-contenido {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.4;
+}
 </style>
 </head>
 <body>
 
 <h1>
-  QSL SARA Armada Argentina – XXI JUEGOS OLIMPICOS Y PARALIMPICOS PARA
-  VETERANOS DE GUERRA EN MALVINAS
-  <!-- 🛡️ Loguito oculto -->
+  sin definir
   <button id="btnActivador" title="Panel Activador" onclick="abrirActivador()">
     <img src="candado.png" alt="Activador">
   </button>
 </h1>
 
-<!-- VISITANTE -->
 <div id="visitante" class="card">
   <h2>Visitante</h2>
   <p>Ver tus QSL desde la carpeta del evento:</p>
-  <a href="visitante.html" class="button">
-    🔎 Ver QSL como visitante
-  </a>
+  <a href="visitante.html" class="button">🔎 Ver QSL como visitante</a>
+</div>
+
+<div id="mensajeEvento">
+  <div class="mensaje-header">MENSAJE NAVAL DE SERVICIO</div>
+  <pre id="contenidoMensaje" class="mensaje-contenido">Cargando mensaje...</pre>
 </div>
 
 <script>
 function abrirActivador() {
   window.location.href = "cargar_adif.html";
 }
+
+// Cargar mensaje desde archivo local (mensaje.txt)
+fetch("mensaje.txt")
+  .then(r => r.text())
+  .then(t => {
+    document.getElementById("contenidoMensaje").textContent = t;
+  })
+  .catch(err => {
+    document.getElementById("contenidoMensaje").textContent =
+      "No se pudo cargar el mensaje naval.";
+  });
 </script>
 
 </body>
 </html>
+

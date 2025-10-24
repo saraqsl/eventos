@@ -1,0 +1,9 @@
+DE: 
+A: TODOS LOS OPERADORES
+BT
+
+TAREA A REALIZAR:
+Contactar con la estación
+BT
+FIN MENSAJE
+AR
