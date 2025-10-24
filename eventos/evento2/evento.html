@@ -38,11 +38,9 @@ h1 {
   transition: opacity 0.3s;
 }
 #btnActivador:hover {
-  opacity: 1; /* aparece si alguien pasa el mouse */
+  opacity: 1;
   transform: scale(1.1);
 }
-
-/* Imagen del logo */
 #btnActivador img {
   width: 100%;
   height: 100%;
@@ -72,12 +70,39 @@ a.button {
   text-align: center;
 }
 a.button:hover { background:#0056b3; }
+
+/* 🪖 Recuadro estilo mensaje naval */
+#mensajeEvento {
+  margin-top: 10px;
+  background: #1e2b1e;
+  color: #b7c9a6;
+  border: 2px solid #4a5b3f;
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 600px;
+  width: 90%;
+  font-family: "Courier New", monospace;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+}
+.mensaje-header {
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px dashed #4a5b3f;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  color: #d1d8c4;
+}
+.mensaje-contenido {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.4;
+}
 </style>
 </head>
 <body>
 
 <h1>
-  QSL ALUSIVA
+ QSL ALUSIVA
 JORNADA DE PUERTAS ABIERTAS
 BASE AERONAVAL ALTE MARCOS ZAR TRELEW
   <!-- 🛡️ Loguito oculto -->
@@ -95,6 +120,30 @@ BASE AERONAVAL ALTE MARCOS ZAR TRELEW
   </a>
 </div>
 
+<!-- 🪖 Mensaje naval -->
+<div id="mensajeEvento">
+  <div class="mensaje-header">MENSAJE NAVAL DE SERVICIO</div>
+  <pre class="mensaje-contenido">
+DE: LU7HW
+A: TODOS LOS OPERADORES
+BT
+FECHA
+Desde las 08:00 UTC (11:00 LU) del día 09/11/2025 hasta las 15:00UTC (18:00 LU) del
+día 09/11 /2025
+BANDAS
+40 – 20 – 10 Mt
+MODO
+SSB CW
+ESTACIÓN AUTORIZADA
+LU7WH (Estación Principal de Comunicaciones)
+TAREA A REALIZAR:
+Contactar con la estación LU7WH
+BT
+FIN MENSAJE
+AR
+  </pre>
+</div>
+
 <script>
 function abrirActivador() {
   window.location.href = "cargar_adif.html";
@@ -102,5 +151,4 @@ function abrirActivador() {
 </script>
 
 </body>
-
 </html>
