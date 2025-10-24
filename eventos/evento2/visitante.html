@@ -54,7 +54,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbysRnXsh6QUwgGlIPltyj8E
 const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
 let canvasesGenerados = [];
 
-// 🧩 Generar QSL en canvas (dos líneas con fondo semitransparente, negrita)
+// 🧩 Generar QSL en canvas (renglones verticales, negrita)
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
@@ -69,7 +69,7 @@ function generarQSL(activador, contacto) {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // Activador destacado (arriba)
-      ctx.font = 'bold 60px "Black Ops One", monospace';
+      ctx.font = 'bold 80px "Black Ops One", monospace';
       ctx.fillStyle = '#0033cc';
       ctx.textAlign = 'left';
       ctx.fillText(activador, 25, 60);
@@ -79,7 +79,7 @@ function generarQSL(activador, contacto) {
       ctx.fillStyle = '#000';
       ctx.textAlign = 'left';
       const startX = 40; // margen izquierdo
-      let y = 220;       // posición inicial en vertical
+      let y = 420;       // posición inicial en vertical
       const lineHeight = 28; // espacio entre renglones
 
       ctx.fillText(`CALL: ${contacto.call}`, startX, y); y += lineHeight;
@@ -153,6 +153,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
