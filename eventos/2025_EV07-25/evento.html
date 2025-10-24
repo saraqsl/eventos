@@ -24,7 +24,6 @@ h1 {
   max-width: 900px;
 }
 
-/* 🔰 Loguito oculto (botón activador) */
 #btnActivador {
   position: absolute;
   top: -10px;
@@ -34,19 +33,11 @@ h1 {
   background: transparent;
   border: none;
   cursor: pointer;
-  opacity: 0.20; /* casi invisible */
+  opacity: 0.20;
   transition: opacity 0.3s;
 }
-#btnActivador:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-#btnActivador img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
+#btnActivador:hover { opacity: 1; transform: scale(1.1); }
+#btnActivador img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
 .card {
   background: white;
@@ -71,7 +62,6 @@ a.button {
 }
 a.button:hover { background:#0056b3; }
 
-/* 🪖 Recuadro estilo mensaje naval */
 #mensajeEvento {
   margin-top: 10px;
   background: #1e2b1e;
@@ -104,48 +94,39 @@ a.button:hover { background:#0056b3; }
 <h1>
   QSL SARA Armada Argentina – XXI JUEGOS OLIMPICOS Y PARALIMPICOS PARA
   VETERANOS DE GUERRA EN MALVINAS
-  <!-- 🛡️ Loguito oculto -->
   <button id="btnActivador" title="Panel Activador" onclick="abrirActivador()">
     <img src="candado.png" alt="Activador">
   </button>
 </h1>
 
-<!-- VISITANTE -->
 <div id="visitante" class="card">
   <h2>Visitante</h2>
   <p>Ver tus QSL desde la carpeta del evento:</p>
-  <a href="visitante.html" class="button">
-    🔎 Ver QSL como visitante
-  </a>
+  <a href="visitante.html" class="button">🔎 Ver QSL como visitante</a>
 </div>
 
-<!-- 🪖 Mensaje naval -->
 <div id="mensajeEvento">
   <div class="mensaje-header">MENSAJE NAVAL DE SERVICIO</div>
-  <pre class="mensaje-contenido">
-DE: BASE EV07-25
-A: TODOS LOS OPERADORES
-BT
-SE AUTORIZA LA DESCARGA DE QSL DESDE EL SISTEMA EN LÍNEA.
-OLIMPIADAS '25 - Punta Alta SE HIZO REALIDAD ¡¡¡ PUNTA ALTA ES OLIMPICA 
-    ¡¡¡ CON EL CORAZON Y LOS BRAZOS ABIERTOS RECIBIREMOS A TODAS LAS DELEGACIONES 
-    QUE QUIERAN PASARLA BIEN ... EN ESTO QUE CON GRAN ESFUERZO LOGRAMOS LLEGAR .... 
-    A LOS XXI JUEGOS OLIMPICOS Y PARALIMPICOS PARA VETERANOS DE GUERRA EN MALVINAS ... 
-    CON 23 DISCIPLINAS A DISPUTAR, CON ATENCION MEDICA CON AMBULANCIAS DE 5ta. GENERACION 
-    DESDE EL PAMI, PARA NUESTRO RESGUARDO Y POR PARTE DE LA ARMADA ARGENTINA CON SU PARTICIPACION
-    OTORGANDONOS LOS ESCENARIOS DEPORTIVOS DE SU BASE NAVAL ....
-    SE REALIZARAN DEL 1° AL 8 DE NOV '25 .- A TODOS >>>>>>>>> MUCHAS GRACIAS ¡¡¡ COMITE OLIMPICO
-BT
-FIN MENSAJE
-AR
-  </pre>
+  <pre id="contenidoMensaje" class="mensaje-contenido">Cargando mensaje...</pre>
 </div>
 
 <script>
 function abrirActivador() {
   window.location.href = "cargar_adif.html";
 }
+
+// Cargar mensaje desde archivo local (mensaje.txt)
+fetch("mensaje.txt")
+  .then(r => r.text())
+  .then(t => {
+    document.getElementById("contenidoMensaje").textContent = t;
+  })
+  .catch(err => {
+    document.getElementById("contenidoMensaje").textContent =
+      "No se pudo cargar el mensaje naval.";
+  });
 </script>
 
 </body>
 </html>
+
