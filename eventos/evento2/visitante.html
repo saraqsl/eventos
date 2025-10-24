@@ -65,36 +65,28 @@ function generarQSL(activador, contacto) {
     const img = new Image();
     img.src = IMG_QSL;
     img.onload = () => {
-      // Dibujar fondo
+      // Fondo
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // SD principal (activador) a la izquierda
-      ctx.font = 'bold 52px Arial';
-      ctx.fillStyle = 'red';
+      // Activador destacado (arriba)
+      ctx.font = 'bold 34px "Black Ops One", monospace';
+      ctx.fillStyle = '#0033cc';
       ctx.textAlign = 'left';
-      ctx.fillText(activador, 20, 70);
+      ctx.fillText(activador, 25, 60);
 
-      // Datos del contacto en dos líneas, centrados abajo
-      ctx.font = 'bold 20px Arial';
-      ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
-      const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
-      const linea2 = `Hora: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
+      // Datos del contacto (vertical tipo columna)
+      ctx.font = 'bold 18px "Courier New", monospace';
+      ctx.fillStyle = '#000';
+      ctx.textAlign = 'left';
+      const startX = 40; // margen izquierdo
+      let y = 120;       // posición inicial en vertical
+      const lineHeight = 28; // espacio entre renglones
 
-      // Calcular posición del rectángulo semitransparente
-      const rectWidth = canvas.width - 40; // margen de 20px a cada lado
-      const rectHeight = 50;
-      const rectX = 20;
-      const rectY = canvas.height - 65; // un poquito arriba del borde
-
-      // Dibujar rectángulo semitransparente
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // blanco con opacidad
-      ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
-
-      // Dibujar texto encima del rectángulo
-      ctx.fillStyle = 'black';
-      ctx.fillText(linea1, canvas.width / 2, canvas.height - 50);
-      ctx.fillText(linea2, canvas.width / 2, canvas.height - 25);
+      ctx.fillText(`CALL: ${contacto.call}`, startX, y); y += lineHeight;
+      ctx.fillText(`FECHA: ${contacto.date}`, startX, y); y += lineHeight;
+      ctx.fillText(`HORA UTC: ${contacto.time}`, startX, y); y += lineHeight;
+      ctx.fillText(`BANDA: ${contacto.band}`, startX, y); y += lineHeight;
+      ctx.fillText(`MODO: ${contacto.mode}`, startX, y);
 
       document.getElementById('qslContainer').appendChild(canvas);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
@@ -161,6 +153,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
