@@ -69,7 +69,7 @@ function generarQSL(activador, contacto) {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // Activador destacado (arriba)
-      ctx.font = 'bold 80px "Black Ops One", monospace';
+      ctx.font = 'bold 70px "Black Ops One", monospace';
       ctx.fillStyle = '#0033cc';
       ctx.textAlign = 'left';
       ctx.fillText(activador, 25, 60);
@@ -79,7 +79,7 @@ function generarQSL(activador, contacto) {
       ctx.fillStyle = '#000';
       ctx.textAlign = 'left';
       const startX = 40; // margen izquierdo
-      let y = 420;       // posición inicial en vertical
+      let y = 220;       // posición inicial en vertical
       const lineHeight = 28; // espacio entre renglones
 
       ctx.fillText(`CALL: ${contacto.call}`, startX, y); y += lineHeight;
@@ -153,6 +153,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
