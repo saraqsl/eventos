@@ -14,7 +14,42 @@ body {
   margin: 0;
   padding: 0;
 }
-h1 { margin-top: 20px; color: #333; }
+
+h1 {
+  margin-top: 20px;
+  color: #333;
+  position: relative;
+  text-align: center;
+  width: 90%;
+  max-width: 900px;
+}
+
+/* 🔰 Loguito oculto (botón activador) */
+#btnActivador {
+  position: absolute;
+  top: -10px;
+  right: -50px;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.15; /* casi invisible */
+  transition: opacity 0.3s;
+}
+#btnActivador:hover {
+  opacity: 1; /* aparece si alguien pasa el mouse */
+  transform: scale(1.1);
+}
+
+/* Imagen del logo */
+#btnActivador img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .card {
   background: white;
   border-radius: 12px;
@@ -25,6 +60,7 @@ h1 { margin-top: 20px; color: #333; }
   max-width: 500px;
 }
 #visitante { border-left: 5px solid #007bff; }
+
 a.button {
   display:inline-block;
   padding:10px 20px;
@@ -40,8 +76,14 @@ a.button:hover { background:#0056b3; }
 </head>
 <body>
 
-<h1>QSL SARA Armada Argentina – XXI JUEGOS OLIMPICOS Y PARALIMPICOS 
- PARA VETERANOS DE GUERRA EN MALVINAS</h1>
+<h1>
+  QSL SARA Armada Argentina – XXI JUEGOS OLIMPICOS Y PARALIMPICOS PARA
+  VETERANOS DE GUERRA EN MALVINAS
+  <!-- 🛡️ Loguito oculto -->
+  <button id="btnActivador" title="Panel Activador" onclick="abrirActivador()">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Coat_of_arms_of_the_Argentine_Navy.svg/240px-Coat_of_arms_of_the_Argentine_Navy.svg.png" alt="Activador">
+  </button>
+</h1>
 
 <!-- VISITANTE -->
 <div id="visitante" class="card">
@@ -52,14 +94,11 @@ a.button:hover { background:#0056b3; }
   </a>
 </div>
 
-<!-- 🔒 BOTÓN PARA ACTIVADOR -->
-<div class="card">
-  <p style="text-align:center;">
-    <a href="cargar_adif.html" style="display:inline-block;padding:10px 20px;background:#28a745;color:white;border-radius:6px;text-decoration:none;">
-      🔑 Panel Activador
-    </a>
-  </p>
-</div>
+<script>
+function abrirActivador() {
+  window.location.href = "cargar_adif.html";
+}
+</script>
 
 </body>
 </html>
