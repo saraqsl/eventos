@@ -42,8 +42,12 @@ canvas {
   border: 2px solid #003366; 
   display: block;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  width: 100%;          /* 🔹 se adapta al ancho disponible */
+  max-width: 530px;     /* 🔹 nunca más grande que su tamaño real */
+  height: auto;         /* 🔹 mantiene proporción */
 }
 </style>
+
 </head>
 <body>
 
@@ -167,5 +171,6 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
