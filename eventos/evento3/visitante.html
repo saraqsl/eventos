@@ -6,15 +6,20 @@
 <title>Ver QSL – EV07-25</title>
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #eef2f5;
+  font-family: "Courier New", monospace;
+  background: #e5ebf0;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0;
   padding: 20px;
 }
-h1 { color: #333; }
+h1 {
+  color: #002b5c;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 input, button {
   padding: 8px;
   margin: 6px 0;
@@ -22,24 +27,27 @@ input, button {
   border: 1px solid #ccc;
   width: 80%;
   max-width: 300px;
+  font-family: "Courier New", monospace;
 }
 button {
   cursor: pointer;
-  background: #007bff;
+  background: #003366;
   color: white;
   border: none;
+  text-transform: uppercase;
 }
 button:hover { background: #0056b3; }
 canvas { 
   margin-top: 20px; 
-  border: 1px solid #ccc; 
+  border: 2px solid #003366; 
   display: block;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
 }
 </style>
 </head>
 <body>
 
-<h1>🔎 Ver QSL – EV07-25</h1>
+<h1>📡 MENSAJE DE RADIO – EV07-25</h1>
 
 <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
 <button onclick="verQSL()">Ver mis QSLs</button>
@@ -50,38 +58,52 @@ canvas {
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzj-2MqYOph8tBrj4M2mg0L4-omSiijacWzX-xP_3M763vdWxGtID05CR0RertnOweYKg/exec";
-const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
+const API_URL = "https://script.google.com/macros/s/AKfycbysRnXsh6QUwgGlIPltyj8EnoeQTtoNnx3fe1Mf5hwQcWQp3m5P8ZSRUKKn-lw1Zy30Vg/exec";
+const IMG_QSL = "qsl.jpg"; // fondo de la tarjeta
 let canvasesGenerados = [];
 
-// 🧩 Generar QSL en canvas (dos líneas de datos, negrita)
+// 🧩 Generar QSL estilo militar/naval
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
-    canvas.width = 600;
-    canvas.height = 400;
+    canvas.width = 530;  // 14 cm aprox.
+    canvas.height = 340; // 9 cm aprox.
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
     img.src = IMG_QSL;
     img.onload = () => {
-      // Dibujar fondo
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Fondo centrado sin deformar
+      const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
+      const newWidth = img.width * ratio;
+      const newHeight = img.height * ratio;
+      const offsetX = (canvas.width - newWidth) / 2;
+      const offsetY = (canvas.height - newHeight) / 2;
+      ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 
-      // SD principal (activador) a la izquierda
-      ctx.font = 'bold 36px Arial';
-      ctx.fillStyle = 'red';
+      // Encabezado militar
+      ctx.fillStyle = '#001a33';
+      ctx.font = 'bold 26px "Courier New", monospace';
       ctx.textAlign = 'left';
-      ctx.fillText(activador, 20, 70);
+      ctx.fillText(`DE ${activador}`, 25, 40);
+      ctx.fillText(`A ${contacto.call}`, 25, 70);
+      ctx.fillText(`BT`, 25, 100);
 
-      // Datos del contacto en dos líneas, centrados abajo
-      ctx.font = 'bold 20px Arial';
-      ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
-      const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
-      const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
-      ctx.fillText(linea1, canvas.width / 2, canvas.height - 60);
-      ctx.fillText(linea2, canvas.width / 2, canvas.height - 30);
+      // Datos de contacto vertical tipo telegrama
+      ctx.font = 'bold 18px "Courier New", monospace';
+      ctx.fillStyle = '#003300';
+      let y = 140;
+      const lineHeight = 24;
+      ctx.fillText(`FECHA: ${contacto.date}`, 25, y); y += lineHeight;
+      ctx.fillText(`HORA UTC: ${contacto.time}`, 25, y); y += lineHeight;
+      ctx.fillText(`BANDA: ${contacto.band}`, 25, y); y += lineHeight;
+      ctx.fillText(`MODO: ${contacto.mode}`, 25, y); y += lineHeight;
+
+      // Mensaje final estilo naval
+      ctx.fillStyle = '#001a33';
+      ctx.font = 'bold 22px "Courier New", monospace';
+      ctx.fillText(`BT`, 25, y + 25);
+      ctx.fillText(`FIN MENSAJE`, 25, y + 55);
 
       document.getElementById('qslContainer').appendChild(canvas);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
@@ -89,8 +111,6 @@ function generarQSL(activador, contacto) {
     };
   });
 }
-
-
 
 // 🧩 Ver QSLs del visitante
 async function verQSL() {
@@ -147,3 +167,4 @@ async function descargarTodas() {
 
 </body>
 </html>
+
