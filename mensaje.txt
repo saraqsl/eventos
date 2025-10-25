@@ -1,10 +1,13 @@
-DE: 
-A: TODOS LOS OPERADORES
+DE: SARA eventos
+A: TODOS LOS OPERADORES Radioaficinados 
 BT
-
+Gracias por utilizar la paltaforma para descargar sus qsl , 
+creada por integrantes voluntarios para brindar servicio a las actividades 
+radiales 73 y buenos contactos 
 TAREA A REALIZAR:
-Contactar con la estación
+dibertirse contactar y pasarla bien 
 BT
 FIN MENSAJE
 AR
+
 
