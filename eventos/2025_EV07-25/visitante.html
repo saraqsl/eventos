@@ -35,6 +35,7 @@ button {
   color: white;
   border: none;
   text-transform: uppercase;
+  transition: 0.2s;
 }
 button:hover { background: #0056b3; }
 canvas { 
@@ -42,9 +43,17 @@ canvas {
   border: 2px solid #003366; 
   display: block;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-  width: 100%;          /* 🔹 se adapta al ancho disponible */
-  max-width: 530px;     /* 🔹 nunca más grande que su tamaño real */
-  height: auto;         /* 🔹 mantiene proporción */
+  width: 100%;
+  max-width: 530px;
+  height: auto;
+}
+#accionesDescarga {
+  display: none;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
 }
 </style>
 </head>
@@ -54,7 +63,12 @@ canvas {
 
 <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
 <button onclick="verQSL()">Ver mis QSLs</button>
-<button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas</button>
+
+<div id="accionesDescarga">
+  <button onclick="descargarTodas()">📦 Descargar ZIP</button>
+  <button onclick="descargarActual()">🖼️ Descargar imagen</button>
+  <button onclick="copiarActual()">📋 Copiar imagen</button>
+</div>
 
 <div id="qslContainer"></div>
 
@@ -62,7 +76,7 @@ canvas {
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwGheoFenZr8EfbrZ3H2SNwHX0lgKe45xF_3WIQ-0FL1Q5qc03H_2onSTlD76RHmFxMUA/exec";
-const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
+const IMG_QSL = "qsl.jpg"; 
 let canvasesGenerados = [];
 
 // 🧩 Generar QSL en canvas (dos líneas de datos, negrita)
@@ -76,16 +90,16 @@ function generarQSL(activador, contacto) {
     const img = new Image();
     img.src = IMG_QSL;
     img.onload = () => {
-      // Dibujar fondo
+      // Fondo
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // SD principal (activador) a la izquierda
+      // Activador a la izquierda
       ctx.font = 'bold 36px Arial';
       ctx.fillStyle = 'red';
       ctx.textAlign = 'left';
       ctx.fillText(activador, 20, 70);
 
-      // Datos del contacto en dos líneas, centrados abajo
+      // Datos abajo en dos líneas centradas
       ctx.font = 'bold 20px Arial';
       ctx.fillStyle = 'black';
       ctx.textAlign = 'center';
@@ -101,8 +115,6 @@ function generarQSL(activador, contacto) {
   });
 }
 
-
-
 // 🧩 Ver QSLs del visitante
 async function verQSL() {
   const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
@@ -111,7 +123,7 @@ async function verQSL() {
   const container = document.getElementById('qslContainer');
   container.innerHTML = "Cargando...";
   canvasesGenerados = [];
-  document.getElementById('btnDescargarTodas').style.display = 'none';
+  document.getElementById('accionesDescarga').style.display = 'none';
 
   try {
     const res = await fetch(API_URL);
@@ -130,7 +142,7 @@ async function verQSL() {
     if (encontrados === 0) {
       container.textContent = "No se encontraron QSLs para este SD.";
     } else {
-      document.getElementById('btnDescargarTodas').style.display = 'inline-block';
+      document.getElementById('accionesDescarga').style.display = 'flex';
     }
 
   } catch (err) {
@@ -139,7 +151,7 @@ async function verQSL() {
   }
 }
 
-// 🧩 Descargar todas las QSLs como ZIP
+// 📦 Descargar todas las QSLs como ZIP
 async function descargarTodas() {
   if (!canvasesGenerados.length) return;
   const zip = new JSZip();
@@ -154,16 +166,31 @@ async function descargarTodas() {
   link.download = 'mis_qsls.zip';
   link.click();
 }
+
+// 🖼️ Descargar imagen actual (JPG por defecto)
+function descargarActual(formato = 'jpg') {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const tipo = formato === 'png' ? 'image/png' : 'image/jpeg';
+  const nombre = `mi_qsl.${formato}`;
+  const link = document.createElement('a');
+  link.download = nombre;
+  link.href = canvas.toDataURL(tipo, 0.92);
+  link.click();
+}
+
+// 📋 Copiar imagen al portapapeles
+async function copiarActual() {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+  alert('📋 Imagen copiada al portapapeles');
+}
 </script>
 
 </body>
 </html>
 
-
-
-
-
-
-
-
+  
 
