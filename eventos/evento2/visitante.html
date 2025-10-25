@@ -35,6 +35,7 @@ button {
   color: white;
   border: none;
   text-transform: uppercase;
+  transition: 0.2s;
 }
 button:hover { background: #0056b3; }
 canvas { 
@@ -42,20 +43,31 @@ canvas {
   border: 2px solid #003366; 
   display: block;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-  width: 100%;          /* 🔹 se adapta al ancho disponible */
-  max-width: 530px;     /* 🔹 nunca más grande que su tamaño real */
-  height: auto;         /* 🔹 mantiene proporción */
+  width: 100%;
+  max-width: 530px;
+  height: auto;
+}
+#accionesDescarga {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
 }
 </style>
-
 </head>
 <body>
 
-<h1>🔎 Ver QSL con la estación LU7WH </h1>
+<h1>🔎 Ver QSL con la estación LU7WH</h1>
 
 <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
 <button onclick="verQSL()">Ver mis QSLs</button>
-<button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas</button>
+
+<div id="accionesDescarga" style="display:none;">
+  <button onclick="descargarTodas()">📦 Descargar ZIP</button>
+  <button onclick="descargarActual()">🖼️ Descargar imagen</button>
+  <button onclick="copiarActual()">📋 Copiar imagen</button>
+</div>
 
 <div id="qslContainer"></div>
 
@@ -66,10 +78,10 @@ const API_URL = "https://script.google.com/macros/s/AKfycbysRnXsh6QUwgGlIPltyj8E
 const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
 let canvasesGenerados = [];
 
-// 🧩 Generar QSL en canvas (renglones verticales, negrita)
+// 🧩 Generar QSL (vertical, con texto destacado)
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
-   const canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = 600;
     canvas.height = 400;
     const ctx = canvas.getContext('2d');
@@ -77,39 +89,45 @@ function generarQSL(activador, contacto) {
     const img = new Image();
     img.src = IMG_QSL;
     img.onload = () => {
-
       // Fondo
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // Activador destacado (arriba)
-      ctx.font = 'bold 70px "times new roman", monospace';
+      // Activador destacado
+      ctx.font = 'bold 70px "Times New Roman", monospace';
       ctx.fillStyle = '#0033cc';
       ctx.textAlign = 'left';
       ctx.fillText(activador, 25, 60);
 
-      // Datos del contacto (vertical tipo columna)
-      ctx.font = 'bold 18px "arial blak", monospace';
+      // Datos verticales
+      ctx.font = 'bold 18px "Arial Black", monospace';
       ctx.fillStyle = '#00B0F0';
       ctx.textAlign = 'left';
-      const startX = 38; // margen izquierdo
-      let y = 180;       // posición inicial en vertical
-      const lineHeight = 25; // espacio entre renglones
+      const startX = 38;
+      let y = 180;
+      const lineHeight = 25;
 
-      ctx.fillText(`CALL: ${contacto.call}`, startX, y); y += lineHeight;
-      ctx.fillText(`FECHA: ${contacto.date}`, startX, y); y += lineHeight;
-      ctx.fillText(`HORA UTC: ${contacto.time}`, startX, y); y += lineHeight;
-      ctx.fillText(`BANDA: ${contacto.band}`, startX, y); y += lineHeight;
-      ctx.fillText(`MODO: ${contacto.mode}`, startX, y);
-      
+      const datos = [
+        `CALL: ${contacto.call}`,
+        `FECHA: ${contacto.date}`,
+        `HORA UTC: ${contacto.time}`,
+        `BANDA: ${contacto.band}`,
+        `MODO: ${contacto.mode}`
+      ];
+
+      datos.forEach((linea) => {
+        ctx.strokeStyle = 'black';   // contorno
+        ctx.lineWidth = 3;
+        ctx.strokeText(linea, startX, y);
+        ctx.fillText(linea, startX, y);
+        y += lineHeight;
+      });
+
       document.getElementById('qslContainer').appendChild(canvas);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
       resolve();
     };
   });
 }
-
-
-
 
 // 🧩 Ver QSLs del visitante
 async function verQSL() {
@@ -119,7 +137,7 @@ async function verQSL() {
   const container = document.getElementById('qslContainer');
   container.innerHTML = "Cargando...";
   canvasesGenerados = [];
-  document.getElementById('btnDescargarTodas').style.display = 'none';
+  document.getElementById('accionesDescarga').style.display = 'none';
 
   try {
     const res = await fetch(API_URL);
@@ -138,7 +156,7 @@ async function verQSL() {
     if (encontrados === 0) {
       container.textContent = "No se encontraron QSLs para este SD.";
     } else {
-      document.getElementById('btnDescargarTodas').style.display = 'inline-block';
+      document.getElementById('accionesDescarga').style.display = 'flex';
     }
 
   } catch (err) {
@@ -147,20 +165,43 @@ async function verQSL() {
   }
 }
 
-// 🧩 Descargar todas las QSLs como ZIP
+// 📦 Descargar todas las QSLs como ZIP (PNG)
 async function descargarTodas() {
   if (!canvasesGenerados.length) return;
   const zip = new JSZip();
+
   canvasesGenerados.forEach((c) => {
     const dataUrl = c.canvas.toDataURL('image/png');
     const base64 = dataUrl.split(',')[1];
     zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
   });
+
   const content = await zip.generateAsync({type:"blob"});
   const link = document.createElement('a');
   link.href = URL.createObjectURL(content);
   link.download = 'mis_qsls.zip';
   link.click();
+}
+
+// 🖼️ Descargar imagen actual (JPG o PNG)
+function descargarActual(formato = 'jpg') {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const tipo = formato === 'png' ? 'image/png' : 'image/jpeg';
+  const nombre = `mi_qsl.${formato}`;
+  const link = document.createElement('a');
+  link.download = nombre;
+  link.href = canvas.toDataURL(tipo, 0.92);
+  link.click();
+}
+
+// 📋 Copiar imagen actual al portapapeles
+async function copiarActual() {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+  alert('📋 Imagen copiada al portapapeles');
 }
 </script>
 
