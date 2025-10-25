@@ -98,46 +98,26 @@ footer {
 <main>
 
   <section>
-    <h2>1️⃣ Olimpiadas VGM CMM  certificado alegorico ” <span class="badge">Próximamente</span></h2>
-    <ul>
-      <li>Duración: 01 noviembre de 2025 al 08 noviembre 2025 .</li>
-      <li>Objetivo: fomentar la participación de estaciones LU en actividades conmemorativas nacionales.</li>
-      <li>Modalidad: todas las bandas autorizadas, fonía y digital.</li>
-      <li>sescarga QSLs: en el enlace oficial del evento.</li>
-      <li>OLIMPIADAS '25 - Punta Alta
-SE HIZO REALIDAD ¡¡¡ PUNTA ALTA ES OLIMPICA ¡¡¡ CON EL CORAZON Y LOS BRAZOS ABIERTOS RECIBIREMOS A TODAS LAS
-        DELEGACIONES QUE QUIERAN PASARLA BIEN ... EN ESTO QUE CON GRAN ESFUERZO LOGRAMOS LLEGAR .... 
-        A LOS XXI JUEGOS OLIMPICOS Y PARALIMPICOS PARA VETERANOS DE GUERRA EN MALVINAS ... 
-        CON 23 DISCIPLINAS A DISPUTAR, CON ATENCION MEDICA CON AMBULANCIAS DE 5ta. 
-        GENERACION DESDE EL PAMI, PARA NUESTRO RESGUARDO Y POR PARTE DE LA ARMADA ARGENTINA CON SU PARTICIPACION 
-        OTORGANDONOS LOS ESCENARIOS DEPORTIVOS DE SU BASE NAVAL ....
-        SE REALIZARAN DEL 1° AL 8 DE NOV '25 .- A TODOS >>>>>>>>> MUCHAS GRACIAS ¡¡¡ COMITE OLIMPICO
+    <div id="mensajeEvento">
+  <div class="mensaje-header">MENSAJE NAVAL DE SERVICIO</div>
+  <pre id="contenidoMensaje" class="mensaje-contenido">Cargando mensaje...</pre>
+</div>
 
- </li>
-    </ul>
-  </section>
+<script>
+function abrirActivador() {
+  window.location.href = "cargar_adif.html";
+}
 
-  <section>
-    <h2>2️⃣ QSL “Malvinas 2026” <span class="badge">Próximamente</span></h2>
-    <ul>
-      <li>Duración: 10 al 15 de marzo de 2026.</li>
-      <li>Tema: homenaje a los héroes de Malvinas y la soberanía nacional.</li>
-      <li>Participación: abierta a radioaficionados nacionales e internacionales.</li>
-      <li>QSL conmemorativa enviada en formato digital.</li>
-      <li>Reglamento completo disponible al inicio del certamen.</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>3️⃣ Día de la Armada Argentina <span class="badge">Planificado</span></h2>
-    <ul>
-      <li>Fecha: 2 de febrero de 2026.</li>
-      <li>Evento conmemorativo de la creación de la Armada Argentina.</li>
-      <li>Actividades coordinadas desde las bases navales y centros SARA.</li>
-      <li>Confirmación vía QSL digital en portal oficial.</li>
-      <li>Más detalles serán anunciados en enero 2026.</li>
-    </ul>
-  </section>
+// Cargar mensaje desde archivo local (mensaje.txt)
+fetch("mensaje.txt")
+  .then(r => r.text())
+  .then(t => {
+    document.getElementById("contenidoMensaje").textContent = t;
+  })
+  .catch(err => {
+    document.getElementById("contenidoMensaje").textContent =
+      "No se pudo cargar el mensaje naval.";
+  });
 
   <a href="index.html" class="volver">⬅ Volver al índice</a>
 </main>
@@ -148,6 +128,7 @@ SE HIZO REALIDAD ¡¡¡ PUNTA ALTA ES OLIMPICA ¡¡¡ CON EL CORAZON Y LOS BRAZO
 
 </body>
 </html>
+
 
 
 
