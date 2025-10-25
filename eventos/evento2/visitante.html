@@ -79,7 +79,7 @@ function generarQSL(activador, contacto) {
       ctx.fillStyle = '#00ff00';
       ctx.textAlign = 'left';
       const startX = 38; // margen izquierdo
-      let y = 170;       // posición inicial en vertical
+      let y = 200;       // posición inicial en vertical
       const lineHeight = 25; // espacio entre renglones
 
       ctx.fillText(`CALL: ${contacto.call}`, startX, y); y += lineHeight;
@@ -153,6 +153,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
