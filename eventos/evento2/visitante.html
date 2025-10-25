@@ -87,15 +87,6 @@ function generarQSL(activador, contacto) {
       ctx.fillText(`HORA UTC: ${contacto.time}`, startX, y); y += lineHeight;
       ctx.fillText(`BANDA: ${contacto.band}`, startX, y); y += lineHeight;
       ctx.fillText(`MODO: ${contacto.mode}`, startX, y);
-// Calcular posición del rectángulo semitransparente
-      const rectWidth = canvas.width - 40; // margen de 20px a cada lado
-      const rectHeight = 50;
-      const rectX = 20;
-      const rectY = canvas.height - 65; // un poquito arriba del borde
-
-      // Dibujar rectángulo semitransparente
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // blanco con opacidad
-      ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
       
       document.getElementById('qslContainer').appendChild(canvas);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
@@ -162,6 +153,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
