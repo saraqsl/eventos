@@ -86,6 +86,20 @@ footer {
   font-size:0.8em;
   font-weight:bold;
 }
+.mensaje-header {
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px dashed #8bc34a;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+}
+.mensaje-contenido {
+  background: rgba(0, 20, 0, 0.7);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #8bc34a;
+  white-space: pre-wrap;
+}
 </style>
 </head>
 <body>
@@ -96,28 +110,12 @@ footer {
 </header>
 
 <main>
-
   <section>
     <div id="mensajeEvento">
-  <div class="mensaje-header">MENSAJE NAVAL DE SERVICIO</div>
-  <pre id="contenidoMensaje" class="mensaje-contenido">Cargando mensaje...</pre>
-</div>
-
-<script>
-function abrirActivador() {
-  window.location.href = "cargar_adif.html";
-}
-
-// Cargar mensaje desde archivo local (mensaje.txt)
-fetch("mensaje.txt")
-  .then(r => r.text())
-  .then(t => {
-    document.getElementById("contenidoMensaje").textContent = t;
-  })
-  .catch(err => {
-    document.getElementById("contenidoMensaje").textContent =
-      "No se pudo cargar el mensaje naval.";
-  });
+      <div class="mensaje-header">MENSAJE NAVAL DE SERVICIO</div>
+      <pre id="contenidoMensaje" class="mensaje-contenido">Cargando mensaje...</pre>
+    </div>
+  </section>
 
   <a href="index.html" class="volver">⬅ Volver al índice</a>
 </main>
@@ -126,10 +124,20 @@ fetch("mensaje.txt")
   © 2025 - S.A.R.A | Armada Argentina - Todos los derechos reservados
 </footer>
 
+<script>
+// Cargar mensaje desde archivo local (mensaje.txt)
+fetch("mensaje.txt")
+  .then(r => r.text())
+  .then(t => {
+    document.getElementById("contenidoMensaje").textContent = t;
+  })
+  .catch(err => {
+    document.getElementById("contenidoMensaje").textContent =
+      "⚠️ No se pudo cargar el mensaje naval.";
+  });
+</script>
+
 </body>
 </html>
-
-
-
 
 
