@@ -57,14 +57,25 @@ let canvasesGenerados = [];
 // 🧩 Generar QSL en canvas (renglones verticales, negrita)
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 600;
-    canvas.height = 400;
-    const ctx = canvas.getContext('2d');
+   const canvas = document.createElement('canvas');
+canvas.width = 530;  // 14 cm aprox.
+canvas.height = 340; // 9 cm aprox.
+const ctx = canvas.getContext('2d');
 
-    const img = new Image();
-    img.src = IMG_QSL;
-    img.onload = () => {
+const img = new Image();
+img.src = IMG_QSL;
+img.onload = () => {
+  // Mantener proporción del fondo
+  const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
+  const newWidth = img.width * ratio;
+  const newHeight = img.height * ratio;
+  const offsetX = (canvas.width - newWidth) / 2;
+  const offsetY = (canvas.height - newHeight) / 2;
+  ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+
+  // ... (resto del texto)
+};
+
       // Fondo
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -153,6 +164,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
