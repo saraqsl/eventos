@@ -6,15 +6,20 @@
 <title>Ver QSL – EV07-25</title>
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #eef2f5;
+  font-family: "Courier New", monospace;
+  background: #e5ebf0;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0;
   padding: 20px;
 }
-h1 { color: #333; }
+h1 {
+  color: #002b5c;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 input, button {
   padding: 8px;
   margin: 6px 0;
@@ -22,18 +27,24 @@ input, button {
   border: 1px solid #ccc;
   width: 80%;
   max-width: 300px;
+  font-family: "Courier New", monospace;
 }
 button {
   cursor: pointer;
-  background: #007bff;
+  background: #003366;
   color: white;
   border: none;
+  text-transform: uppercase;
 }
 button:hover { background: #0056b3; }
 canvas { 
   margin-top: 20px; 
-  border: 1px solid #ccc; 
+  border: 2px solid #003366; 
   display: block;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  width: 100%;          /* 🔹 se adapta al ancho disponible */
+  max-width: 530px;     /* 🔹 nunca más grande que su tamaño real */
+  height: auto;         /* 🔹 mantiene proporción */
 }
 </style>
 </head>
@@ -147,6 +158,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
