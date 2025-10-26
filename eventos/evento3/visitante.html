@@ -20,7 +20,7 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-input, button {
+input, button, select {
   padding: 8px;
   margin: 6px 0;
   border-radius: 6px;
@@ -37,17 +37,21 @@ button {
   text-transform: uppercase;
 }
 button:hover { background: #0056b3; }
+select {
+  background: #fff;
+  color: #003366;
+  font-weight: bold;
+}
 canvas { 
   margin-top: 20px; 
   border: 2px solid #003366; 
   display: block;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-  width: 100%;          /* 🔹 se adapta al ancho disponible */
-  max-width: 530px;     /* 🔹 nunca más grande que su tamaño real */
-  height: auto;         /* 🔹 mantiene proporción */
+  width: 100%;
+  max-width: 530px;
+  height: auto;
 }
 </style>
-
 </head>
 <body>
 
@@ -55,7 +59,15 @@ canvas {
 
 <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
 <button onclick="verQSL()">Ver mis QSLs</button>
-<button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas</button>
+
+<select id="modoDescarga">
+  <option value="png">Descargar PNG</option>
+  <option value="jpg">Descargar JPG</option>
+  <option value="copiar">Copiar imagen</option>
+</select>
+
+<button onclick="descargarIndividual()" id="btnDescargarUna" style="display:none;">Guardar / Copiar actual</button>
+<button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas (ZIP)</button>
 
 <div id="qslContainer"></div>
 
@@ -63,21 +75,19 @@ canvas {
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbysRnXsh6QUwgGlIPltyj8EnoeQTtoNnx3fe1Mf5hwQcWQp3m5P8ZSRUKKn-lw1Zy30Vg/exec";
-const IMG_QSL = "qsl.jpg"; // fondo de la tarjeta
+const IMG_QSL = "qsl.jpg";
 let canvasesGenerados = [];
 
 // 🧩 Generar QSL estilo militar/naval
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
-    canvas.width = 530;  // 14 cm aprox.
-    canvas.height = 340; // 9 cm aprox.
+    canvas.width = 530;
+    canvas.height = 340;
     const ctx = canvas.getContext('2d');
-
     const img = new Image();
     img.src = IMG_QSL;
     img.onload = () => {
-      // Fondo centrado sin deformar
       const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
       const newWidth = img.width * ratio;
       const newHeight = img.height * ratio;
@@ -85,7 +95,6 @@ function generarQSL(activador, contacto) {
       const offsetY = (canvas.height - newHeight) / 2;
       ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 
-      // Encabezado militar
       ctx.fillStyle = '#001a33';
       ctx.font = 'bold 36px "Courier New", monospace';
       ctx.textAlign = 'left';
@@ -93,7 +102,6 @@ function generarQSL(activador, contacto) {
       ctx.fillText(`A ${contacto.call}`, 25, 70);
       ctx.fillText(`BT`, 25, 100);
 
-      // Datos de contacto vertical tipo telegrama
       ctx.font = 'bold 18px "Courier New", monospace';
       ctx.fillStyle = '#003300';
       let y = 140;
@@ -103,7 +111,6 @@ function generarQSL(activador, contacto) {
       ctx.fillText(`BANDA: ${contacto.band}`, 25, y); y += lineHeight;
       ctx.fillText(`MODO: ${contacto.mode}`, 25, y); y += lineHeight;
 
-      // Mensaje final estilo naval
       ctx.fillStyle = '#001a33';
       ctx.font = 'bold 22px "Courier New", monospace';
       ctx.fillText(`BT`, 25, y + 25);
@@ -125,30 +132,49 @@ async function verQSL() {
   container.innerHTML = "Cargando...";
   canvasesGenerados = [];
   document.getElementById('btnDescargarTodas').style.display = 'none';
+  document.getElementById('btnDescargarUna').style.display = 'none';
 
   try {
     const res = await fetch(API_URL);
     const allData = await res.json();
-
     container.innerHTML = "";
     let encontrados = 0;
-
     for (const contacto of allData) {
       if (contacto.call === sdVisitante) {
         await generarQSL(contacto.owner, contacto);
         encontrados++;
       }
     }
-
     if (encontrados === 0) {
       container.textContent = "No se encontraron QSLs para este SD.";
     } else {
       document.getElementById('btnDescargarTodas').style.display = 'inline-block';
+      document.getElementById('btnDescargarUna').style.display = 'inline-block';
     }
-
   } catch (err) {
     console.error(err);
     container.textContent = "❌ Error al cargar datos del evento.";
+  }
+}
+
+// 🧩 Descargar una imagen (según modo)
+async function descargarIndividual() {
+  if (!canvasesGenerados.length) return alert("No hay imágenes generadas.");
+  const modo = document.getElementById("modoDescarga").value;
+  const c = canvasesGenerados[0]; // solo la primera por simplicidad
+  const canvas = c.canvas;
+
+  if (modo === "copiar") {
+    canvas.toBlob((blob) => {
+      navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      alert("✅ Imagen copiada al portapapeles");
+    }, "image/png");
+  } else {
+    const formato = modo === "jpg" ? "image/jpeg" : "image/png";
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL(formato);
+    link.download = `${c.activador}_${c.visitante}.${modo}`;
+    link.click();
   }
 }
 
@@ -171,6 +197,4 @@ async function descargarTodas() {
 
 </body>
 </html>
-
-
 
