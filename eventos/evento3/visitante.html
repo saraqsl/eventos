@@ -51,6 +51,15 @@ canvas {
   max-width: 530px;
   height: auto;
 }
+.qslCard {
+  text-align: center;
+  margin-bottom: 25px;
+}
+small {
+  display: block;
+  color: #003366;
+  margin-bottom: 4px;
+}
 </style>
 </head>
 <body>
@@ -59,14 +68,6 @@ canvas {
 
 <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
 <button onclick="verQSL()">Ver mis QSLs</button>
-
-<select id="modoDescarga">
-  <option value="png">Descargar PNG</option>
-  <option value="jpg">Descargar JPG</option>
-  <option value="copiar">Copiar imagen</option>
-</select>
-
-<button onclick="descargarIndividual()" id="btnDescargarUna" style="display:none;">Guardar / Copiar actual</button>
 <button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas (ZIP)</button>
 
 <div id="qslContainer"></div>
@@ -95,6 +96,7 @@ function generarQSL(activador, contacto) {
       const offsetY = (canvas.height - newHeight) / 2;
       ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 
+      // Texto militar/naval
       ctx.fillStyle = '#001a33';
       ctx.font = 'bold 36px "Courier New", monospace';
       ctx.textAlign = 'left';
@@ -116,7 +118,28 @@ function generarQSL(activador, contacto) {
       ctx.fillText(`BT`, 25, y + 25);
       ctx.fillText(`FIN MENSAJE`, 25, y + 55);
 
-      document.getElementById('qslContainer').appendChild(canvas);
+      // 📸 Contenedor con botones individuales
+      const cardDiv = document.createElement('div');
+      cardDiv.className = "qslCard";
+      cardDiv.appendChild(canvas);
+
+      const label = document.createElement('small');
+      label.textContent = `${activador} ⇄ ${contacto.call}`;
+      cardDiv.appendChild(label);
+
+      const select = document.createElement('select');
+      select.innerHTML = `
+        <option value="png">Descargar PNG</option>
+        <option value="jpg">Descargar JPG</option>
+        <option value="copiar">Copiar imagen</option>`;
+      cardDiv.appendChild(select);
+
+      const btnGuardar = document.createElement('button');
+      btnGuardar.textContent = "Guardar / Copiar";
+      btnGuardar.onclick = () => descargarIndividual(canvas, activador, contacto.call, select.value);
+      cardDiv.appendChild(btnGuardar);
+
+      document.getElementById('qslContainer').appendChild(cardDiv);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
       resolve();
     };
@@ -132,38 +155,35 @@ async function verQSL() {
   container.innerHTML = "Cargando...";
   canvasesGenerados = [];
   document.getElementById('btnDescargarTodas').style.display = 'none';
-  document.getElementById('btnDescargarUna').style.display = 'none';
 
   try {
     const res = await fetch(API_URL);
     const allData = await res.json();
     container.innerHTML = "";
     let encontrados = 0;
+
     for (const contacto of allData) {
       if (contacto.call === sdVisitante) {
         await generarQSL(contacto.owner, contacto);
         encontrados++;
       }
     }
+
     if (encontrados === 0) {
       container.textContent = "No se encontraron QSLs para este SD.";
     } else {
       document.getElementById('btnDescargarTodas').style.display = 'inline-block';
-      document.getElementById('btnDescargarUna').style.display = 'inline-block';
     }
+
   } catch (err) {
     console.error(err);
     container.textContent = "❌ Error al cargar datos del evento.";
   }
 }
 
-// 🧩 Descargar una imagen (según modo)
-async function descargarIndividual() {
-  if (!canvasesGenerados.length) return alert("No hay imágenes generadas.");
-  const modo = document.getElementById("modoDescarga").value;
-  const c = canvasesGenerados[0]; // solo la primera por simplicidad
-  const canvas = c.canvas;
-
+// 🧩 Guardar o copiar imagen individual
+function descargarIndividual(canvas, activador, visitante, modo) {
+  if (!canvas) return;
   if (modo === "copiar") {
     canvas.toBlob((blob) => {
       navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
@@ -173,7 +193,7 @@ async function descargarIndividual() {
     const formato = modo === "jpg" ? "image/jpeg" : "image/png";
     const link = document.createElement('a');
     link.href = canvas.toDataURL(formato);
-    link.download = `${c.activador}_${c.visitante}.${modo}`;
+    link.download = `${activador}_${visitante}.${modo}`;
     link.click();
   }
 }
@@ -197,4 +217,5 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
