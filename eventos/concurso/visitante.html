@@ -3,159 +3,156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ver QSL – EV07-25</title>
+<title>Contactos Confirmados - Concurso Armada Argentina</title>
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #eef2f5;
+  font-family: "Courier New", monospace;
+  background: #1b1f1c;
+  color: #c6d2c0;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0;
   padding: 20px;
 }
-h1 { color: #333; }
+
+h1 {
+  color: #d6e2ce;
+  text-transform: uppercase;
+  border-bottom: 2px solid #4a5b3f;
+  padding-bottom: 6px;
+  margin-bottom: 15px;
+  text-shadow: 0 0 4px rgba(0,255,100,0.3);
+}
+
+/* Input y botón */
 input, button {
-  padding: 8px;
-  margin: 6px 0;
+  padding: 8px 10px;
+  margin: 6px;
   border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 80%;
-  max-width: 300px;
+  border: 1px solid #5d6f52;
+  background: #0e120e;
+  color: #d1d8c4;
+  font-family: "Courier New", monospace;
 }
 button {
   cursor: pointer;
-  background: #007bff;
-  color: white;
-  border: none;
+  background: linear-gradient(180deg, #2a3228 0%, #1d241c 100%);
+  color: #b7c9a6;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: 0.2s;
 }
-button:hover { background: #0056b3; }
-canvas { 
-  margin-top: 20px; 
-  border: 1px solid #ccc; 
-  display: block;
+button:hover { background: #31412f; color: #e0f0d0; }
+
+/* Tabla */
+table {
+  margin-top: 20px;
+  border-collapse: collapse;
+  width: 95%;
+  max-width: 800px;
+  font-size: 14px;
+  background: #111511;
+  border: 1px solid #4a5b3f;
+  box-shadow: 0 0 10px rgba(0,255,100,0.05);
+}
+th, td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #2c352c;
+  text-align: left;
+}
+th {
+  background: #263126;
+  color: #d1d8c4;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+tr:nth-child(even) { background: #151915; }
+tr:hover { background: #253025; }
+
+/* Mensaje */
+#mensaje {
+  margin-top: 20px;
+  color: #9fb39b;
+  font-size: 14px;
+  text-align: center;
 }
 </style>
 </head>
 <body>
 
-<h1>🔎 Ver QSL – EV07-25</h1>
+<h1>🔎 Contactos Confirmados</h1>
 
-<input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
-<button onclick="verQSL()">Ver mis QSLs</button>
-<button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas</button>
+<div>
+  <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
+  <button onclick="verContactos()">Ver contactos</button>
+</div>
 
-<div id="qslContainer"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
+<div id="mensaje"></div>
+<table id="tablaContactos" style="display:none;">
+  <thead>
+    <tr>
+      <th>Estación Contactada</th>
+      <th>Fecha</th>
+      <th>Hora (UTC)</th>
+      <th>Banda</th>
+      <th>Modo</th>
+    </tr>
+  </thead>
+  <tbody id="tbodyContactos"></tbody>
+</table>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbysRnXsh6QUwgGlIPltyj8EnoeQTtoNnx3fe1Mf5hwQcWQp3m5P8ZSRUKKn-lw1Zy30Vg/exec";
-const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
-let canvasesGenerados = [];
 
-// 🧩 Generar QSL en canvas (dos líneas con fondo semitransparente, negrita)
-function generarQSL(activador, contacto) {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 600;
-    canvas.height = 400;
-    const ctx = canvas.getContext('2d');
+// 🔹 Mostrar listado de contactos
+async function verContactos() {
+  const sd = document.getElementById('sdVisitante').value.trim().toUpperCase();
+  const mensaje = document.getElementById('mensaje');
+  const tabla = document.getElementById('tablaContactos');
+  const tbody = document.getElementById('tbodyContactos');
 
-    const img = new Image();
-    img.src = IMG_QSL;
-    img.onload = () => {
-      // Dibujar fondo
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  if (!sd) {
+    mensaje.textContent = "Ingrese su SD para ver los contactos.";
+    tabla.style.display = 'none';
+    return;
+  }
 
-      // SD principal (activador) a la izquierda
-      ctx.font = 'bold 36px Arial';
-      ctx.fillStyle = 'red';
-      ctx.textAlign = 'left';
-      ctx.fillText(activador, 20, 70);
-
-      // Datos del contacto en dos líneas, centrados abajo
-      ctx.font = 'bold 20px Arial';
-      ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
-      const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
-      const linea2 = `Hora: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
-
-      // Calcular posición del rectángulo semitransparente
-      const rectWidth = canvas.width - 40; // margen de 20px a cada lado
-      const rectHeight = 50;
-      const rectX = 20;
-      const rectY = canvas.height - 65; // un poquito arriba del borde
-
-      // Dibujar rectángulo semitransparente
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // blanco con opacidad
-      ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
-
-      // Dibujar texto encima del rectángulo
-      ctx.fillStyle = 'black';
-      ctx.fillText(linea1, canvas.width / 2, canvas.height - 50);
-      ctx.fillText(linea2, canvas.width / 2, canvas.height - 25);
-
-      document.getElementById('qslContainer').appendChild(canvas);
-      canvasesGenerados.push({canvas, activador, visitante: contacto.call});
-      resolve();
-    };
-  });
-}
-
-
-
-
-// 🧩 Ver QSLs del visitante
-async function verQSL() {
-  const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
-  if (!sdVisitante) return alert("Ingrese su SD");
-
-  const container = document.getElementById('qslContainer');
-  container.innerHTML = "Cargando...";
-  canvasesGenerados = [];
-  document.getElementById('btnDescargarTodas').style.display = 'none';
+  mensaje.textContent = "Cargando contactos...";
+  tabla.style.display = 'none';
+  tbody.innerHTML = "";
 
   try {
     const res = await fetch(API_URL);
-    const allData = await res.json();
+    const data = await res.json();
 
-    container.innerHTML = "";
-    let encontrados = 0;
+    const contactos = data.filter(c => c.call === sd);
 
-    for (const contacto of allData) {
-      if (contacto.call === sdVisitante) {
-        await generarQSL(contacto.owner, contacto);
-        encontrados++;
-      }
+    if (contactos.length === 0) {
+      mensaje.textContent = "⚠️ No se encontraron contactos para este SD.";
+      return;
     }
 
-    if (encontrados === 0) {
-      container.textContent = "No se encontraron QSLs para este SD.";
-    } else {
-      document.getElementById('btnDescargarTodas').style.display = 'inline-block';
-    }
+    contactos.forEach(c => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${c.owner}</td>
+        <td>${c.date}</td>
+        <td>${c.time}</td>
+        <td>${c.band}</td>
+        <td>${c.mode}</td>
+      `;
+      tbody.appendChild(fila);
+    });
+
+    mensaje.textContent = `✅ Se encontraron ${contactos.length} contactos.`;
+    tabla.style.display = 'table';
 
   } catch (err) {
     console.error(err);
-    container.textContent = "❌ Error al cargar datos del evento.";
+    mensaje.textContent = "❌ Error al cargar los contactos del concurso.";
   }
-}
-
-// 🧩 Descargar todas las QSLs como ZIP
-async function descargarTodas() {
-  if (!canvasesGenerados.length) return;
-  const zip = new JSZip();
-  canvasesGenerados.forEach((c) => {
-    const dataUrl = c.canvas.toDataURL('image/png');
-    const base64 = dataUrl.split(',')[1];
-    zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
-  });
-  const content = await zip.generateAsync({type:"blob"});
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(content);
-  link.download = 'mis_qsls.zip';
-  link.click();
 }
 </script>
 
