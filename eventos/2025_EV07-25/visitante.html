@@ -47,6 +47,15 @@ canvas {
   max-width: 530px;
   height: auto;
 }
+.qsl-item {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.qsl-item button {
+  width: auto;
+  margin-top: 8px;
+  font-size: 13px;
+}
 #accionesDescarga {
   display: none;
   margin-top: 10px;
@@ -64,7 +73,7 @@ canvas {
 <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
 <button onclick="verQSL()">Ver mis QSLs</button>
 
-<!-- ✅ NUEVOS BOTONES DE DESCARGA -->
+<!-- ✅ Botones generales -->
 <div id="accionesDescarga">
   <button onclick="descargarTodas()">📦 ZIP</button>
   <button onclick="descargarActual('jpg')">🖼️ JPG</button>
@@ -84,6 +93,9 @@ let canvasesGenerados = [];
 // 🧩 Generar QSL en canvas (dos líneas de datos, negrita)
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
+    const container = document.createElement('div');
+    container.className = 'qsl-item';
+
     const canvas = document.createElement('canvas');
     canvas.width = 600;
     canvas.height = 400;
@@ -110,7 +122,20 @@ function generarQSL(activador, contacto) {
       ctx.fillText(linea1, canvas.width / 2, canvas.height - 60);
       ctx.fillText(linea2, canvas.width / 2, canvas.height - 30);
 
-      document.getElementById('qslContainer').appendChild(canvas);
+      // ✅ Botón de descarga individual
+      const btnDescarga = document.createElement('button');
+      btnDescarga.textContent = '⬇️ Descargar esta QSL';
+      btnDescarga.onclick = () => {
+        const link = document.createElement('a');
+        link.download = `${activador}_${contacto.call}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.92);
+        link.click();
+      };
+
+      container.appendChild(canvas);
+      container.appendChild(btnDescarga);
+      document.getElementById('qslContainer').appendChild(container);
+
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
       resolve();
     };
@@ -169,7 +194,7 @@ async function descargarTodas() {
   link.click();
 }
 
-// 🖼️ Descargar imagen actual (JPG o PNG)
+// 🖼️ Descargar primera imagen (JPG o PNG)
 function descargarActual(formato = 'jpg') {
   if (!canvasesGenerados.length) return alert('No hay QSL generada.');
   const canvas = canvasesGenerados[0].canvas;
@@ -193,5 +218,6 @@ async function copiarActual() {
 
 </body>
 </html>
+
 
 
