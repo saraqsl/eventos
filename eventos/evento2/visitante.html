@@ -39,13 +39,26 @@ button {
 }
 button:hover { background: #0056b3; }
 canvas { 
-  margin-top: 20px; 
+  margin-top: 10px; 
   border: 2px solid #003366; 
   display: block;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
   width: 100%;
   max-width: 530px;
   height: auto;
+}
+.qslCard {
+  margin-bottom: 20px;
+  text-align: center;
+}
+.qslCard button {
+  margin-top: 8px;
+  background: #004c99;
+  font-size: 0.9em;
+  padding: 6px 10px;
+}
+.qslCard button:hover {
+  background: #0070cc;
 }
 #accionesDescarga {
   display: flex;
@@ -75,12 +88,15 @@ canvas {
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbysRnXsh6QUwgGlIPltyj8EnoeQTtoNnx3fe1Mf5hwQcWQp3m5P8ZSRUKKn-lw1Zy30Vg/exec";
-const IMG_QSL = "qsl.jpg"; // tu imagen de fondo
+const IMG_QSL = "qsl.jpg"; // fondo de la QSL
 let canvasesGenerados = [];
 
-// 🧩 Generar QSL (vertical, con texto destacado)
+// 🧩 Generar QSL (con descarga individual)
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
+    const card = document.createElement('div');
+    card.className = 'qslCard';
+
     const canvas = document.createElement('canvas');
     canvas.width = 600;
     canvas.height = 400;
@@ -122,7 +138,14 @@ function generarQSL(activador, contacto) {
         y += lineHeight;
       });
 
-      document.getElementById('qslContainer').appendChild(canvas);
+      // Agregar canvas + botón de descarga
+      card.appendChild(canvas);
+      const btnDesc = document.createElement('button');
+      btnDesc.textContent = '⬇️ Descargar esta QSL';
+      btnDesc.onclick = () => descargarIndividual(canvas, activador, contacto.call);
+      card.appendChild(btnDesc);
+
+      document.getElementById('qslContainer').appendChild(card);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
       resolve();
     };
@@ -165,17 +188,15 @@ async function verQSL() {
   }
 }
 
-// 📦 Descargar todas las QSLs como ZIP (PNG)
+// 📦 Descargar todas las QSLs como ZIP
 async function descargarTodas() {
   if (!canvasesGenerados.length) return;
   const zip = new JSZip();
-
   canvasesGenerados.forEach((c) => {
     const dataUrl = c.canvas.toDataURL('image/png');
     const base64 = dataUrl.split(',')[1];
     zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
   });
-
   const content = await zip.generateAsync({type:"blob"});
   const link = document.createElement('a');
   link.href = URL.createObjectURL(content);
@@ -183,15 +204,22 @@ async function descargarTodas() {
   link.click();
 }
 
-// 🖼️ Descargar imagen actual (JPG o PNG)
+// 🖼️ Descargar imagen actual (primera QSL)
 function descargarActual(formato = 'jpg') {
   if (!canvasesGenerados.length) return alert('No hay QSL generada.');
   const canvas = canvasesGenerados[0].canvas;
   const tipo = formato === 'png' ? 'image/png' : 'image/jpeg';
-  const nombre = `mi_qsl.${formato}`;
   const link = document.createElement('a');
-  link.download = nombre;
+  link.download = `mi_qsl.${formato}`;
   link.href = canvas.toDataURL(tipo, 0.92);
+  link.click();
+}
+
+// 🖼️ Descargar una QSL específica
+function descargarIndividual(canvas, activador, visitante) {
+  const link = document.createElement('a');
+  link.download = `${activador}_${visitante}.jpg`;
+  link.href = canvas.toDataURL('image/jpeg', 0.92);
   link.click();
 }
 
@@ -207,36 +235,6 @@ async function copiarActual() {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
