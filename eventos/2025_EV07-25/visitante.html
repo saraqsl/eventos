@@ -1,77 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ver QSL – EV07-25</title>
-<style>
-body {
-  font-family: "Courier New", monospace;
-  background: #e5ebf0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  padding: 20px;
-}
-h1 {
-  color: #002b5c;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-input, button {
-  padding: 8px;
-  margin: 6px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 80%;
-  max-width: 300px;
-  font-family: "Courier New", monospace;
-}
-button {
-  cursor: pointer;
-  background: #003366;
-  color: white;
-  border: none;
-  text-transform: uppercase;
-  transition: 0.2s;
-}
-button:hover { background: #0056b3; }
-canvas { 
-  margin-top: 20px; 
-  border: 2px solid #003366; 
-  display: block;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-  width: 100%;
-  max-width: 530px;
-  height: auto;
-}
-#accionesDescarga {
-  display: none;
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-</style>
-</head>
-<body>
-
-<h1>🔎 Ver QSL – EV07-25</h1>
-
-<input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
-<button onclick="verQSL()">Ver mis QSLs</button>
-
-<div id="accionesDescarga">
-  <button onclick="descargarTodas()">📦 Descargar ZIP</button>
-  <button onclick="descargarActual()">🖼️ Descargar imagen</button>
-  <button onclick="copiarActual()">📋 Copiar imagen</button>
-</div>
-
-<div id="qslContainer"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
 
 <script>
@@ -156,9 +82,9 @@ async function descargarTodas() {
   if (!canvasesGenerados.length) return;
   const zip = new JSZip();
   canvasesGenerados.forEach((c) => {
-    const dataUrl = c.canvas.toDataURL('image/png');
+    const dataUrl = c.canvas.toDataURL('image/jpeg', 0.92);
     const base64 = dataUrl.split(',')[1];
-    zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
+    zip.file(`${c.activador}_${c.visitante}.jpg`, base64, {base64:true});
   });
   const content = await zip.generateAsync({type:"blob"});
   const link = document.createElement('a');
@@ -167,7 +93,7 @@ async function descargarTodas() {
   link.click();
 }
 
-// 🖼️ Descargar imagen actual (JPG por defecto)
+// 🖼️ Descargar imagen actual (JPG o PNG)
 function descargarActual(formato = 'jpg') {
   if (!canvasesGenerados.length) return alert('No hay QSL generada.');
   const canvas = canvasesGenerados[0].canvas;
@@ -188,9 +114,3 @@ async function copiarActual() {
   alert('📋 Imagen copiada al portapapeles');
 }
 </script>
-
-</body>
-</html>
-
-  
-
