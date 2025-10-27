@@ -1,0 +1,40 @@
+function generarQSL(activador, contacto) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = IMG_QSL;
+    img.onload = () => {
+      // Fondo
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Activador destacado (arriba)
+      ctx.font = 'bold 34px "Black Ops One", monospace';
+      ctx.fillStyle = '#0033cc';
+      ctx.textAlign = 'left';
+      ctx.fillText(activador, 25, 60);
+
+      // Datos del contacto (vertical tipo columna)
+      ctx.font = 'bold 18px "Courier New", monospace';
+      ctx.fillStyle = '#000';
+      ctx.textAlign = 'left';
+      const startX = 40; // margen izquierdo
+      let y = 120;       // posición inicial en vertical
+      const lineHeight = 28; // espacio entre renglones
+
+      ctx.fillText(`CALL: ${contacto.call}`, startX, y); y += lineHeight;
+      ctx.fillText(`FECHA: ${contacto.date}`, startX, y); y += lineHeight;
+      ctx.fillText(`HORA UTC: ${contacto.time}`, startX, y); y += lineHeight;
+      ctx.fillText(`BANDA: ${contacto.band}`, startX, y); y += lineHeight;
+      ctx.fillText(`MODO: ${contacto.mode}`, startX, y);
+
+      document.getElementById('qslContainer').appendChild(canvas);
+      canvasesGenerados.push({canvas, activador, visitante: contacto.call});
+      resolve();
+    };
+  });
+}
+
