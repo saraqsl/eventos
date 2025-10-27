@@ -98,16 +98,16 @@ function generarQSL(activador, contacto) {
 
       // Texto militar/naval
       ctx.fillStyle = '#001a33';
-      ctx.font = 'bold 45px "Courier New", monospace';
+      ctx.font = 'bold 35px "Courier New", monospace';
       ctx.textAlign = 'left';
-      ctx.fillText(`Gracias ´por contactar con ${activador}`, 25, 40)
+      ctx.fillText(`de ${activador}`, 25, 40)
       ctx.fillText(`BT`, 25, 70);
 
       ctx.font = 'bold 18px "Courier New", monospace';
-      ctx.fillStyle = '#003300';
+      ctx.fillStyle = #FFFFFF';
       let y = 140;
       const lineHeight = 24;
-      ctx.fillText(`A ${contacto.call}`, 25, 70);
+      ctx.fillText(`A ${contacto.call}`, 25, 100);
       ctx.fillText(`FECHA: ${contacto.date}`, 25, y); y += lineHeight;
       ctx.fillText(`HORA UTC: ${contacto.time}`, 25, y); y += lineHeight;
       ctx.fillText(`BANDA: ${contacto.band}`, 25, y); y += lineHeight;
@@ -217,6 +217,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
