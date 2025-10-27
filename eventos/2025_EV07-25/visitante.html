@@ -1,3 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ver QSL – EV07-25</title>
+<style>
+body {
+  font-family: "Courier New", monospace;
+  background: #e5ebf0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 20px;
+}
+h1 {
+  color: #002b5c;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+input, button {
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 80%;
+  max-width: 300px;
+  font-family: "Courier New", monospace;
+}
+button {
+  cursor: pointer;
+  background: #003366;
+  color: white;
+  border: none;
+  text-transform: uppercase;
+  transition: 0.2s;
+}
+button:hover { background: #0056b3; }
+canvas { 
+  margin-top: 20px; 
+  border: 2px solid #003366; 
+  display: block;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 530px;
+  height: auto;
+}
+#accionesDescarga {
+  display: none;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+</style>
+</head>
+<body>
+
+<h1>🔎 Ver QSL – EV07-25</h1>
+
+<input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
+<button onclick="verQSL()">Ver mis QSLs</button>
+
+<!-- ✅ NUEVOS BOTONES DE DESCARGA -->
+<div id="accionesDescarga">
+  <button onclick="descargarTodas()">📦 ZIP</button>
+  <button onclick="descargarActual('jpg')">🖼️ JPG</button>
+  <button onclick="descargarActual('png')">🖼️ PNG</button>
+  <button onclick="copiarActual()">📋 Copiar</button>
+</div>
+
+<div id="qslContainer"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
 
 <script>
@@ -114,3 +190,8 @@ async function copiarActual() {
   alert('📋 Imagen copiada al portapapeles');
 }
 </script>
+
+</body>
+</html>
+
+
