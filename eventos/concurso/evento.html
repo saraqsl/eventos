@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>concurso</title>
+<title>Concurso Armada Argentina</title>
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #f0f3f7;
+  font-family: "Courier New", monospace;
+  background: radial-gradient(circle at center, #1b1f1c 0%, #0e100f 100%);
+  color: #c6d2c0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -15,56 +16,72 @@ body {
   padding: 0;
 }
 
+/* Título principal */
 h1 {
-  margin-top: 20px;
-  color: #333;
-  position: relative;
+  margin-top: 25px;
+  color: #d6e2ce;
+  text-shadow: 0 0 6px rgba(0,255,100,0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
   text-align: center;
+  border-bottom: 2px solid #4a5b3f;
+  padding-bottom: 8px;
   width: 90%;
   max-width: 900px;
 }
 
-#btnActivador {
-  position: absolute;
-  top: -10px;
-  right: -50px;
-  width: 40px;
-  height: 40px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  opacity: 0.20;
-  transition: opacity 0.3s;
+/* Contenedor de botones superiores */
+.botones-superiores {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
+  flex-wrap: wrap;
 }
-#btnActivador:hover { opacity: 1; transform: scale(1.1); }
-#btnActivador img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
+/* Estilo militar para los botones */
+.boton-militar {
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid #5d6f52;
+  background: linear-gradient(180deg, #2a3228 0%, #1d241c 100%);
+  color: #b7c9a6;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: "Courier New", monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.boton-militar:hover {
+  background: #31412f;
+  color: #e0f0d0;
+  border-color: #7f926c;
+  transform: scale(1.03);
+}
+
+/* Tarjeta */
 .card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  margin: 15px;
+  background: #111511;
+  border: 1px solid #4a5b3f;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,255,100,0.05);
+  margin: 20px;
   padding: 15px;
   width: 90%;
   max-width: 500px;
 }
-#visitante { border-left: 5px solid #007bff; }
-
-a.button {
-  display:inline-block;
-  padding:10px 20px;
-  background:#007bff;
-  color:white;
-  border-radius:6px;
-  text-decoration:none;
-  margin-top: 10px;
-  text-align: center;
+.card h2 {
+  color: #a8bda2;
+  border-bottom: 1px dashed #4a5b3f;
+  padding-bottom: 4px;
+  margin-top: 0;
 }
-a.button:hover { background:#0056b3; }
 
+/* Mensaje de servicio */
 #mensajeEvento {
-  margin-top: 10px;
-  background: #1e2b1e;
+  margin-top: 15px;
+  background: #0d130d;
   color: #b7c9a6;
   border: 2px solid #4a5b3f;
   border-radius: 8px;
@@ -72,7 +89,7 @@ a.button:hover { background:#0056b3; }
   max-width: 600px;
   width: 90%;
   font-family: "Courier New", monospace;
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
 }
 .mensaje-header {
   text-align: center;
@@ -81,27 +98,29 @@ a.button:hover { background:#0056b3; }
   padding-bottom: 4px;
   margin-bottom: 8px;
   color: #d1d8c4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 .mensaje-contenido {
   white-space: pre-wrap;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 </style>
 </head>
 <body>
 
-<h1>
-  Concurso 40 metros Dia de la ARMADA ARGENTINA 
-  <button id="btnActivador" title="Panel Activador" onclick="abrirActivador()">
-    <img src="candado.png" alt="Activador">
-  </button>
-</h1>
+<h1>Concurso 40 m – Día de la Armada Argentina</h1>
+
+<!-- 🔹 Nueva fila de botones -->
+<div class="botones-superiores">
+  <a href="visitante.html" class="boton-militar">🔎 Ver QSL</a>
+  <a href="cargar_adif.html" class="boton-militar">📤 Cargar ADIF de contactos</a>
+</div>
 
 <div id="visitante" class="card">
-  <h2>Visitante</h2>
-  <p>Ver QSLs con los operadores que contacto :</p>
-  <a href="visitante.html" class="button">🔎 Ver QSL como visitante</a>
+  <h2>Participante / Visitante</h2>
+  <p>Consulte sus QSL generadas y confirme contactos con estaciones de la Armada Argentina.</p>
 </div>
 
 <div id="mensajeEvento">
@@ -110,10 +129,6 @@ a.button:hover { background:#0056b3; }
 </div>
 
 <script>
-function abrirActivador() {
-  window.location.href = "cargar_adif.html";
-}
-
 // Cargar mensaje desde archivo local (mensaje.txt)
 fetch("mensaje.txt")
   .then(r => r.text())
@@ -128,5 +143,7 @@ fetch("mensaje.txt")
 
 </body>
 </html>
+
+
 
 
