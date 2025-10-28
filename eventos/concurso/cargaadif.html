@@ -59,84 +59,59 @@
 </style>
 </head>
 <body>
-  <form id="formAdif">
-    <h2>📡 Cargar Log ADIF</h2>
+ <form id="formAdif">
+  <input type="text" id="licencia" placeholder="Licencia" required />
+  <input type="email" id="email" placeholder="Correo" required />
+  <input type="file" id="archivo" accept=".adi" required />
+  <button type="submit">Subir ADIF</button>
+</form>
 
-    <label for="licencia">Licencia / Indicativo:</label>
-    <input type="text" id="licencia" name="licencia" required placeholder="Ej: LU1ABC" />
-
-    <label for="email">Correo:</label>
-    <input type="email" id="email" name="email" required placeholder="ejemplo@gmail.com" />
-
-    <label for="archivo">Archivo .ADI:</label>
-    <input type="file" id="archivo" name="archivo" accept=".adi,.adif" required />
-
-    <button type="submit">📤 Enviar</button>
-    <div id="mensaje"></div>
-  </form>
+<div id="mensaje" style="margin-top:10px;font-weight:bold;"></div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFkPCbV98NAaiHWuQC3oRHY9caI9k_8lXfKWvV_by5UArDIXWm7xL9r4bpdayEYcNTvA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsJ1Sk-FxZ8c0RUo6SjaU2-jqiQVmOWaHBKMEfXfIAcWxWorObpS7Kcd2Y5o5lG9TP0A/exec";
 
 document.getElementById("formAdif").addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const licencia = document.getElementById("licencia").value.trim().toUpperCase();
   const email = document.getElementById("email").value.trim();
   const archivo = document.getElementById("archivo").files[0];
   const mensaje = document.getElementById("mensaje");
 
   if (!archivo) {
-    alert("Seleccioná un archivo ADIF antes de enviar.");
+    mensaje.textContent = "⚠️ Seleccioná un archivo ADIF.";
+    mensaje.style.color = "orange";
     return;
   }
 
-  mensaje.textContent = "⏳ Subiendo archivo...";
+  mensaje.textContent = "⏳ Subiendo...";
+  mensaje.style.color = "gray";
 
   const reader = new FileReader();
-  reader.onload = async function(event) {
-    const base64 = event.target.result;
+  reader.onload = async () => {
+    const base64 = reader.result;
 
-    const data = {
-      licencia: licencia,
-      email: email,
-      archivo_base64: base64
-    };
+    const body = new URLSearchParams();
+    body.append("licencia", licencia);
+    body.append("email", email);
+    body.append("archivo_base64", base64);
 
     try {
-      const response = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: new URLSearchParams(data)
-      });
+      const res = await fetch(SCRIPT_URL, { method: "POST", body });
+      const data = await res.json();
 
-      const result = await response.json();
-
-      if (result.success) {
-        mensaje.textContent = "✅ Archivo cargado correctamente";
-        mensaje.style.color = "#80ff80";
+      if (data.success) {
+        mensaje.textContent = data.resumen || "✅ Archivo subido correctamente.";
+        mensaje.style.color = "limegreen";
       } else {
-        mensaje.textContent = "❌ Error: " + result.error;
+        mensaje.textContent = `❌ Error: ${data.error || "No se pudo procesar el archivo."}`;
         mensaje.style.color = "red";
       }
     } catch (err) {
-      mensaje.textContent = "⚠️ Error de conexión: " + err.message;
+      mensaje.textContent = "⚠️ Error de conexión con el servidor.";
       mensaje.style.color = "red";
     }
   };
-
   reader.readAsDataURL(archivo);
 });
 </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
