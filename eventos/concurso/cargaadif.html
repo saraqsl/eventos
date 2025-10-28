@@ -1,42 +1,79 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cargar ADIF</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Carga de Log ADIF</title>
 <style>
-body {
-  font-family: "Courier New", monospace;
-  background: #0b1b2a;
-  color: #00ffea;
-  text-align: center;
-  padding: 30px;
-}
-input, button {
-  margin: 10px;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #00ffea;
-  background: #112233;
-  color: #00ffea;
-}
-button:hover {
-  background: #00ffea;
-  color: #000;
-}
+  body {
+    font-family: "Segoe UI", sans-serif;
+    background: #111;
+    color: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  form {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #000;
+    width: 320px;
+  }
+  h2 {
+    text-align: center;
+    color: #80ff80;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="file"] {
+    width: 100%;
+    margin-top: 5px;
+    padding: 6px;
+    border: none;
+    border-radius: 5px;
+  }
+  button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 8px;
+    background: #28a745;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #218838;
+  }
+  #mensaje {
+    margin-top: 15px;
+    text-align: center;
+    color: #80ff80;
+  }
 </style>
 </head>
 <body>
+  <form id="formAdif">
+    <h2>📡 Cargar Log ADIF</h2>
 
-<h1>📡 CARGA DE ARCHIVO ADIF</h1>
-<form id="formAdif">
-  <input type="text" id="licencia" placeholder="Tu indicativo (ej: LU1ABC)" required><br>
-  <input type="email" id="email" placeholder="Tu correo electrónico" required><br>
-  <input type="file" id="archivo" accept=".adi,.adif" required><br>
-  <button type="submit">Enviar</button>
-</form>
+    <label for="licencia">Licencia / Indicativo:</label>
+    <input type="text" id="licencia" name="licencia" required placeholder="Ej: LU1ABC" />
 
-<p id="mensaje"></p>
+    <label for="email">Correo:</label>
+    <input type="email" id="email" name="email" required placeholder="ejemplo@gmail.com" />
+
+    <label for="archivo">Archivo .ADI:</label>
+    <input type="file" id="archivo" name="archivo" accept=".adi,.adif" required />
+
+    <button type="submit">📤 Enviar</button>
+    <div id="mensaje"></div>
+  </form>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykqpRyxEdJ5Vb7PZlztKWN6ZECyAIUOZJS-lJQDOWxwzoj6HRDiplXpXPequYmG7jXtA/exec";
@@ -45,48 +82,54 @@ document.getElementById("formAdif").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const licencia = document.getElementById("licencia").value.trim().toUpperCase();
-  const correo = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim();
   const archivo = document.getElementById("archivo").files[0];
   const mensaje = document.getElementById("mensaje");
 
   if (!archivo) {
-    mensaje.textContent = "⚠️ Seleccioná un archivo ADIF.";
+    alert("Seleccioná un archivo ADIF antes de enviar.");
     return;
   }
 
-  mensaje.textContent = "⏳ Enviando...";
+  mensaje.textContent = "⏳ Subiendo archivo...";
 
-  // 🧩 Convertir archivo a Base64
   const reader = new FileReader();
-  reader.onload = async function() {
-    try {
-      const base64Data = reader.result.split(",")[1];
-      const formData = new FormData();
-      formData.append("licencia", licencia);
-      formData.append("correo", correo);
-      formData.append("archivo_base64", base64Data);
+  reader.onload = async function(event) {
+    const base64 = event.target.result;
 
-      const res = await fetch(SCRIPT_URL, {
+    const data = {
+      licencia: licencia,
+      email: email,
+      archivo_base64: base64
+    };
+
+    try {
+      const response = await fetch(SCRIPT_URL, {
         method: "POST",
-        body: formData
+        body: new URLSearchParams(data)
       });
 
-      const result = await res.json();
+      const result = await response.json();
 
       if (result.success) {
-        mensaje.textContent = `✅ Archivo cargado correctamente (${result.total} QSOs procesados)`;
+        mensaje.textContent = "✅ Archivo cargado correctamente";
+        mensaje.style.color = "#80ff80";
       } else {
-        mensaje.textContent = `❌ Error: ${result.error}`;
+        mensaje.textContent = "❌ Error: " + result.error;
+        mensaje.style.color = "red";
       }
     } catch (err) {
-      mensaje.textContent = `❌ Error: ${err.message}`;
+      mensaje.textContent = "⚠️ Error de conexión: " + err.message;
+      mensaje.style.color = "red";
     }
   };
+
   reader.readAsDataURL(archivo);
 });
 </script>
 </body>
 </html>
+
 
 
 
