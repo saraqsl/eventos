@@ -59,7 +59,8 @@
 </style>
 </head>
 <body>
- <form id="formAdif">
+<form id="formAdif">
+  <h2>Subir Log ADIF</h2>
   <input type="text" id="licencia" placeholder="Licencia" required />
   <input type="email" id="email" placeholder="Correo" required />
   <input type="file" id="archivo" accept=".adi" required />
@@ -69,50 +70,60 @@
 <div id="mensaje" style="margin-top:10px;font-weight:bold;"></div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEaq443wfj3lGaO1RRmL7Z0tFerQHr9f6eENHqijbzIoCr1ZGP3rTgQSuSPNfSXcsBRA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsJ1Sk-FxZ8c0RUo6SjaU2-jqiQVmOWaHBKMEfXfIAcWxWorObpS7Kcd2Y5o5lG9TP0A/exec";
 
-document.getElementById("formAdif").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const licencia = document.getElementById("licencia").value.trim().toUpperCase();
-  const email = document.getElementById("email").value.trim();
-  const archivo = document.getElementById("archivo").files[0];
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("formAdif");
   const mensaje = document.getElementById("mensaje");
 
-  if (!archivo) {
-    mensaje.textContent = "⚠️ Seleccioná un archivo ADIF.";
-    mensaje.style.color = "orange";
-    return;
-  }
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault(); // 🚫 evita recargar la página
 
-  mensaje.textContent = "⏳ Subiendo...";
-  mensaje.style.color = "gray";
+    const licencia = document.getElementById("licencia").value.trim().toUpperCase();
+    const email = document.getElementById("email").value.trim();
+    const archivo = document.getElementById("archivo").files[0];
 
-  const reader = new FileReader();
-  reader.onload = async () => {
-    const base64 = reader.result;
+    if (!archivo) {
+      mensaje.textContent = "⚠️ Seleccioná un archivo ADIF.";
+      mensaje.style.color = "orange";
+      return;
+    }
 
-    const formData = new FormData();
-formData.append("licencia", licencia);
-formData.append("email", email);
-formData.append("archivo_base64", base64);
+    mensaje.textContent = "⏳ Subiendo...";
+    mensaje.style.color = "gray";
 
-const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
-      const data = await res.json();
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result;
 
-      if (data.success) {
-        mensaje.textContent = data.resumen || "✅ Archivo subido correctamente.";
-        mensaje.style.color = "limegreen";
-      } else {
-        mensaje.textContent = `❌ Error: ${data.error || "No se pudo procesar el archivo."}`;
+      const formData = new FormData();
+      formData.append("licencia", licencia);
+      formData.append("email", email);
+      formData.append("archivo_base64", base64);
+
+      try {
+        const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          mensaje.textContent = data.resumen || "✅ Archivo subido correctamente.";
+          mensaje.style.color = "limegreen";
+        } else {
+          mensaje.textContent = `❌ Error: ${data.error || "No se pudo procesar el archivo."}`;
+          mensaje.style.color = "red";
+        }
+      } catch (err) {
+        mensaje.textContent = "⚠️ Error de conexión con el servidor.";
         mensaje.style.color = "red";
       }
-    } catch (err) {
-      mensaje.textContent = "⚠️ Error de conexión con el servidor.";
-      mensaje.style.color = "red";
-    }
-  };
-  reader.readAsDataURL(archivo);
+    };
+
+    reader.readAsDataURL(archivo);
+  });
 });
 </script>
+</body>
+</html>
+
 
 
