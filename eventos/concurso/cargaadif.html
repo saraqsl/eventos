@@ -3,125 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cargar ADIF – Concurso</title>
+<title>Cargar ADIF</title>
 <style>
 body {
   font-family: "Courier New", monospace;
-  background: #1e2b1e;
-  color: #c8d8c4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background: #0b1b2a;
+  color: #00ffea;
+  text-align: center;
   padding: 30px;
 }
-h1 {
-  text-transform: uppercase;
-  color: #b0ffb0;
-  border-bottom: 2px solid #4a5b3f;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-}
-form {
-  background: #263326;
-  border: 2px solid #4a5b3f;
-  border-radius: 10px;
-  padding: 20px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
-}
-label {
-  display: block;
-  margin-top: 10px;
-  color: #b7c9a6;
-}
-input[type="text"], input[type="email"], input[type="file"] {
-  width: 100%;
+input, button {
+  margin: 10px;
   padding: 8px;
-  margin-top: 4px;
-  border-radius: 6px;
-  border: none;
-  background: #303f30;
-  color: #fff;
+  border-radius: 5px;
+  border: 1px solid #00ffea;
+  background: #112233;
+  color: #00ffea;
 }
-button {
-  background: #506b50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  margin-top: 20px;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background 0.3s;
-  width: 100%;
+button:hover {
+  background: #00ffea;
+  color: #000;
 }
-button:hover { background: #7fb77f; }
-#mensaje { margin-top: 20px; text-align: center; }
 </style>
 </head>
 <body>
-<h1>📡 Cargar Log de Concurso</h1>
-<form id="form-adif">
-  <input type="text" id="licencia" placeholder="Licencia" required>
-  <input type="email" id="correo" placeholder="Correo" required>
-  <input type="file" id="archivo" accept=".adi" required>
-  <button type="submit">Subir</button>
+
+<h1>📡 CARGA DE ARCHIVO ADIF</h1>
+<form id="formAdif">
+  <input type="text" id="licencia" placeholder="Tu indicativo (ej: LU1ABC)" required><br>
+  <input type="email" id="email" placeholder="Tu correo electrónico" required><br>
+  <input type="file" id="archivo" accept=".adi,.adif" required><br>
+  <button type="submit">Enviar</button>
 </form>
 
+<p id="mensaje"></p>
+
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzsJ1Sk-FxZ8c0RUo6SjaU2-jqiQVmOWaHBKMEfXfIAcWxWorObpS7Kcd2Y5o5lG9TP0A/exec";
-
-document.getElementById("form-adif").addEventListener("submit", async (ev) => {
-  ev.preventDefault();
-  const licencia = document.getElementById("licencia").value;
-  const correo = document.getElementById("correo").value;
-  const archivo = document.getElementById("archivo").files[0];
-
-  const reader = new FileReader();
-  reader.onload = async () => {
-    const base64 = reader.result.split(",")[1];
-    const formData = new FormData();
-    formData.append("licencia", licencia);
-    formData.append("correo", correo);
-    formData.append("archivo_base64", base64);
-
-    const res = await fetch(API_URL, { method: "POST", body: formData });
-    const json = await res.json();
-    alert(json.success ? `✅ Cargado ${json.total} contactos` : `❌ Error: ${json.error}`);
-  };
-  reader.readAsDataURL(archivo);
-});
-/script>
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsJ1Sk-FxZ8c0RUo6SjaU2-jqiQVmOWaHBKMEfXfIAcWxWorObpS7Kcd2Y5o5lG9TP0A/exec"; // la del Apps Script
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsJ1Sk-FxZ8c0RUo6SjaU2-jqiQVmOWaHBKMEfXfIAcWxWorObpS7Kcd2Y5o5lG9TP0A/exec";
 
 document.getElementById("formAdif").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const licencia = document.getElementById("licencia").value.trim().toUpperCase();
-  const email = document.getElementById("email").value.trim();
+  const correo = document.getElementById("email").value.trim();
   const archivo = document.getElementById("archivo").files[0];
   const mensaje = document.getElementById("mensaje");
 
-  if (!archivo) return alert("Seleccioná un archivo ADIF.");
-
-  const formData = new FormData();
-  formData.append("licencia", licencia);
-  formData.append("email", email);
-  formData.append("archivo", archivo);
+  if (!archivo) {
+    mensaje.textContent = "⚠️ Seleccioná un archivo ADIF.";
+    return;
+  }
 
   mensaje.textContent = "⏳ Enviando...";
-  try {
-    const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
-    const data = await res.json();
-    mensaje.textContent = data.success ? "✅ Archivo cargado correctamente" : "❌ Error al cargar";
-  } catch {
-    mensaje.textContent = "❌ Error de conexión.";
-  }
+
+  // 🧩 Convertir archivo a Base64
+  const reader = new FileReader();
+  reader.onload = async function() {
+    try {
+      const base64Data = reader.result.split(",")[1];
+      const formData = new FormData();
+      formData.append("licencia", licencia);
+      formData.append("correo", correo);
+      formData.append("archivo_base64", base64Data);
+
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        mensaje.textContent = `✅ Archivo cargado correctamente (${result.total} QSOs procesados)`;
+      } else {
+        mensaje.textContent = `❌ Error: ${result.error}`;
+      }
+    } catch (err) {
+      mensaje.textContent = `❌ Error: ${err.message}`;
+    }
+  };
+  reader.readAsDataURL(archivo);
 });
 </script>
 </body>
 </html>
+
 
 
 
