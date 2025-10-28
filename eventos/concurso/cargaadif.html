@@ -91,13 +91,12 @@ document.getElementById("formAdif").addEventListener("submit", async (e) => {
   reader.onload = async () => {
     const base64 = reader.result;
 
-    const body = new URLSearchParams();
-    body.append("licencia", licencia);
-    body.append("email", email);
-    body.append("archivo_base64", base64);
+    const formData = new FormData();
+formData.append("licencia", licencia);
+formData.append("email", email);
+formData.append("archivo_base64", base64);
 
-    try {
-      const res = await fetch(SCRIPT_URL, { method: "POST", body });
+const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
       const data = await res.json();
 
       if (data.success) {
@@ -115,4 +114,5 @@ document.getElementById("formAdif").addEventListener("submit", async (e) => {
   reader.readAsDataURL(archivo);
 });
 </script>
+
 
