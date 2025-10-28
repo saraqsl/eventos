@@ -3,161 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contactos Confirmados - Concurso Armada Argentina</title>
+<title>📡 Registro de Contactos Confirmados</title>
 <style>
 body {
   font-family: "Courier New", monospace;
-  background: #1b1f1c;
-  color: #c6d2c0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
+  background-color: #0a0a0a;
+  color: #0ff;
+  text-align: center;
   padding: 20px;
 }
 
 h1 {
-  color: #d6e2ce;
-  text-transform: uppercase;
-  border-bottom: 2px solid #4a5b3f;
-  padding-bottom: 6px;
-  margin-bottom: 15px;
-  text-shadow: 0 0 4px rgba(0,255,100,0.3);
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
 }
 
-/* Input y botón */
 input, button {
-  padding: 8px 10px;
-  margin: 6px;
-  border-radius: 6px;
-  border: 1px solid #5d6f52;
-  background: #0e120e;
-  color: #d1d8c4;
-  font-family: "Courier New", monospace;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #00ffff;
+  background: #001f1f;
+  color: #00ffff;
+  margin: 5px;
 }
-button {
+
+button:hover {
+  background: #003333;
   cursor: pointer;
-  background: linear-gradient(180deg, #2a3228 0%, #1d241c 100%);
-  color: #b7c9a6;
-  font-weight: bold;
-  text-transform: uppercase;
-  transition: 0.2s;
 }
-button:hover { background: #31412f; color: #e0f0d0; }
 
-/* Tabla */
-table {
+#resultados {
   margin-top: 20px;
-  border-collapse: collapse;
-  width: 95%;
-  max-width: 800px;
-  font-size: 14px;
-  background: #111511;
-  border: 1px solid #4a5b3f;
-  box-shadow: 0 0 10px rgba(0,255,100,0.05);
-}
-th, td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #2c352c;
   text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(0, 30, 30, 0.9);
+  border: 1px solid #00ffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 15px #00ffff33;
 }
-th {
-  background: #263126;
-  color: #d1d8c4;
-  text-transform: uppercase;
-  font-size: 13px;
-  letter-spacing: 1px;
-}
-tr:nth-child(even) { background: #151915; }
-tr:hover { background: #253025; }
 
-/* Mensaje */
-#mensaje {
-  margin-top: 20px;
-  color: #9fb39b;
-  font-size: 14px;
-  text-align: center;
+.linea {
+  border-bottom: 1px dashed #007777;
+  padding: 6px 0;
+}
+
+footer {
+  margin-top: 30px;
+  color: #007777;
+  font-size: 0.9rem;
 }
 </style>
 </head>
 <body>
 
-<h1>🔎 Contactos cargados por los corresponsales con su estacion  </h1>
+<h1>🛰️ REGISTRO DE CONTACTOS CONFIRMADOS</h1>
 
-<div>
-  <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
-  <button onclick="verContactos()">Ver contactos</button>
-</div>
+<p>Ingrese su distintivo (SD) para visualizar sus QSOs confirmados.</p>
 
-<div id="mensaje"></div>
-<table id="tablaContactos" style="display:none;">
-  <thead>
-    <tr>
-      <th>Estación Contactada</th>
-      <th>Fecha</th>
-      <th>Hora (UTC)</th>
-      <th>Banda</th>
-      <th>Modo</th>
-    </tr>
-  </thead>
-  <tbody id="tbodyContactos"></tbody>
-</table>
+<input type="text" id="sdVisitante" placeholder="Ej: LU1ABC" />
+<button onclick="buscarContactos()">Buscar</button>
+
+<div id="resultados"></div>
+
+<footer>
+BT<br>
+Transmisión finalizada.<br>
+AR<br>
+</footer>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzsJ1Sk-FxZ8c0RUo6SjaU2-jqiQVmOWaHBKMEfXfIAcWxWorObpS7Kcd2Y5o5lG9TP0A/exec";
+// URL pública de todos.json generado por tu Apps Script
+const URL_JSON = "https://script.google.com/macros/s/AKfycbzsJ1Sk-FxZ8c0RUo6SjaU2-jqiQVmOWaHBKMEfXfIAcWxWorObpS7Kcd2Y5o5lG9TP0A/exec"; 
+// ⚠️ Reemplazar con tu URL publicada del Apps Script (que devuelva todos.json)
 
-// 🔹 Mostrar listado de contactos
-async function verContactos() {
+async function buscarContactos() {
   const sd = document.getElementById('sdVisitante').value.trim().toUpperCase();
-  const mensaje = document.getElementById('mensaje');
-  const tabla = document.getElementById('tablaContactos');
-  const tbody = document.getElementById('tbodyContactos');
-
-  if (!sd) {
-    mensaje.textContent = "Ingrese su SD para ver los contactos.";
-    tabla.style.display = 'none';
-    return;
-  }
-
-  mensaje.textContent = "Cargando contactos...";
-  tabla.style.display = 'none';
-  tbody.innerHTML = "";
+  const contenedor = document.getElementById('resultados');
+  contenedor.innerHTML = "⏳ Cargando datos...";
 
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
+    const resp = await fetch(URL_JSON);
+    const datos = await resp.json();
 
-    const contactos = data.filter(c => c.call === sd);
+    let encontrados = [];
+    for (const [owner, contactos] of Object.entries(datos)) {
+      for (const qso of contactos) {
+        const call = (qso.call || "").toUpperCase();
+        const station = (qso.station_callsign || "").toUpperCase();
+        if (call === sd || station === sd) {
+          encontrados.push({
+            owner,
+            call: qso.call || "",
+            date: qso.qso_date || "",
+            time: qso.time_on || "",
+            band: qso.band || "",
+            mode: qso.mode || ""
+          });
+        }
+      }
+    }
 
-    if (contactos.length === 0) {
-      mensaje.textContent = "⚠️ No se encontraron contactos para este SD.";
+    if (encontrados.length === 0) {
+      contenedor.innerHTML = `<p>⚠️ No se encontraron contactos confirmados para <b>${sd}</b>.</p>`;
       return;
     }
 
-    contactos.forEach(c => {
-      const fila = document.createElement('tr');
-      fila.innerHTML = `
-        <td>${c.owner}</td>
-        <td>${c.date}</td>
-        <td>${c.time}</td>
-        <td>${c.band}</td>
-        <td>${c.mode}</td>
-      `;
-      tbody.appendChild(fila);
+    // Mostrar resultados tipo parte naval
+    let html = `<p>📖 Informe de contacto para <b>${sd}</b></p><hr>`;
+    encontrados.forEach((q, i) => {
+      html += `
+        <div class="linea">
+          Nº ${i + 1}<br>
+          ESTACIÓN CONTACTADA: ${q.owner}<br>
+          LLAMADA: ${q.call}<br>
+          FECHA: ${q.date}  HORA: ${q.time}<br>
+          BANDA: ${q.band}  MODO: ${q.mode}<br>
+          -- FIN DE ENTRADA --
+        </div>`;
     });
 
-    mensaje.textContent = `✅ Se encontraron ${contactos.length} contactos.`;
-    tabla.style.display = 'table';
+    html += `<hr><p>BT<br>Fin del mensaje.<br>AR</p>`;
+    contenedor.innerHTML = html;
 
   } catch (err) {
     console.error(err);
-    mensaje.textContent = "❌ Error al cargar los contactos del concurso.";
+    contenedor.innerHTML = `<p>❌ Error al cargar datos del servidor.</p>`;
   }
 }
 </script>
-
 </body>
 </html>
+
 
 
 
