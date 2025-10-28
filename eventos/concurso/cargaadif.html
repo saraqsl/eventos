@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cargar ADIF – Concurso</title>
+<style>
+body {
+  font-family: "Courier New", monospace;
+  background: #1e2b1e;
+  color: #c8d8c4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+}
+h1 {
+  text-transform: uppercase;
+  color: #b0ffb0;
+  border-bottom: 2px solid #4a5b3f;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+form {
+  background: #263326;
+  border: 2px solid #4a5b3f;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+}
+label {
+  display: block;
+  margin-top: 10px;
+  color: #b7c9a6;
+}
+input[type="text"], input[type="email"], input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: none;
+  background: #303f30;
+  color: #fff;
+}
+button {
+  background: #506b50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.3s;
+  width: 100%;
+}
+button:hover { background: #7fb77f; }
+#mensaje { margin-top: 20px; text-align: center; }
+</style>
+</head>
+<body>
+<h1>📡 Cargar Log de Concurso</h1>
+<form id="formAdif">
+  <label for="licencia">📻 Indicativo (SD):</label>
+  <input type="text" id="licencia" name="licencia" required>
+
+  <label for="email">✉️ Correo electrónico:</label>
+  <input type="email" id="email" name="email" required>
+
+  <label for="archivo">📁 Archivo ADIF (.adi):</label>
+  <input type="file" id="archivo" name="archivo" accept=".adi,.adif" required>
+
+  <button type="submit">Enviar Log</button>
+</form>
+<div id="mensaje"></div>
+
+<script>
+const SCRIPT_URL = "TU_URL_WEBAPP_GAS"; // la del Apps Script
+
+document.getElementById("formAdif").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const licencia = document.getElementById("licencia").value.trim().toUpperCase();
+  const email = document.getElementById("email").value.trim();
+  const archivo = document.getElementById("archivo").files[0];
+  const mensaje = document.getElementById("mensaje");
+
+  if (!archivo) return alert("Seleccioná un archivo ADIF.");
+
+  const formData = new FormData();
+  formData.append("licencia", licencia);
+  formData.append("email", email);
+  formData.append("archivo", archivo);
+
+  mensaje.textContent = "⏳ Enviando...";
+  try {
+    const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
+    const data = await res.json();
+    mensaje.textContent = data.success ? "✅ Archivo cargado correctamente" : "❌ Error al cargar";
+  } catch {
+    mensaje.textContent = "❌ Error de conexión.";
+  }
+});
+</script>
+</body>
+</html>
