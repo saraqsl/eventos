@@ -5,6 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eventos Anuales SARA ⚓ Radar Naval</title>
 <style>
+<!-- 🔢 Contador de visitas estilo botón -->
+<div id="contadorVisitas" style="
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: 2px solid #00ff99;
+  border-radius: 10px;
+  color: #00ff99;
+  background: rgba(0,20,40,0.9);
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  text-shadow: 0 0 6px #00ff99;
+  box-shadow: 0 0 10px #00ff9944;
+  cursor: default;
+  transition: all 0.3s ease;
+">
+  👀 Cargando visitas...
+</div>
+
+<script>
+async function contarVisita() {
+  try {
+    const resp = await fetch(
+      "https://script.google.com/macros/s/AKfycbxue9-C31QQzJNPuJ4Ao1pthssBLjy4b15WGy7lunXCNLpGkF-KbAPadp--j5tqldfWRw/exec?action=contador"
+    );
+    const data = await resp.json();
+    document.getElementById("contadorVisitas").innerHTML = `👀 Visitas: <b>${data.visitas}</b>`;
+  } catch (err) {
+    document.getElementById("contadorVisitas").innerText = "❌ Error contador";
+  }
+}
+contarVisita();
+</script>
 
   /* --- ESTILO GENERAL --- */
 body {
@@ -308,6 +341,7 @@ document.querySelectorAll('.evento-item').forEach(item => {
 
 </body>
 </html>
+
 
 
 
