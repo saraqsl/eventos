@@ -281,24 +281,27 @@ footer {
 
 <script>
 // --- Contador de visitas ---
+// --- Contador de visitas ---
 async function contarVisita() {
   const contador = document.getElementById("contadorVisitas");
   const hoy = new Date().toISOString().slice(0, 10);
   const ultimaVisita = localStorage.getItem("ultimaVisitaSARA");
 
+  // 👉 Nuevo script del contador
   const urlBase = "https://script.google.com/macros/s/AKfycbxeDKsR0i_lV1-yg9ci3B-N2X6VSqRP8pMr9791hT28M3GIFShXf2qMBQRtP1Q24i1Ieg/exec";
 
   try {
-    const accion = (ultimaVisita === hoy) ? "contador_solo_ver" : "contador_sumar";
+    const accion = (ultimaVisita === hoy) ? "ver" : "sumar";
     const resp = await fetch(`${urlBase}?action=${accion}`);
     const data = await resp.json();
     contador.innerHTML = `👀 Visitas: <b>${data.visitas}</b>`;
-    if (accion === "contador_sumar") localStorage.setItem("ultimaVisitaSARA", hoy);
+    if (accion === "sumar") localStorage.setItem("ultimaVisitaSARA", hoy);
   } catch {
     contador.innerHTML = "❌ Error contador";
   }
 }
 contarVisita();
+
 
 // --- Modal acceso privado ---
 const modal = document.getElementById("modalPrivado");
@@ -334,6 +337,7 @@ document.querySelectorAll('.evento-item').forEach(item => {
 </script>
 </body>
 </html>
+
 
 
 
