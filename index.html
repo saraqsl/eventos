@@ -286,7 +286,7 @@ async function contarVisita() {
   const hoy = new Date().toISOString().slice(0, 10);
   const ultimaVisita = localStorage.getItem("ultimaVisitaSARA");
 
-  const urlBase = "https://script.google.com/macros/s/AKfycby4BPugmNZ5-vkamxuwHj_h2fmtMVOSaemgI4zq6MxIBQFunTAt87w3gSnaTe7_01DD0Q/exec";
+  const urlBase = "https://script.google.com/macros/s/AKfycbxeDKsR0i_lV1-yg9ci3B-N2X6VSqRP8pMr9791hT28M3GIFShXf2qMBQRtP1Q24i1Ieg/exec";
 
   try {
     const accion = (ultimaVisita === hoy) ? "contador_solo_ver" : "contador_sumar";
@@ -334,6 +334,7 @@ document.querySelectorAll('.evento-item').forEach(item => {
 </script>
 </body>
 </html>
+
 
 
 
