@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Escuchas</title>
+<style>
+  body {
+    background-color: #0a0a0a;
+    color: #e0e0e0;
+    font-family: "Courier New", monospace;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 {
+    color: #00ff55;
+    text-shadow: 0 0 8px #00ff55;
+  }
+  form {
+    background-color: #111;
+    border: 2px solid #0f0;
+    border-radius: 10px;
+    display: inline-block;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: left;
+    width: 300px;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+    color: #8f8;
+  }
+  input, select {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: none;
+    background-color: #222;
+    color: #0f0;
+    font-size: 14px;
+  }
+  button {
+    margin-top: 15px;
+    width: 100%;
+    background-color: #004400;
+    color: #00ff55;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px;
+    border: 2px solid #00ff55;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #007700;
+  }
+  #mensaje {
+    margin-top: 20px;
+    color: #0f0;
+    font-weight: bold;
+  }
+  a.volver {
+    display: inline-block;
+    margin-top: 30px;
+    color: #00ff55;
+    text-decoration: none;
+    border: 1px solid #00ff55;
+    padding: 6px 12px;
+    border-radius: 6px;
+  }
+  a.volver:hover {
+    background-color: #004400;
+  }
+</style>
+</head>
+<body>
+
+<h1>📡 Registro de Escuchas SWL</h1>
+
+<form id="formEscucha">
+  <label>📛 Tu SD de Escucha:</label>
+  <input type="text" name="swl" required placeholder="Ej: LU-1234-SWL">
+
+  <label>🎯 Estación Escuchada:</label>
+  <input type="text" name="escuchado" required placeholder="Ej: LU8XXX">
+
+  <label>📅 Fecha:</label>
+  <input type="date" name="fecha" required>
+
+  <label>🕓 Hora (UTC):</label>
+  <input type="time" name="hora" required>
+
+  <label>📶 Banda:</label>
+  <input type="text" name="banda" required placeholder="Ej: 40m">
+
+  <label>🎙️ Modo:</label>
+  <input type="text" name="modo" required placeholder="Ej: SSB">
+
+  <button type="submit">Enviar Registro</button>
+</form>
+
+<p id="mensaje"></p>
+
+<a href="index.html" class="volver">⬅️ Volver</a>
+
+<script>
+document.getElementById("formEscucha").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const datos = Object.fromEntries(new FormData(e.target).entries());
+  const urlScript = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyJ9qMlbkZ134feqwij3x0zvgJuJWDHuC1sxdTQRti6cVXuna8UTB6fwAXkzLj9g1pyLw/exec";
+
+  try {
+    const response = await fetch(urlScript, {
+      method: "POST",
+      body: JSON.stringify(datos),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const result = await response.json();
+    document.getElementById("mensaje").textContent = result.mensaje || "✅ Escucha guardada correctamente";
+    e.target.reset();
+  } catch (err) {
+    document.getElementById("mensaje").textContent = "❌ Error al enviar. Intente nuevamente.";
+  }
+});
+</script>
+
+</body>
+</html>
+
