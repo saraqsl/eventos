@@ -78,7 +78,7 @@ document.getElementById("formEscucha").addEventListener("submit", async (e) => {
   const datos = Object.fromEntries(new FormData(e.target).entries());
 
   try {
-    const response = await fetch("", { // 🔸 vacío → envía al mismo script
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwUiggn3-L670n_dst8ONTemthc-FEIsQmMxjnf2dRx682sbFRXy4VltSkqglW1fC4-Mg/exec", { // 🔸 vacío → envía al mismo script
       method: "POST",
       body: JSON.stringify(datos),
       headers: { "Content-Type": "application/json" }
@@ -95,6 +95,7 @@ document.getElementById("formEscucha").addEventListener("submit", async (e) => {
 
 </body>
 </html>
+
 
 
 
