@@ -181,6 +181,20 @@ footer {
   border-radius: 6px;
   cursor: pointer;
 }
+  #btnEscuchas {
+  float: right;
+  font-size: 0.85em;
+  padding: 4px 8px;
+  background: #009966;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+#btnEscuchas:hover {
+  background: #00cc88;
+}
 #btnBases:hover { background: #00b4d8; }
 </style>
 </head>
@@ -205,8 +219,10 @@ footer {
 
   <div class="evento-lista">
     <h2>📡 Eventos disponibles
-      <button id="btnBases" onclick="window.open('bases.html','_blank')">Bases</button>
-    </h2>
+  <button id="btnBases" onclick="window.open('bases.html','_blank')">Bases</button>
+  <button id="btnEscuchas" onclick="window.open('escuchas.html','_blank')">Escuchas</button>
+</h2>
+
 
     <div class="evento-item" data-fecha-inicio="2025-11-01" data-fecha-fin="2025-11-08">
       <a href="eventos/2025_EV07-25/evento.html">🛰️ Olimpiadas VGM CMM 2025</a>
@@ -339,6 +355,7 @@ document.querySelectorAll('.evento-item').forEach(item => {
 </script>
 </body>
 </html>
+
 
 
 
