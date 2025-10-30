@@ -10,13 +10,20 @@ Olimpiadas VGM
 OLIMPIADAS '25 - Punta Alta SE HIZO REALIDAD ¡¡¡ PUNTA ALTA ES OLIMPICA 
     Estaciones Autorizadas entrega qsl 
 
-LU1BCP	Alejandro	LU8DIP	Diego
-LU1CBQ	Luis	    LU9FWM	Luis
-LU3AFJ	Daniel	    LU9MAH	Adrián
-LU4WAC	Alberto	    LW1DPS	Raúl
-LU5AB	Fabián	    LW3DQF	Carlos
-LU5DU	Gustavo   	LW9DTR	Martín
-LU6DKT	Jorge	    LW9ELX	Edgardo
+LU1BCP	Alejandro	
+LU8DIP	Diego
+LU1CBQ	Luis	    
+LU9FWM	Luis
+LU3AFJ	Daniel	    
+LU9MAH	Adrián
+LU4WAC	Alberto	    
+LW1DPS	Raúl
+LU5AB	Fabián	    
+LW3DQF	Carlos
+LU5DU	Gustavo   	
+LW9DTR	Martín
+LU6DKT	Jorge	    
+LW9ELX	Edgardo
 LU6EWR	Rolando		
 Período de Activación	Del 1 al 8 de noviembre de 2025.
 Horario de Operación	Según disponibilidad de operadores 
@@ -27,6 +34,7 @@ Un evento del Servicio Auxiliar de Radioaficionados de la Armada (SARA)
 BT
 FIN MENSAJE
 AR
+
 
 
 
