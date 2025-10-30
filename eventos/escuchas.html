@@ -1,57 +1,101 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prueba Escuchas (debug)</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Escuchas</title>
+<style>
+  body {
+    background-color: #0a0a0a;
+    color: #e0e0e0;
+    font-family: "Courier New", monospace;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 {
+    color: #00ff55;
+    text-shadow: 0 0 8px #00ff55;
+  }
+  form {
+    background-color: #111;
+    border: 2px solid #0f0;
+    border-radius: 10px;
+    display: inline-block;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: left;
+    width: 300px;
+  }
+  label { display:block; margin-top:10px; color:#8f8; }
+  input, select {
+    width:100%; padding:6px; margin-top:5px; border-radius:4px;
+    border:none; background-color:#222; color:#0f0; font-size:14px;
+  }
+  button {
+    margin-top:15px; width:100%; background-color:#004400;
+    color:#00ff55; font-size:16px; font-weight:bold; padding:8px;
+    border:2px solid #00ff55; border-radius:6px; cursor:pointer;
+  }
+  button:hover { background-color:#007700; }
+  #mensaje { margin-top:20px; color:#0f0; font-weight:bold; }
+</style>
 </head>
 <body>
-<h3>Prueba envío escuchas (debug)</h3>
+
+<h1>📡 Registro de Escuchas SWL</h1>
 
 <form id="formEscucha">
-  <input name="swl" placeholder="SWL" required><br>
-  <input name="correo" placeholder="correo@example.com" type="email" required><br>
-  <input name="escuchado" placeholder="estacion" required><br>
-  <input name="fecha" type="date" required><br>
-  <input name="hora" type="time" required><br>
-  <input name="banda" placeholder="40m"><br>
-  <input name="modo" placeholder="SSB"><br>
-  <button>Enviar</button>
+  <label>📛 Tu SD de Escucha:</label>
+  <input type="text" name="swl" required placeholder="Ej: LU-1234-SWL">
+
+  <label>📧 Tu correo electrónico:</label>
+  <input type="email" name="correo" required placeholder="Ej: ejemplo@mail.com">
+
+  <label>🎯 Estación Escuchada:</label>
+  <input type="text" name="escuchado" required placeholder="Ej: LU8XXX">
+
+  <label>📅 Fecha:</label>
+  <input type="date" name="fecha" required>
+
+  <label>🕓 Hora (UTC):</label>
+  <input type="time" name="hora" required>
+
+  <label>📶 Banda:</label>
+  <input type="text" name="banda" required placeholder="Ej: 40m">
+
+  <label>🎙️ Modo:</label>
+  <input type="text" name="modo" required placeholder="Ej: SSB">
+
+  <button type="submit">Enviar Registro</button>
 </form>
 
-<pre id="out" style="background:#eee;padding:10px;"></pre>
+<p id="mensaje"></p>
 
 <script>
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbw681M1zJqJSSfHRF4kklJUrjlBynFlz7RUhmP_H-63RJidtElqwomoaRX7CWgGxK0Ctg/exec"; // <- pegá la URL del nuevo deployment
-
-document.getElementById('formEscucha').addEventListener('submit', async (ev) => {
-  ev.preventDefault();
-  const datos = Object.fromEntries(new FormData(ev.target).entries());
-  const out = document.getElementById('out');
-  out.textContent = "Enviando...\n";
+document.getElementById("formEscucha").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  document.getElementById("mensaje").textContent = "📡 Enviando...";
+  const datos = Object.fromEntries(new FormData(e.target).entries());
 
   try {
-    const res = await fetch(URL_SCRIPT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(datos)
+    const response = await fetch("", { // 🔸 vacío → envía al mismo script
+      method: "POST",
+      body: JSON.stringify(datos),
+      headers: { "Content-Type": "application/json" }
     });
 
-    const text = await res.text(); // tomamos el texto crudo
-    out.textContent += "HTTP status: " + res.status + " " + res.statusText + "\n\n";
-    out.textContent += "Respuesta cruda:\n" + text + "\n\n";
-
-    try {
-      const json = JSON.parse(text);
-      out.textContent += "JSON.parse OK:\n" + JSON.stringify(json, null, 2);
-    } catch (err) {
-      out.textContent += "No fue JSON válido: " + err.message;
-    }
-
+    const result = await response.json();
+    document.getElementById("mensaje").textContent = result.mensaje || "✅ Escucha guardada correctamente";
+    e.target.reset();
   } catch (err) {
-    out.textContent += "ERROR fetch: " + err.message;
+    document.getElementById("mensaje").textContent = "❌ Error al enviar. Intente nuevamente.";
   }
 });
 </script>
+
 </body>
 </html>
+
+
 
 
