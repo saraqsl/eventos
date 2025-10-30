@@ -31,7 +31,7 @@
     margin-top: 10px;
     color: #8f8;
   }
-  input, select {
+  input {
     width: 100%;
     padding: 6px;
     margin-top: 5px;
@@ -83,6 +83,9 @@
   <label>📛 Tu SD de Escucha:</label>
   <input type="text" name="swl" required placeholder="Ej: LU-1234-SWL">
 
+  <label>📧 Correo electrónico:</label>
+  <input type="email" name="correo" required placeholder="Ej: nombre@ejemplo.com">
+
   <label>🎯 Estación Escuchada:</label>
   <input type="text" name="escuchado" required placeholder="Ej: LU8XXX">
 
@@ -109,7 +112,7 @@
 document.getElementById("formEscucha").addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target).entries());
-  const urlScript = "https://script.google.com/macros/s/AKfycbyndmRNZORH9N0jkLz_Au2shyVe_Wppv-avM9Yjvw7U4j9tbxAufeCw588vyaS-gFRLKw/exec";
+  const urlScript = "https://script.google.com/macros/s/AKfycbyiVVwZX_OUPoRl2Oajdaxe9-t9_N-6tk-57_2WiuzKUV9FXM4uUII_WT23-_9Gd3aULA/exec";
 
   try {
     const response = await fetch(urlScript, {
@@ -119,16 +122,20 @@ document.getElementById("formEscucha").addEventListener("submit", async (e) => {
     });
 
     const result = await response.json();
-    document.getElementById("mensaje").textContent = result.mensaje || "✅ Escucha guardada correctamente";
+    document.getElementById("mensaje").textContent =
+      result.mensaje || "✅ Escucha guardada correctamente";
     e.target.reset();
   } catch (err) {
-    document.getElementById("mensaje").textContent = "❌ Error al enviar. Intente nuevamente.";
+    document.getElementById("mensaje").textContent =
+      "❌ Error al enviar. Intente nuevamente.";
   }
 });
 </script>
 
 </body>
 </html>
+
+
 
 
 
