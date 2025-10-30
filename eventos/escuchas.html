@@ -109,7 +109,7 @@
 document.getElementById("formEscucha").addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target).entries());
-  const urlScript = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyJ9qMlbkZ134feqwij3x0zvgJuJWDHuC1sxdTQRti6cVXuna8UTB6fwAXkzLj9g1pyLw/exec";
+  const urlScript = "https://script.google.com/macros/s/AKfycbwj8EPEWyQNSnrgE6--zkYyxhvhIneWE8ZhE6G8onm1OcLq8vxeikAVjXTbJQwZ5MHOpg/exec";
 
   try {
     const response = await fetch(urlScript, {
@@ -129,4 +129,5 @@ document.getElementById("formEscucha").addEventListener("submit", async (e) => {
 
 </body>
 </html>
+
 
