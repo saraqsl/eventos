@@ -291,8 +291,9 @@ async function contarVisita() {
   const urlBase = "https://script.google.com/macros/s/AKfycbzR9oIRLei7V44_qXGlAGgRYqNATnCdg1xt2w1ob-Qtg5EyahuLZfUq5b1qbvlzmSrosg/exec";
 
   try {
-    const accion = (ultimaVisita === hoy) ? "ver" : "sumar";
-    const resp = await fetch(`${urlBase}?action=${accion}`);
+  const accion = (ultimaVisita === hoy) ? "contador_solo_ver" : "contador_sumar";
+const resp = await fetch(`${urlBase}?action=${accion}`);
+
     const data = await resp.json();
     contador.innerHTML = `👀 Visitas: <b>${data.visitas}</b>`;
     if (accion === "sumar") localStorage.setItem("ultimaVisitaSARA", hoy);
@@ -337,6 +338,7 @@ document.querySelectorAll('.evento-item').forEach(item => {
 </script>
 </body>
 </html>
+
 
 
 
