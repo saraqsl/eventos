@@ -50,15 +50,22 @@ h1 {
 }
 #visitante { border-left: 5px solid #007bff; }
 
+.botones {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 a.button {
-  display:inline-block;
+  flex: 1;
+  text-align: center;
   padding:10px 20px;
   background:#007bff;
   color:white;
   border-radius:6px;
   text-decoration:none;
-  margin-top: 10px;
-  text-align: center;
+  min-width: 120px;
 }
 a.button:hover { background:#0056b3; }
 
@@ -92,7 +99,7 @@ a.button:hover { background:#0056b3; }
 <body>
 
 <h1>
-  QSL SARA Armada Argentina – XXI JUEGOS OLIMPICOS Y PARALIMPICOS PARA
+  QSL SARA Armada Argentina – XXI JUEGOS OLÍMPICOS Y PARALÍMPICOS PARA
   VETERANOS DE GUERRA EN MALVINAS
   <button id="btnActivador" title="Panel Activador" onclick="abrirActivador()">
     <img src="candado.png" alt="Activador">
@@ -100,12 +107,16 @@ a.button:hover { background:#0056b3; }
 </h1>
 
 <div id="visitante" class="card">
-  <h2>Radioaficionados y radioescuchas </h2>
-  <p>las qsl estaran disponible durante
-  o finalizado el evento para los radiaficionados . 
-    las estaciones swl tendran que previamente 
-    cargar escucha en la web principal boton SWL :</p>
-  <a href="visitante.html" class="button">🔎 Ver QSL </a>
+  <h2>Radioaficionados y Radioescuchas</h2>
+  <p>
+    Las QSL estarán disponibles durante o finalizado el evento para los radioaficionados.
+    Las estaciones SWL deberán cargar sus escuchas en la web principal (botón SWL).
+  </p>
+
+  <div class="botones">
+    <a href="visitante.html" class="button">🔎 Ver QSL</a>
+    <a href="bases.pdf" target="_blank" class="button" style="background:#28a745;">📜 Ver Bases PDF</a>
+  </div>
 </div>
 
 <div id="mensajeEvento">
