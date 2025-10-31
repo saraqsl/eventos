@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Próximamente - SARA</title>
+<style>
+  :root{
+    --bg:#0b1610;
+    --panel:#0f2a1f;
+    --accent:#9bd07a;
+    --accent-dark:#6aa44e;
+    --muted:#b7c3b0;
+    --gold:#d6c77f;
+  }
+  html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;background:
+    radial-gradient(ellipse at 20% 10%, rgba(155,208,122,0.05), transparent 10%),
+    linear-gradient(180deg,var(--bg), #07110a 80%); color:var(--muted);}
+
+  .wrap{
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+    box-sizing:border-box;
+  }
+
+  .card{
+    width:100%;
+    max-width:960px;
+    background: linear-gradient(180deg, rgba(15,42,31,0.95), rgba(8,20,13,0.95));
+    border:2px solid rgba(155,208,122,0.07);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+    border-radius:14px;
+    padding:30px;
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:22px;
+    align-items:center;
+  }
+
+  /* Left text */
+  .left h1{
+    margin:0 0 8px 0;
+    font-family: "Stencil Std","Impact", "Arial Black", sans-serif;
+    letter-spacing:2px;
+    color:var(--accent);
+    font-size: clamp(28px, 4.4vw, 40px);
+    text-shadow: 0 3px 0 rgba(0,0,0,0.6), 0 0 12px rgba(155,208,122,0.06);
+  }
+  .subtitle{
+    color:var(--muted);
+    margin: 0 0 16px 0;
+    font-size: clamp(14px, 1.6vw, 16px);
+    line-height:1.4;
+  }
+
+  .notice{
+    display:inline-block;
+    background: linear-gradient(90deg, rgba(155,208,122,0.07), rgba(155,208,122,0.02));
+    border-left:6px solid var(--accent);
+    padding:14px 16px;
+    border-radius:6px;
+    color:var(--muted);
+    max-width:700px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  }
+
+  .cta-row{
+    margin-top:16px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .btn{
+    background: linear-gradient(180deg,var(--accent),var(--accent-dark));
+    color:#06210a;
+    padding:10px 16px;
+    font-weight:700;
+    border-radius:8px;
+    text-decoration:none;
+    display:inline-block;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .btn.ghost{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid rgba(155,208,122,0.08);
+    font-weight:600;
+  }
+
+  /* Right side - soldier svg + badge */
+  .right {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    justify-content:center;
+  }
+
+  .shield{
+    width:220px;
+    height:220px;
+    display:grid;
+    place-items:center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.05));
+    border-radius:12px;
+    border: 2px solid rgba(155,208,122,0.06);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.6);
+  }
+
+  /* simple soldier silhouette (SVG) */
+  .soldier svg{ width:160px; height:160px; display:block; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6)); }
+  .under { font-size:13px; color:var(--gold); letter-spacing:1px; font-weight:700; text-transform:uppercase; }
+
+  /* subtle animated ribbon */
+  .ribbon{
+    margin-top:6px;
+    padding:6px 12px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(155,208,122,0.03));
+    border-radius:6px;
+    color:var(--muted);
+    border-left:6px solid var(--accent);
+    font-weight:600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  }
+
+  /* responsive */
+  @media (max-width:880px){
+    .card{ grid-template-columns: 1fr; padding:22px; }
+    .right{ order:-1; }
+    .shield{ width:170px; height:170px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main" aria-labelledby="titulo">
+      <div class="left">
+        <h1 id="titulo">EN BREVE SE PODRA DESCARGAR QSLs </h1>
+
+        <p class="subtitle">Gracias por su comprensión. Lo esperamos para participar — 73, SARA.</p>
+
+        <div class="notice" role="status" aria-live="polite">
+          <strong>Información:</strong>
+          <ul style="margin:8px 0 0 16px; padding:0; color:var(--muted);">
+            
+            <li>Pronto se habilitará el formulario para carga de ADIF y consultas de QSL.</li>
+            <li>Si necesita contacto urgente: respuesta vía correo de la organización.</li>
+          </ul>
+        </div>
+
+        <div class="cta-row" aria-hidden="false">
+          <a class="btn" href="index.html">🏠 Volver al sitio</a>
+          <a class="btn ghost" href="mailto:contacto@sara.org.ar">✉ Contacto</a>
+        </div>
+      </div>
+
+      <div class="right" aria-hidden="false">
+        <div class="shield">
+          <div class="soldier" title="En construcción">
+            <!-- SVG sencillo de casco/figura estilo militar (libre) -->
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="#9BD07A"/>
+                  <stop offset="1" stop-color="#6AA44E"/>
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="200" height="200" rx="12" fill="url(#g1)" opacity="0.06"/>
+              <!-- casco -->
+              <path d="M40 80 q60 -60 120 0 v18 q0 20 -120 0 z" fill="#0b2d20" stroke="#06301a" stroke-width="2"/>
+              <!-- cara -->
+              <ellipse cx="100" cy="118" rx="34" ry="34" fill="#0d1b14"/>
+              <!-- visera -->
+              <rect x="56" y="100" width="88" height="12" rx="4" fill="#07130b"/>
+              <!-- insignia -->
+              <circle cx="100" cy="66" r="8" fill="#d6c77f"/>
+              <!-- cuerpo simplificado -->
+              <path d="M60 148 q40 30 80 0 v18 h-80 z" fill="#06140b"/>
+              <!-- texto pequeño -->
+              <text x="100" y="186" font-size="12" text-anchor="middle" fill="#cfe8b9" font-family="Arial, sans-serif">SARA - Armada</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="under">Próxima activación</div>
+        <div class="ribbon">Mantente atento — más información pronto</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
