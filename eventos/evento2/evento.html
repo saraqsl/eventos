@@ -50,15 +50,22 @@ h1 {
 }
 #visitante { border-left: 5px solid #007bff; }
 
+.botones {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 a.button {
-  display:inline-block;
+  flex: 1;
+  text-align: center;
   padding:10px 20px;
   background:#007bff;
   color:white;
   border-radius:6px;
   text-decoration:none;
-  margin-top: 10px;
-  text-align: center;
+  min-width: 120px;
 }
 a.button:hover { background:#0056b3; }
 
@@ -102,8 +109,12 @@ BASE AERONAVAL ALTE MARCOS ZAR TRELEW
 
 <div id="visitante" class="card">
   <h2>Visitante</h2>
-  <p>Ver tus QSL desde la carpeta del evento:</p>
-  <a href="visitante.html" class="button">🔎 Ver QSL como visitante</a>
+  <p>Las QSL estarán disponibles durante o finalizado el evento para los radioaficionados.
+    Las estaciones SWL deberán cargar sus escuchas en la web principal (botón SWL).:</p>
+ <div class="botones">
+    <a href="visitante1.html" class="button">🔎 Ver QSL</a>
+    <a href="bases.pdf" class="button" style="background:#28a745;">📜 Ver Bases PDF</a>
+  </div>
 </div>
 
 <div id="mensajeEvento">
@@ -130,4 +141,5 @@ fetch("mensaje.txt")
 
 </body>
 </html>
+
 
