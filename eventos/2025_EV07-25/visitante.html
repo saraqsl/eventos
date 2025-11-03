@@ -68,7 +68,7 @@ canvas {
 </head>
 <body>
 
-<h1>🔎 Ver QSL – EV07-25 Disponibles cuando los operadores comiencen la carga de contactos </h1>
+<h1>🔎 Ver QSL – EV07-25 Disponibles puede descargar si los operadores subieron contactos </h1>
 
 <input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: lu9mah)">
 <button onclick="verQSL()">Ver mis QSLs</button>
@@ -108,19 +108,19 @@ function generarQSL(activador, contacto) {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // Activador a la izquierda
-      ctx.font = 'bold 36px Arial';
-      ctx.fillStyle = 'red';
-      ctx.textAlign = 'left';
-      ctx.fillText(activador, 20, 70);
+      ctx.font = 'bold 50px types roman';
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'center';
+      ctx.fillText(activador, 290, 70);
 
       // Datos abajo en dos líneas centradas
       ctx.font = 'bold 20px Arial';
       ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'right';
       const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
       const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
-      ctx.fillText(linea1, canvas.width / 2, canvas.height - 60);
-      ctx.fillText(linea2, canvas.width / 2, canvas.height - 30);
+      ctx.fillText(linea1, canvas.width / 2 +85, canvas.height - 60);
+      ctx.fillText(linea2, canvas.width / 2+90, canvas.height - 35);
 
       // ✅ Botón de descarga individual
       const btnDescarga = document.createElement('button');
