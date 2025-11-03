@@ -121,7 +121,7 @@ function generarQSL(activador, contacto) {
       const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
       const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
       ctx.fillText(linea1, canvas.width / 2 +85, canvas.height - 60);
-      ctx.fillText(linea2, canvas.width / 2+90, canvas.height - 35);
+      ctx.fillText(linea2, canvas.width / 2+100, canvas.height - 35);
 
       // ✅ Botón de descarga individual
       const btnDescarga = document.createElement('button');
@@ -219,4 +219,5 @@ async function copiarActual() {
 
 </body>
 </html>
+
 
