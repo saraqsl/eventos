@@ -88,7 +88,7 @@ canvas {
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwGheoFenZr8EfbrZ3H2SNwHX0lgKe45xF_3WIQ-0FL1Q5qc03H_2onSTlD76RHmFxMUA/exec";
-const IMG_QSL = "qsl.jpg"; 
+const IMG_QSL = "qsl.png"; 
 let canvasesGenerados = [];
 
 // 🧩 Generar QSL en canvas (dos líneas de datos, negrita)
@@ -99,7 +99,7 @@ function generarQSL(activador, contacto) {
 
     const canvas = document.createElement('canvas');
     canvas.width = 600;
-    canvas.height = 350;
+    canvas.height = 330;
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
@@ -219,6 +219,7 @@ async function copiarActual() {
 
 </body>
 </html>
+
 
 
 
