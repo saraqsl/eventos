@@ -91,7 +91,25 @@ function parseADIF(texto, activador) {
       date: get('QSO_DATE'),
       time: get('TIME_ON'),
       band: get('BAND'),
-      mode: get('MODE')
+      mode: get('MODE'),
+      rst: get('RST_RCVD')
+    };
+    return {
+      owner: activador,
+      call: get('CALL').toUpperCase(),
+      date: get('QSO_DATE'),
+      time: get('TIME_ON'),
+      band: get('BAND'),
+      mode: get('MODE'),
+      rst: get('RST_RCVD')
+    };
+  }).filter(x => x.call);
+}
+
+// ☁️ Subir ADIF a Drive
+async function subirAdif() {
+  if (!accesoPermitido) {
+    alert("⚠️ Ingresá la clave de activador primero.");
     };
   }).filter(x => x.call);
 }
@@ -140,6 +158,7 @@ async function subirAdif() {
 
 </body>
 </html>
+
 
 
 
