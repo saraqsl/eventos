@@ -1,9 +1,33 @@
 DE: 
 A: TODOS LOS OPERADORES
 BT
+Sabado: 08 desde las 18:00hs (LU) hasta el 09 a 02:00hs (LU).
+
+Bandas: 40 – 10 – 2 Mts.
+
+Modos: SSB – FM – DV.
+
+REQUISITOS PARA LA OBTENCIÓN DE LA QSL
+
+Las Estaciones de Radioaficionados (argentinas y extranjeras):
+
+•	Deberán contactar con la Señal Distintiva “LU7AHM”
+
+Descarga de QSL:
+
+•	Las QSL se podrán descargar ingresando a: http://www.saraqsl.com, en la sección correspondiente al evento.
+
+Verificación de QSO: 
+
+•	En caso de que el corresponsal no vea reflejada su QSL, deberá contactarse con el Manager.
+
+Para estaciones SWL (radio escuchas):
+
+•	Procedimiento: Las estaciones Radioescuchas podrán confirmar las recepciones cargando todos los datos escuchados en la web o enviándolos a la siguiente dirección de correo electrónico: “lu3ia@hotmail.com” (Manager – Armada Argentina)
 
 TAREA A REALIZAR:
-Contactar con la estación
+Contactar con la estación  L U 7 A H M 
 BT
 FIN MENSAJE
+
 AR
