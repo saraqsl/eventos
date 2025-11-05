@@ -58,7 +58,7 @@ h1 { margin-bottom: 30px; }
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzj-2MqYOph8tBrj4M2mg0L4-omSiijacWzX-xP_3M763vdWxGtID05CR0RertnOweYKg/exec";
-const CLAVE_CORRECTA = "sara"; // 🔑 Clave de activador
+const CLAVE_CORRECTA = "sarasarmiento"; // 🔑 Clave de activador
 let accesoPermitido = false;
 
 // 🔒 Verificar clave
@@ -91,7 +91,8 @@ function parseADIF(texto, activador) {
       date: get('QSO_DATE'),
       time: get('TIME_ON'),
       band: get('BAND'),
-      mode: get('MODE')
+      mode: get('MODE'),
+      rst: get('RST_RCVD')
     };
   }).filter(x => x.call);
 }
@@ -140,3 +141,4 @@ async function subirAdif() {
 
 </body>
 </html>
+
