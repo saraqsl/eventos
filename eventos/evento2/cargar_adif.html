@@ -93,15 +93,7 @@ function parseADIF(texto, activador) {
       band: get('BAND'),
       mode: get('MODE'),
       rst: get('RST_RCVD')
-    };
-    return {
-      owner: activador,
-      call: get('CALL').toUpperCase(),
-      date: get('QSO_DATE'),
-      time: get('TIME_ON'),
-      band: get('BAND'),
-      mode: get('MODE'),
-      rst: get('RST_RCVD')
+   
     };
   }).filter(x => x.call);
 }
@@ -158,6 +150,7 @@ async function subirAdif() {
 
 </body>
 </html>
+
 
 
 
