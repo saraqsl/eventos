@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ver QSL – evento 3</title>
+<title>Ver QSL – EV07-25</title>
 <style>
 body {
   font-family: "Courier New", monospace;
@@ -20,7 +20,7 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-input, button, select {
+input, button {
   padding: 8px;
   margin: 6px 0;
   border-radius: 6px;
@@ -35,15 +35,11 @@ button {
   color: white;
   border: none;
   text-transform: uppercase;
+  transition: 0.2s;
 }
 button:hover { background: #0056b3; }
-select {
-  background: #fff;
-  color: #003366;
-  font-weight: bold;
-}
 canvas { 
-  margin-top: 20px; 
+  margin-top: 10px; 
   border: 2px solid #003366; 
   display: block;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
@@ -52,23 +48,39 @@ canvas {
   height: auto;
 }
 .qslCard {
+  margin-bottom: 20px;
   text-align: center;
-  margin-bottom: 25px;
 }
-small {
-  display: block;
-  color: #003366;
-  margin-bottom: 4px;
+.qslCard button {
+  margin-top: 8px;
+  background: #004c99;
+  font-size: 0.9em;
+  padding: 6px 10px;
+}
+.qslCard button:hover {
+  background: #0070cc;
+}
+#accionesDescarga {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
 }
 </style>
 </head>
 <body>
 
-<h1>📡 MENSAJE DE RADIO – evento 3</h1>
+<h1>🔎 Ver QSL con la estación LU7WH</h1>
 
-<input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: lu9mah)">
+<input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: LU1ABC)">
 <button onclick="verQSL()">Ver mis QSLs</button>
-<button onclick="descargarTodas()" id="btnDescargarTodas" style="display:none;">Descargar todas (ZIP)</button>
+
+<div id="accionesDescarga" style="display:none;">
+  <button onclick="descargarTodas()">📦 Descargar ZIP</button>
+  <button onclick="descargarActual()">🖼️ Descargar imagen</button>
+  <button onclick="copiarActual()">📋 Copiar imagen</button>
+</div>
 
 <div id="qslContainer"></div>
 
@@ -76,70 +88,65 @@ small {
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbzj-2MqYOph8tBrj4M2mg0L4-omSiijacWzX-xP_3M763vdWxGtID05CR0RertnOweYKg/exec";
-const IMG_QSL = "qsl.jpg";
+const IMG_QSL = "qsl.jpg"; // fondo de la QSL
 let canvasesGenerados = [];
 
-// 🧩 Generar QSL estilo militar/naval
+// 🧩 Generar QSL (con descarga individual)
 function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
+    const card = document.createElement('div');
+    card.className = 'qslCard';
+
     const canvas = document.createElement('canvas');
-    canvas.width = 530;
-    canvas.height = 340;
+    canvas.width = 600;
+    canvas.height = 380;
     const ctx = canvas.getContext('2d');
+
     const img = new Image();
     img.src = IMG_QSL;
     img.onload = () => {
-      const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
-      const newWidth = img.width * ratio;
-      const newHeight = img.height * ratio;
-      const offsetX = (canvas.width - newWidth) / 2;
-      const offsetY = (canvas.height - newHeight) / 2;
-      ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+      // Fondo
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // Texto militar/naval
-      ctx.fillStyle = '#001a33';
-      ctx.font = 'bold 30px "Courier New", monospace';
+      // Activador destacado
+      ctx.font = 'bold 70px "Times New Roman", monospace';
+      ctx.fillStyle = '#0033cc';
       ctx.textAlign = 'left';
-      ctx.fillText(`de ${activador}`, 25, 40);
-      ctx.fillText(`A ${contacto.call}`, 25, 70);
-      ctx.fillText(`BT`, 25, 100);
+      ctx.fillText(activador, 25, 60);
 
-      ctx.font = 'bold 18px "Courier New", monospace';
-      ctx.fillStyle = '#FFFFFF';
-      let y = 140;
-      const lineHeight = 24;
-      ctx.fillText(`FECHA: ${contacto.date}`, 25, y); y += lineHeight;
-      ctx.fillText(`HORA UTC: ${contacto.time}`, 25, y); y += lineHeight;
-      ctx.fillText(`BANDA: ${contacto.band}`, 25, y); y += lineHeight;
-      ctx.fillText(`MODO: ${contacto.mode}`, 25, y); y += lineHeight;
+      // Datos verticales
+      ctx.font = 'bold 18px "Arial Black", monospace';
+      ctx.fillStyle = '#00B0F0';
+      ctx.textAlign = 'left';
+      const startX = 38;
+      let y = 180;
+      const lineHeight = 25;
 
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 22px "Courier New", monospace';
-      ctx.fillText(`BT`, 25, y + 25);
-      ctx.fillText(`FIN MENSAJE`, 25, y + 55);
+      const datos = [
+        `CALL: ${contacto.call}`,
+        `FECHA: ${contacto.date}`,
+        `HORA UTC: ${contacto.time}`,
+        `BANDA: ${contacto.band}`,
+        `MODO: ${contacto.mode}`,
+         `RST: ${contacto.rst}`
+      ];
 
-      // 📸 Contenedor con botones individuales
-      const cardDiv = document.createElement('div');
-      cardDiv.className = "qslCard";
-      cardDiv.appendChild(canvas);
+      datos.forEach((linea) => {
+        ctx.strokeStyle = 'black';   // contorno
+        ctx.lineWidth = 3;
+        ctx.strokeText(linea, startX, y);
+        ctx.fillText(linea, startX, y);
+        y += lineHeight;
+      });
 
-      const label = document.createElement('small');
-      label.textContent = `${activador} ⇄ ${contacto.call}`;
-      cardDiv.appendChild(label);
+      // Agregar canvas + botón de descarga
+      card.appendChild(canvas);
+      const btnDesc = document.createElement('button');
+      btnDesc.textContent = '⬇️ Descargar esta QSL';
+      btnDesc.onclick = () => descargarIndividual(canvas, activador, contacto.call);
+      card.appendChild(btnDesc);
 
-      const select = document.createElement('select');
-      select.innerHTML = `
-        <option value="png">Descargar PNG</option>
-        <option value="jpg">Descargar JPG</option>
-        <option value="copiar">Copiar imagen</option>`;
-      cardDiv.appendChild(select);
-
-      const btnGuardar = document.createElement('button');
-      btnGuardar.textContent = "Guardar / Copiar";
-      btnGuardar.onclick = () => descargarIndividual(canvas, activador, contacto.call, select.value);
-      cardDiv.appendChild(btnGuardar);
-
-      document.getElementById('qslContainer').appendChild(cardDiv);
+      document.getElementById('qslContainer').appendChild(card);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
       resolve();
     };
@@ -154,11 +161,12 @@ async function verQSL() {
   const container = document.getElementById('qslContainer');
   container.innerHTML = "Cargando...";
   canvasesGenerados = [];
-  document.getElementById('btnDescargarTodas').style.display = 'none';
+  document.getElementById('accionesDescarga').style.display = 'none';
 
   try {
     const res = await fetch(API_URL);
     const allData = await res.json();
+
     container.innerHTML = "";
     let encontrados = 0;
 
@@ -172,7 +180,7 @@ async function verQSL() {
     if (encontrados === 0) {
       container.textContent = "No se encontraron QSLs para este SD.";
     } else {
-      document.getElementById('btnDescargarTodas').style.display = 'inline-block';
+      document.getElementById('accionesDescarga').style.display = 'flex';
     }
 
   } catch (err) {
@@ -181,24 +189,7 @@ async function verQSL() {
   }
 }
 
-// 🧩 Guardar o copiar imagen individual
-function descargarIndividual(canvas, activador, visitante, modo) {
-  if (!canvas) return;
-  if (modo === "copiar") {
-    canvas.toBlob((blob) => {
-      navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-      alert("✅ Imagen copiada al portapapeles");
-    }, "image/png");
-  } else {
-    const formato = modo === "jpg" ? "image/jpeg" : "image/png";
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL(formato);
-    link.download = `${activador}_${visitante}.${modo}`;
-    link.click();
-  }
-}
-
-// 🧩 Descargar todas las QSLs como ZIP
+// 📦 Descargar todas las QSLs como ZIP
 async function descargarTodas() {
   if (!canvasesGenerados.length) return;
   const zip = new JSZip();
@@ -213,14 +204,38 @@ async function descargarTodas() {
   link.download = 'mis_qsls.zip';
   link.click();
 }
+
+// 🖼️ Descargar imagen actual (primera QSL)
+function descargarActual(formato = 'jpg') {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const tipo = formato === 'png' ? 'image/png' : 'image/jpeg';
+  const link = document.createElement('a');
+  link.download = `mi_qsl.${formato}`;
+  link.href = canvas.toDataURL(tipo, 0.92);
+  link.click();
+}
+
+// 🖼️ Descargar una QSL específica
+function descargarIndividual(canvas, activador, visitante) {
+  const link = document.createElement('a');
+  link.download = `${activador}_${visitante}.jpg`;
+  link.href = canvas.toDataURL('image/jpeg', 0.92);
+  link.click();
+}
+
+// 📋 Copiar imagen actual al portapapeles
+async function copiarActual() {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+  alert('📋 Imagen copiada al portapapeles');
+}
 </script>
 
 </body>
 </html>
-
-
-
-
 
 
 
