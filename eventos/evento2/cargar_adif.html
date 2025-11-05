@@ -36,7 +36,7 @@ h1 { margin-bottom: 30px; }
 </head>
 <body>
 
-<h1>📡 Subir archivo ADIF a Drive evento a definir </h1>
+<h1>📡 Subir archivo ADIF a Drive evento a definir</h1>
 
 <!-- 🔐 CLAVE DE ACTIVADOR -->
 <div id="login" class="card">
@@ -93,15 +93,6 @@ function parseADIF(texto, activador) {
       band: get('BAND'),
       mode: get('MODE'),
       rst: get('RST_RCVD')
-   
-    };
-  }).filter(x => x.call);
-}
-
-// ☁️ Subir ADIF a Drive
-async function subirAdif() {
-  if (!accesoPermitido) {
-    alert("⚠️ Ingresá la clave de activador primero.");
     };
   }).filter(x => x.call);
 }
@@ -150,6 +141,7 @@ async function subirAdif() {
 
 </body>
 </html>
+
 
 
 
