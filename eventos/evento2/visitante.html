@@ -127,7 +127,8 @@ function generarQSL(activador, contacto) {
         `FECHA: ${contacto.date}`,
         `HORA UTC: ${contacto.time}`,
         `BANDA: ${contacto.band}`,
-        `MODO: ${contacto.mode}`
+        `MODO: ${contacto.mode}`,
+         `RST: ${contacto.rst}`
       ];
 
       datos.forEach((linea) => {
@@ -235,6 +236,7 @@ async function copiarActual() {
 
 </body>
 </html>
+
 
 
 
