@@ -216,6 +216,68 @@ footer {
 
 <main>
   <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs registradas por los activadores de los eventos ⚓</p>
+<!-- 🕒 Reloj UTC Limpio y Portable -->
+<div class="reloj-utc">
+  <div class="fecha" id="fecha"></div>
+  <div class="hora" id="hora"></div>
+</div>
+
+<script>
+function actualizarRelojUTC() {
+  const ahora = new Date();
+
+  const opcionesFecha = {
+    timeZone: 'UTC',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  };
+
+  const opcionesHora = {
+    timeZone: 'UTC',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  };
+
+  document.getElementById('fecha').textContent =
+    new Intl.DateTimeFormat('es-ES', opcionesFecha).format(ahora);
+
+  document.getElementById('hora').textContent =
+    new Intl.DateTimeFormat('es-ES', opcionesHora).format(ahora) + ' UTC';
+}
+
+actualizarRelojUTC();
+setInterval(actualizarRelojUTC, 1000);
+</script>
+
+<style>
+.reloj-utc {
+  background-color: #000;
+  color: #00ff99;
+  font-family: "Courier New", monospace;
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 20px auto;
+  box-shadow: 0 0 10px rgba(0,255,100,0.5);
+}
+
+.reloj-utc .fecha {
+  font-size: 1.1em;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+}
+
+.reloj-utc .hora {
+  font-size: 2.4em;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+}
+</style>
 
   <div class="evento-lista">
     <h2>📡 Eventos disponibles
@@ -355,6 +417,7 @@ document.querySelectorAll('.evento-item').forEach(item => {
 </script>
 </body>
 </html>
+
 
 
 
