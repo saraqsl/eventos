@@ -117,7 +117,7 @@ function generarQSL(activador, contacto) {
 
       // Datos agrupados en 3 filas (izquierda y derecha)
       ctx.font = 'bold 18px "Arial Black", monospace';
-      ctx.fillStyle = '#00B0F0';
+      ctx.fillStyle = '#0033cc';
 
       const startY = 310;
       const lineHeight = 25;
@@ -135,14 +135,11 @@ function generarQSL(activador, contacto) {
         `RST: ${contacto.rst}`
       ];
 
-      for (let i = 0; i < 3; i++) {
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 3;
-        ctx.strokeText(izquierda[i], leftX, startY + i * lineHeight);
-        ctx.fillText(izquierda[i], leftX, startY + i * lineHeight);
-        ctx.strokeText(derecha[i], rightX, startY + i * lineHeight);
-        ctx.fillText(derecha[i], rightX, startY + i * lineHeight);
-      }
+       for (let i = 0; i < 3; i++) {
+    // Texto sin borde
+    ctx.fillText(izquierda[i], leftX, startY + i * lineHeight);
+    ctx.fillText(derecha[i], rightX, startY + i * lineHeight);
+  }
 
       // Agregar canvas y botón
       card.appendChild(canvas);
@@ -247,6 +244,8 @@ async function copiarActual() {
 
 </body>
 </html>
+
+
 
 
 
