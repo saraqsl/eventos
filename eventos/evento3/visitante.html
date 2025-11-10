@@ -88,7 +88,7 @@ canvas {
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbzj-2MqYOph8tBrj4M2mg0L4-omSiijacWzX-xP_3M763vdWxGtID05CR0RertnOweYKg/exec";
-const IMG_QSL = "qsl.jpg"; // fondo de la QSL
+const IMG_QSL = "qsl3.png"; // fondo de la QSL
 let canvasesGenerados = [];
 
 // 🧩 Generar QSL (con descarga individual)
@@ -104,42 +104,47 @@ function generarQSL(activador, contacto) {
 
     const img = new Image();
     img.src = IMG_QSL;
+
     img.onload = () => {
       // Fondo
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // Activador destacado
-      ctx.font = 'bold 70px "Times New Roman", monospace';
+      ctx.font = 'bold 60px "Times New Roman", monospace';
       ctx.fillStyle = '#0033cc';
       ctx.textAlign = 'left';
-      ctx.fillText(activador, 25, 60);
+      ctx.fillText(activador, 20, 260);
 
-      // Datos verticales
+      // Datos agrupados en 3 filas (izquierda y derecha)
       ctx.font = 'bold 18px "Arial Black", monospace';
       ctx.fillStyle = '#00B0F0';
-      ctx.textAlign = 'left';
-      const startX = 38;
-      let y = 180;
-      const lineHeight = 25;
 
-      const datos = [
+      const startY = 310;
+      const lineHeight = 25;
+      const leftX = 20;
+      const rightX = 250;
+
+      const izquierda = [
         `CALL: ${contacto.call}`,
         `FECHA: ${contacto.date}`,
-        `HORA UTC: ${contacto.time}`,
+        `HORA UTC: ${contacto.time}`
+      ];
+      const derecha = [
         `BANDA: ${contacto.band}`,
         `MODO: ${contacto.mode}`,
-         `RST: ${contacto.rst}`
+        `RST: ${contacto.rst}`
       ];
 
-      datos.forEach((linea) => {
-        ctx.strokeStyle = 'black';   // contorno
+      for (let i = 0; i < 3; i++) {
+        ctx.strokeStyle = 'black';
         ctx.lineWidth = 3;
-        ctx.strokeText(linea, startX, y);
-        ctx.fillText(linea, startX, y);
-        y += lineHeight;
-      });
+        ctx.strokeText(izquierda[i], leftX, startY + i * lineHeight);
+        ctx.fillText(izquierda[i], leftX, startY + i * lineHeight);
+        ctx.strokeText(derecha[i], rightX, startY + i * lineHeight);
+        ctx.fillText(derecha[i], rightX, startY + i * lineHeight);
+      }
 
-      // Agregar canvas + botón de descarga
+      // Agregar canvas y botón
       card.appendChild(canvas);
       const btnDesc = document.createElement('button');
       btnDesc.textContent = '⬇️ Descargar esta QSL';
@@ -150,8 +155,14 @@ function generarQSL(activador, contacto) {
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
       resolve();
     };
+
+    img.onerror = () => {
+      console.error("❌ No se pudo cargar la imagen de fondo:", IMG_QSL);
+      resolve();
+    };
   });
 }
+
 
 // 🧩 Ver QSLs del visitante
 async function verQSL() {
@@ -236,6 +247,8 @@ async function copiarActual() {
 
 </body>
 </html>
+
+
 
 
 
