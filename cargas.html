@@ -69,6 +69,7 @@
     color:var(--muted);
     max-width:700px;
     box-shadow:0 6px 18px rgba(0,0,0,0.45);
+    margin-bottom: 20px; /* Agregué un margen para separar del botón */
   }
   .right{
     display:flex;
@@ -116,6 +117,14 @@
   button:hover{
     filter:brightness(1.1);
   }
+  /* Estilo para separar los botones de acción */
+  .button-group {
+    margin-bottom: 12px; /* Espacio debajo de cada grupo de botón */
+  }
+  /* Eliminar el margen inferior del último grupo si es necesario */
+  .button-group:last-of-type {
+    margin-bottom: 0;
+  }
   @media (max-width:880px){
     .card{grid-template-columns:1fr;padding:22px;}
     .right{order:-1;}
@@ -127,7 +136,7 @@
 <div class="wrap">
   <div class="card">
     <div class="left">
-      <h1>Solo para IV carga de contactos adif . Gracias por ser activador de los eventos sara   </h1>
+      <h1>Solo para IV carga de contactos adif . Gracias por ser activador de los eventos sara </h1>
       <p class="subtitle">Elija el evento en el cual participo como operador .</p>
 
       <div class="countdown" id="countdown">Calculando...</div>
@@ -135,24 +144,29 @@
       <div class="notice">
         <strong>Información:</strong>
         <ul style="margin:8px 0 0 16px;padding:0;">
-          <li>Recuerde cargar en el Adif el horario UTC   .</li>
+          <li>Recuerde cargar en el Adif el horario UTC .</li>
           <li>Frecuencia Modo Banda .</li>
-<li>cargue en el evento correspondiente  .</li>
-          
+          <li>cargue en el evento correspondiente .</li>
         </ul>
       </div>
- <form id="suscripcion" action="https://123456789" method="GET" target="_blank">
-       
-        <button type="submit">📡 Entrar al evento  </button> proximamente 
-      </form>
- <form id="suscripcion" action="https://123456789" method="GET" target="_blank">
-       
-        <button type="submit">📡 Entrar al evento  </button> proximamente 
-      </form>
- <form id="suscripcion" action="https://sites.google.com/view/saraturnos/inicio" method="GET" target="_blank">
-       
-        <button type="submit">📡 ECR carga de presentes </button> link para ECR presentismo diario 
-      </form>
+      
+      <div class="button-group">
+        <form id="suscripcion1" action="https://123456789" method="GET" target="_blank">
+          <button type="submit">📡 Entrar al evento </button> proximamente 
+        </form>
+      </div>
+
+      <div class="button-group">
+        <form id="suscripcion2" action="https://123456789" method="GET" target="_blank">
+          <button type="submit">📡 Entrar al evento </button> proximamente 
+        </form>
+      </div>
+
+      <div class="button-group">
+        <form id="suscripcion3" action="https://sites.google.com/view/saraturnos/inicio" method="GET" target="_blank">
+          <button type="submit">📡 ECR carga de presentes </button> link para ECR presentismo diario 
+        </form>
+      </div>
  
   
     </div>
@@ -160,9 +174,8 @@
     <div class="right">
       <div class="shield">
         <div class="soldier">
-  <img src="eventos/logo_sara.png" alt="Soldier" />
-</div>
-
+          <img src="eventos/logo_sara.png" alt="Soldier" />
+        </div>
       </div>
       <div class="under">BZ Gracias por participar </div>
     </div>
@@ -196,9 +209,6 @@
 </script>
 </body>
 </html>
-
-
-
 
 
 
