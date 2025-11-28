@@ -1,17 +1,24 @@
-DE: LU7HW
+DE: Grupo Radio Operadores Histórico Militares  
 A: TODOS LOS OPERADORES
 BT
 FECHA
-Desde las 08:00 UTC (11:00 LU) del día 09/11/2025 hasta las 15:00UTC (18:00 LU) del
-día 09/11 /2025
+Desde las 08:00 UTC (11:00 LU) del día 28/11/2025 hasta las 15:00UTC (18:00 LU) del
+día 05/12 /2025
 BANDAS
 40 – 20 – 10 Mt
 MODO
 SSB CW
-ESTACIÓN AUTORIZADA
-LU7WH (Estación Principal de Comunicaciones)
-TAREA A REALIZAR:
-Contactar con la estación LU7WH
+los operadores saldrán muchos con sus mochilas qrp , a tener pasiencia en la escucha  .
+Lu2mhp Carlos Ávila equipos:trc 300 
+Thomson
+ prc 515 collins ambos qrp
+Lu9mah Adrian chmit  equipo ; trc 300 Thomson 
+y collins Roswell
+Lu8hmc Marcos Carnaghi con prc 515 y racal VRM 4146
+Lu3dmb Maximiliano Bravo con trc 300 Thomson y mel
+ lu1qbq Cristian Sanmartino trc 300 Thomson
+
 BT
 FIN MENSAJE
+
 AR
