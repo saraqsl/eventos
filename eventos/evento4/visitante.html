@@ -69,7 +69,7 @@ function generarQSL(activador, contacto) {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // SD principal (activador) a la izquierda
-      ctx.font = 'bold 36px Arial';
+      ctx.font = 'bold 48px Arial';
       ctx.fillStyle = 'red';
       ctx.textAlign = 'left';
       ctx.fillText(activador, 20, 70);
@@ -80,8 +80,8 @@ function generarQSL(activador, contacto) {
       ctx.textAlign = 'center';
       const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
       const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
-      ctx.fillText(linea1, canvas.width / 2, canvas.height - 60);
-      ctx.fillText(linea2, canvas.width / 2, canvas.height - 30);
+      ctx.fillText(linea1, canvas.width / 2, canvas.height - 40);
+      ctx.fillText(linea2, canvas.width / 2, canvas.height - 10);
 
       document.getElementById('qslContainer').appendChild(canvas);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
@@ -147,6 +147,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
