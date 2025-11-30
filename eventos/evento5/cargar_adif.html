@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cargar ADIF a Drive</title>
+<title>Cargar ADIF + Manual a Drive</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@ body {
   padding: 20px 40px;
   margin-bottom: 20px;
 }
-input, button {
+input, select, button {
   margin: 8px;
   padding: 10px;
   border-radius: 6px;
@@ -32,13 +32,38 @@ button {
 }
 button:hover { background: #0056b3; }
 h1 { margin-bottom: 30px; }
+
+#preview {
+  width: 90%;
+  height: 180px;
+  font-family: monospace;
+  white-space: pre;
+  background: #111;
+  color: #0f0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+table {
+  width: 95%;
+  margin: 10px auto;
+  border-collapse: collapse;
+}
+table th, table td {
+  border: 1px solid #aaa;
+  padding: 6px 8px;
+  text-align: center;
+}
+table th {
+  background: #cde;
+}
 </style>
 </head>
 <body>
 
-<h1>📡 Subir archivo ADIF a Drive</h1>
+<h1>📡 Subir ADIF o Cargar Contactos Manuales</h1>
 
-<!-- 🔐 CLAVE DE ACTIVADOR -->
+<!-- 🔐 LOGIN -->
 <div id="login" class="card">
   <h2>Ingreso activador</h2>
   <input type="password" id="clave" placeholder="Clave de acceso">
@@ -47,36 +72,102 @@ h1 { margin-bottom: 30px; }
   <p id="msgClave"></p>
 </div>
 
-<!-- 📂 PANEL DE SUBIDA -->
-<div id="panel" class="card" style="display:none;">
-  <input type="text" id="indicativo" placeholder="Indicativo (ej: LU9MAH)">
-  <input type="file" id="archivo" accept=".adi,.adif">
-  <br>
-  <button onclick="subirAdif()">Subir ADIF</button>
-  <p id="resultado"></p>
+<!-- 📂 PANEL PRINCIPAL -->
+<div id="panel" style="display:none;">
+
+  <!-- ADIF -->
+  <div class="card">
+    <h2>📁 Subir ADIF</h2>
+    <input type="text" id="indicativo" placeholder="Indicativo (LU9MAH)">
+    <br>
+    <input type="file" id="archivo" accept=".adi,.adif">
+    <br>
+    <button onclick="subirAdif()">Subir ADIF</button>
+    <p id="resultado_adif"></p>
+  </div>
+
+  <!-- CARGA MANUAL -->
+  <div class="card">
+    <h2>✍ Carga Manual de Contactos</h2>
+
+    <input type="text" id="owner" placeholder="Activador (LU9MAH)">
+    <br>
+    <input type="text" id="call" placeholder="Indicativo Worked">
+    <br>
+    <input type="date" id="date">
+    <input type="time" id="time">
+    <br>
+    <select id="band">
+      <option value="">Banda</option>
+      <option>40M</option>
+      <option>20M</option>
+      <option>10M</option>
+      <option>2M</option>
+    </select>
+    <select id="mode">
+      <option value="">Modo</option>
+      <option>SSB</option>
+      <option>CW</option>
+      <option>FM</option>
+      <option>DIGI</option>
+    </select>
+    <br>
+
+    <!-- 🔥 Mostrar RST anterior -->
+    <div id="ultimoRST" style="margin-top:5px; font-size:18px; color:#444; font-weight:bold;"></div>
+
+    <input type="text" id="rst" placeholder="RST enviado (ej: 59)">
+    <br>
+
+    <button onclick="agregarQSO()">Agregar QSO</button>
+  </div>
+
+  <!-- TABLA DE QSOS -->
+  <h2>Contactos Cargados</h2>
+  <table id="tablaQSO">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>CALL</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Banda</th>
+        <th>Modo</th>
+        <th>RST</th>
+        <th>Borrar</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- JSON Preview -->
+  <h2>Vista previa JSON</h2>
+  <pre id="preview">[]</pre>
+
+  <button onclick="enviarJSON()">📤 Enviar JSON Manual</button>
+  <p id="resultado_manual"></p>
+
 </div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBDE0rhV8qPB8FefZAbrmzhECwdoC6A5xUH3KY1qFP2lLEyxoXYxEyQBE4DAF5RIeuxQ/exec";
-const CLAVE_CORRECTA = "sara"; // 🔑 Clave de activador
+const CLAVE_CORRECTA = "sara";
 let accesoPermitido = false;
 
-// 🔒 Verificar clave
+// ===================== LOGIN =====================
 function verificarClave() {
   const clave = document.getElementById('clave').value.trim();
-  const msg = document.getElementById('msgClave');
-
   if (clave === CLAVE_CORRECTA) {
     accesoPermitido = true;
     document.getElementById('login').style.display = 'none';
-    document.getElementById('panel').style.display = 'inline-block';
+    document.getElementById('panel').style.display = 'block';
   } else {
-    msg.textContent = "❌ Clave incorrecta";
-    msg.style.color = "red";
+    document.getElementById('msgClave').textContent = "❌ Clave incorrecta";
+    document.getElementById('msgClave').style.color = "red";
   }
 }
 
-// 📑 Parsear ADIF a JSON
+// ===================== PARSEO ADIF =====================
 function parseADIF(texto, activador) {
   const qsos = texto.split(/<eor>/i).filter(x => x.trim().length);
   return qsos.map(qso => {
@@ -96,58 +187,143 @@ function parseADIF(texto, activador) {
   }).filter(x => x.call);
 }
 
-// ☁️ Subir ADIF a Drive
+// ===================== SUBIR ADIF =====================
 async function subirAdif() {
-  if (!accesoPermitido) {
-    alert("⚠️ Ingresá la clave de activador primero.");
-    return;
-  }
+  if (!accesoPermitido) return alert("Ingresá la clave primero.");
 
   const activador = document.getElementById('indicativo').value.trim().toUpperCase();
   const fileInput = document.getElementById('archivo');
-  const salida = document.getElementById('resultado');
+  const salida = document.getElementById('resultado_adif');
 
   if (!activador) return alert("Ingrese su indicativo");
-  if (!fileInput.files.length) return alert("Seleccione un archivo ADIF");
+  if (!fileInput.files.length) return alert("Seleccione un archivo");
 
-  const file = fileInput.files[0];
-  const texto = await file.text();
+  const texto = await fileInput.files[0].text();
   const data = parseADIF(texto, activador);
 
-  if (!data.length) return alert("No se encontraron contactos válidos en el ADIF");
+  if (!data.length) return alert("No hay contactos válidos.");
 
   const nombre = `${activador}_${new Date().toISOString().slice(0,10).replace(/-/g,'')}_evento.json`;
   const contenidoBase64 = btoa(JSON.stringify(data));
 
-  salida.textContent = "⏳ Subiendo a Drive...";
+  salida.textContent = "⏳ Subiendo...";
 
   try {
-    const response = await fetch(SCRIPT_URL, {
+    const r = await fetch(SCRIPT_URL, {
       method: "POST",
-      body: new URLSearchParams({
-        name: nombre,
-        data: contenidoBase64
-      })
+      body: new URLSearchParams({ name: nombre, data: contenidoBase64 })
     });
-
-    const text = await response.text();
-    salida.textContent = text;
-  } catch (err) {
-    salida.textContent = "❌ Error al subir: " + err;
+    salida.textContent = await r.text();
+  } catch (e) {
+    salida.textContent = "❌ Error: " + e;
   }
 }
+
+// ===================== CARGA MANUAL =====================
+let qsos = [];
+
+function actualizarTabla() {
+  const tbody = document.querySelector("#tablaQSO tbody");
+  tbody.innerHTML = "";
+
+  qsos.forEach((qso, index) => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${qso.call}</td>
+      <td>${qso.date}</td>
+      <td>${qso.time}</td>
+      <td>${qso.band}</td>
+      <td>${qso.mode}</td>
+      <td>${qso.rst}</td>
+      <td><button onclick="borrarQSO(${index})">❌</button></td>
+    `;
+    tbody.appendChild(fila);
+  });
+
+  document.getElementById("preview").textContent = JSON.stringify(qsos, null, 2);
+}
+
+function agregarQSO() {
+  const owner = document.getElementById("owner").value.trim().toUpperCase();
+  const call = document.getElementById("call").value.trim().toUpperCase();
+  const date = document.getElementById("date").value;
+  const time = document.getElementById("time").value.replace(":", "");
+  const band = document.getElementById("band").value;
+  const mode = document.getElementById("mode").value;
+  const rst = document.getElementById("rst").value.trim();
+
+  if (!owner || !call || !date || !time || !band || !mode) {
+    alert("Complete todos los campos.");
+    return;
+  }
+
+  qsos.push({ owner, call, date: date.replace(/-/g, ""), time, band, mode, rst });
+
+  // Guardar últimos valores en localStorage
+  localStorage.setItem("ultimo_rst_enviado", rst);
+  localStorage.setItem("ultima_banda", band);
+  localStorage.setItem("ultima_hora", document.getElementById("time").value);
+
+  // Mostrar RST anterior
+  document.getElementById("ultimoRST").textContent = "RST anterior enviado: " + rst;
+
+  // Limpiar call y poner focus
+  document.getElementById("call").value = "";
+  document.getElementById("call").focus();
+
+  actualizarTabla();
+}
+
+function borrarQSO(i) {
+  if (!confirm("¿Borrar este contacto?")) return;
+  qsos.splice(i, 1);
+  actualizarTabla();
+}
+
+async function enviarJSON() {
+  if (!qsos.length) {
+    alert("No hay contactos cargados.");
+    return;
+  }
+
+  const nombre = `manual_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.json`;
+  const contenidoBase64 = btoa(JSON.stringify(qsos));
+
+  document.getElementById("resultado_manual").textContent = "⏳ Enviando...";
+
+  try {
+    const resp = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({ name: nombre, data: contenidoBase64 })
+    });
+
+    document.getElementById("resultado_manual").textContent = await resp.text();
+
+    qsos = [];
+    actualizarTabla();
+
+  } catch (e) {
+    document.getElementById("resultado_manual").textContent = "❌ Error: " + e;
+  }
+}
+
+// ===================== CARGAR ÚLTIMOS VALORES AL INICIAR =====================
+window.addEventListener("load", () => {
+  const ultimoRST = localStorage.getItem("ultimo_rst_enviado");
+  if (ultimoRST) {
+    document.getElementById("ultimoRST").textContent = "RST anterior enviado: " + ultimoRST;
+    document.getElementById("rst").value = ultimoRST;
+  }
+
+  const ultimaBanda = localStorage.getItem("ultima_banda");
+  if (ultimaBanda) document.getElementById("band").value = ultimaBanda;
+
+  const ultimaHora = localStorage.getItem("ultima_hora");
+  if (ultimaHora) document.getElementById("time").value = ultimaHora;
+});
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
 
