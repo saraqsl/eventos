@@ -69,10 +69,10 @@ function generarQSL(activador, contacto) {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // SD principal (activador) a la izquierda
-      ctx.font = 'bold 36px Arial';
-      ctx.fillStyle = 'red';
+      ctx.font = 'bold 60px Arial';
+      ctx.fillStyle = 'blue';
       ctx.textAlign = 'left';
-      ctx.fillText(activador, 20, 70);
+      ctx.fillText(activador, 10, 50);
 
       // Datos del contacto en dos líneas, centrados abajo
       ctx.font = 'bold 20px Arial';
@@ -147,5 +147,6 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
