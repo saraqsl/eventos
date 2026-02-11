@@ -77,11 +77,11 @@ function generarQSL(activador, contacto) {
       // Datos del contacto en dos líneas, centrados abajo
       ctx.font = 'bold 20px Arial';
       ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'left';
       const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
       const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
-      ctx.fillText(linea1, canvas.width / 2, canvas.height - 60);
-      ctx.fillText(linea2, canvas.width / 2, canvas.height - 30);
+      ctx.fillText(linea1, canvas.width / 2, canvas.height - 50);
+      ctx.fillText(linea2, canvas.width / 2, canvas.height - 20);
 
       document.getElementById('qslContainer').appendChild(canvas);
       canvasesGenerados.push({canvas, activador, visitante: contacto.call});
@@ -147,6 +147,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
