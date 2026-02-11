@@ -59,7 +59,7 @@ function generarQSL(activador, contacto) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
     canvas.width = 600;
-    canvas.height = 380;
+    canvas.height = 370;
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
@@ -77,7 +77,7 @@ function generarQSL(activador, contacto) {
       // Datos del contacto en dos líneas, centrados abajo
       ctx.font = 'bold 20px Arial';
       ctx.fillStyle = 'black';
-      ctx.textAlign = 'left';
+      ctx.textAlign = 'right';
       const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
       const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
       ctx.fillText(linea1, canvas.width / 2, canvas.height - 50);
@@ -147,6 +147,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
