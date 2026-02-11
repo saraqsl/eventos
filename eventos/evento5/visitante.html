@@ -80,7 +80,7 @@ function generarQSL(activador, contacto) {
       ctx.textAlign = 'center';
       const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
       const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
-      ctx.fillText(linea1, canvas.width  12, canvas.height - 40);
+      ctx.fillText(linea1, canvas.width /2, canvas.height - 40);
       ctx.fillText(linea2, canvas.width / 2, canvas.height - 10);
 
       document.getElementById('qslContainer').appendChild(canvas);
@@ -147,6 +147,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
