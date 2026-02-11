@@ -69,14 +69,14 @@ function generarQSL(activador, contacto) {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // SD principal (activador) a la izquierda
-      ctx.font = 'bold 35px Arial';
+      ctx.font = 'bold 38px Arial';
       ctx.fillStyle = 'blue';
       ctx.textAlign = 'left';
-      ctx.fillText(activador, 10, 50);
+      ctx.fillText(activador, 10, 30);
 
       // Datos del contacto en dos líneas, centrados abajo
       ctx.font = 'bold 20px Arial';
-      ctx.fillStyle = 'black';
+      ctx.fillStyle = 'blue';
       ctx.textAlign = 'center';
       const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
       const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
@@ -147,6 +147,7 @@ async function descargarTodas() {
 
 </body>
 </html>
+
 
 
 
