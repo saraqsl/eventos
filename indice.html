@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eventos Anuales SARA ⚓ Radar Naval</title>
+<style>
+/* --- ESTILO GENERAL --- */
+body {
+  font-family: 'Segoe UI', 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #00111d 0%, #000a12 100%);
+  color: #e6edf5;
+  margin: 0;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+/* --- FONDO RADAR ANIMADO --- */
+.radar-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at center, rgba(0,255,0,0.2) 0%, transparent 70%),
+              repeating-radial-gradient(circle at center, rgba(0,255,0,0.1) 0 1px, transparent 1px 100px);
+  overflow: hidden;
+  z-index: -1;
+}
+.radar-line {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100vmax;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0,255,0,0.6), transparent);
+  transform-origin: left center;
+  animation: radar-scan 6s linear infinite;
+  border-radius: 50%;
+}
+@keyframes radar-scan {
+  from { transform: rotate(0deg) translateX(-50%); }
+  to { transform: rotate(360deg) translateX(-50%); }
+}
+
+/* --- CABECERA --- */
+header {
+  background: linear-gradient(90deg, #001d3d, #003566);
+  color: #f8f9fa;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  border-bottom: 3px solid #0d6efd;
+}
+header img { height: 60px; vertical-align: middle; margin: 0 10px; }
+header h1 {
+  display: inline-block;
+  font-size: 1.6em;
+  margin: 0;
+  vertical-align: middle;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(13,110,253,0.7);
+}
+header p { font-size: 0.9em; margin: 0; opacity: 0.85; }
+
+/* --- LISTA DE EVENTOS --- */
+.evento-lista {
+  display: inline-block;
+  margin: 60px auto;
+  text-align: left;
+  background: rgba(0, 30, 60, 0.85);
+  padding: 30px 40px;
+  border-radius: 16px;
+  border: 1px solid rgba(13,110,253,0.3);
+  box-shadow: 0 0 20px rgba(0,255,0,0.15);
+  min-width: 320px;
+  backdrop-filter: blur(4px);
+}
+.evento-lista h2 {
+  color: #00ff99;
+  border-bottom: 2px solid #0077b6;
+  padding-bottom: 6px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  text-shadow: 0 0 5px #00ff99;
+}
+.evento-item { margin-bottom: 15px; }
+.evento-item a {
+  display: inline-block;
+  padding: 10px 0;
+  text-decoration: none;
+  color: #caf0f8;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.evento-item a:hover {
+  color: #00ffcc;
+  transform: translateX(5px);
+}
+
+/* --- BADGES --- */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-left: 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-proximo { background:#ffb703; color:black; }
+.badge-curso { background:#00b4d8; color:white; }
+.badge-finalizado { background:#6c757d; color:white; }
+.fecha { font-size:0.85em; color:#adb5bd; margin-left:10px; }
+
+/* --- BOTÓN PRIVADO --- */
+#btnPrivado {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: #003566;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 18px;
+  font-size: 0.9em;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  transition: 0.3s;
+}
+#btnPrivado:hover {
+  background: #0077b6;
+  transform: scale(1.05);
+}
+
+/* --- MODAL --- */
+.modal { display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
+.modal-content {
+  background: #012a4a;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0,150,255,0.3);
+  border: 1px solid rgba(0,150,255,0.5);
+}
+.modal-content input {
+  width: 80%;
+  padding: 8px;
+  margin-top: 10px;
+  border: 1px solid #468faf;
+  border-radius: 6px;
+  background: #001d3d;
+  color: #caf0f8;
+}
+.modal-content button {
+  margin-top: 12px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal-content button:hover { background: #00b4d8; }
+
+/* --- PIE --- */
+footer {
+  margin-top: 60px;
+  padding: 15px;
+  font-size: 0.9em;
+  color: #adb5bd;
+  border-top: 1px solid #0d3b66;
+}
+#btnBases {
+  float: right;
+  font-size: 0.85em;
+  padding: 4px 8px;
+  margin-left: 10px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+  #btnEscuchas {
+  float: right;
+  font-size: 0.85em;
+  padding: 4px 8px;
+  background: #009966;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+#btnEscuchas:hover {
+  background: #00cc88;
+}
+#btnBases:hover { background: #00b4d8; }
+</style>
+</head>
+<body>
+
+<!-- RADAR ANIMADO -->
+<div class="radar-bg">
+  <div class="radar-line"></div>
+</div>
+
+<header>
+  <img src="logos/logo_armada.png" alt="Logo Armada">
+  <div style="display:inline-block; vertical-align:middle;">
+    <h1> Servicio Auxiliar Radioaficionados de la Armada </h1>
+    <img src="logos/logo_sara.PNG" alt="Logo SARA">
+    <p>“Eventos Anuales · Armada Argentina”</p>
+  </div>
+</header>
+
+<main>
+  <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs registradas por los activadores de los eventos ⚓</p>
+<!-- 🕒 Reloj UTC Limpio y Portable -->
+<div class="reloj-utc">
+  <div class="fecha" id="fecha"></div>
+  <div class="hora" id="hora"></div>
+</div>
+
+<script>
+function actualizarRelojUTC() {
+  const ahora = new Date();
+
+  const opcionesFecha = {
+    timeZone: 'UTC',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  };
+
+  const opcionesHora = {
+    timeZone: 'UTC',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  };
+
+  document.getElementById('fecha').textContent =
+    new Intl.DateTimeFormat('es-ES', opcionesFecha).format(ahora);
+
+  document.getElementById('hora').textContent =
+    new Intl.DateTimeFormat('es-ES', opcionesHora).format(ahora) + ' UTC';
+}
+
+actualizarRelojUTC();
+setInterval(actualizarRelojUTC, 1000);
+</script>
+
+<style>
+.reloj-utc {
+  background-color: #000;
+  color: #00ff99;
+  font-family: "Courier New", monospace;
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 20px auto;
+  box-shadow: 0 0 10px rgba(0,255,100,0.5);
+}
+
+.reloj-utc .fecha {
+  font-size: 1.1em;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+}
+
+.reloj-utc .hora {
+  font-size: 2.4em;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+}
+</style>
+
+  <div class="evento-lista">
+    <h2>📡 Eventos disponibles
+  <button id="btnBases" onclick="window.open('bases.html','_blank')">Bases</button>
+  <button id="btnEscuchas" onclick="window.open('https://forms.gle/7J2CKYAPQGuUYQ81A','_blank')">  SWL </button>
+</h2>
+
+    <div class="evento-item" data-fecha-inicio="2026-03-03" data-fecha-fin="2026-03-08">
+      <a href="eventos/evento6/visitante.html">🇦🇷 Qsl conmemorativa 169 Aniv fallecimiento
+      Almirante Brown </a>
+      <span class="badge"></span>
+      <span class="fecha">03 mar 2026</span>
+    </div>
+    <div class="evento-item" data-fecha-inicio="2025-11-01" data-fecha-fin="2025-11-08">
+      <a href="eventos/2025_EV07-25/visitante.html">🛰️ Olimpiadas VGM CMM 2025</a>
+      <span class="badge"></span>
+      <span class="fecha">1-8 nov 2025</span>
+    </div>
+    <div class="evento-item" data-fecha-inicio="2025-11-08" data-fecha-fin="2025-11-09">
+      <a href="eventos/evento3/visitante.html">⚓ ARA SARMIENTO Noche de los museos</a>
+      <span class="badge"></span>
+      <span class="fecha">8 Nov 2025</span>
+    </div>
+    <div class="evento-item" data-fecha-inicio="2025-11-08" data-fecha-fin="2025-11-09">
+      <a href="eventos/evento2/visitante.html">🇦🇷 BASE AERONAVAL ALTE MARCOS ZAR TRELEW 2025 </a>
+      <span class="badge"></span>
+      <span class="fecha">9 nov 2025</span>
+    </div>
+    <div class="evento-item" data-fecha-inicio="2026-02-14" data-fecha-fin="2026-02-15">
+      <a href="eventos/evento5/visitante.html">🇦🇷 BASE AERONAVAL ALTE MARCOS ZAR Aniversario 2026 </a>
+      <span class="badge"></span>
+      <span class="fecha">14 feb 2026</span>
+    </div>
+    <div class="evento-item" data-fecha-inicio="2025-11-28" data-fecha-fin="2025-12-05">
+      <a href="eventos/evento4/evento.html">⚓Granaderos en Mendoza  </a>
+      <span class="badge"></span>
+      <span class="fecha">28 nov 2025</span> 
+    </div> 
+    
+    <div class="evento-item" data-fecha-inicio="2026-05-17" data-fecha-fin="2026-05-17"> 
+      <a href="eventos/concurso/evento1.html">⚓ Concurso Día de la ARMADA ARGENTINA</a>
+      <span class="badge"></span> 
+      <span class="fecha">17 mayo 2026</span>
+    </div>
+ 
+</main>
+
+<footer>
+  © 2025 - SARA | Servicio Auxiliar de Radioaficionados de la Armada Argentina
+</footer>
+
+<!-- 🔢 Contador de visitas -->
+<div id="contadorVisitas" style="
+  display: inline-block;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #004400, #008800);
+  color: #00ff99;
+  font-family: 'Courier New', monospace;
+  font-size: 1em;
+  border: 2px solid #00ff99;
+  text-shadow: 0 0 6px #00ff99;
+  box-shadow: 0 0 10px #00ff9944;
+  cursor: default;
+  user-select: none;
+  text-align: center;
+  transition: all 0.3s ease;">
+  👀 Visitas: <b>0</b> | 📅 <span id="ultimaFecha">--/--/----</span>
+</div>
+
+
+<!-- 🔘 BOTÓN INTEGRANTES -->
+<button id="btnPrivado">👥 Integrantes</button>
+
+<!-- 🔒 MODAL PRIVADO -->
+<div id="modalPrivado" class="modal">
+  <div class="modal-content">
+    <h3>Acceso Privado</h3>
+    <input type="password" id="clavePrivada" placeholder="Clave de acceso" />
+    <br>
+    <button onclick="verificarClave()">Entrar</button>
+    <button onclick="cerrarModal()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+// --- Contador de visitas ---
+// --- Contador de visitas ---
+async function contarVisita() {
+  const contador = document.getElementById("contadorVisitas");
+  const hoy = new Date().toISOString().slice(0, 10);
+  const ultimaVisita = localStorage.getItem("ultimaVisitaSARA");
+
+  // 👉 Nuevo script del contador
+  const urlBase = "https://script.google.com/macros/s/AKfycbzR9oIRLei7V44_qXGlAGgRYqNATnCdg1xt2w1ob-Qtg5EyahuLZfUq5b1qbvlzmSrosg/exec";
+
+  try {
+  const accion = (ultimaVisita === hoy) ? "contador_solo_ver" : "contador_sumar";
+const resp = await fetch(`${urlBase}?action=${accion}`);
+
+    const data = await resp.json();
+    contador.innerHTML = `👀 Visitas: <b>${data.visitas}</b>`;
+    if (accion === "sumar") localStorage.setItem("ultimaVisitaSARA", hoy);
+  } catch {
+    contador.innerHTML = "❌ Error contador";
+  }
+}
+contarVisita();
+
+
+// --- Modal acceso privado ---
+const modal = document.getElementById("modalPrivado");
+const btn = document.getElementById("btnPrivado");
+btn.onclick = () => modal.style.display = "block";
+window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+function cerrarModal() { modal.style.display = "none"; }
+function verificarClave() {
+  const clave = document.getElementById("clavePrivada").value.trim();
+  const CLAVE_REAL = "SARAtoga";
+  if (clave === CLAVE_REAL) {
+    window.location.href = "cargas.html";
+  } else { alert("Clave incorrecta ❌"); }
+}
+
+// --- Badges ---
+document.querySelectorAll('.evento-item').forEach(item => {
+  const inicio = new Date(item.dataset.fechaInicio);
+  const fin = new Date(item.dataset.fechaFin);
+  const hoy = new Date();
+  const badge = item.querySelector('.badge');
+  if (hoy < inicio) {
+    badge.textContent = "Próximamente";
+    badge.className = "badge badge-proximo";
+  } else if (hoy >= inicio && hoy <= fin) {
+    badge.textContent = "En curso";
+    badge.className = "badge badge-curso";
+  } else {
+    badge.textContent = "Finalizada";
+    badge.className = "badge badge-finalizado";
+  }
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
