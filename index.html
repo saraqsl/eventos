@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -285,6 +287,12 @@ setInterval(actualizarRelojUTC, 1000);
   <button id="btnEscuchas" onclick="window.open('https://forms.gle/7J2CKYAPQGuUYQ81A','_blank')">  SWL </button>
 </h2>
 
+    
+    <div class="evento-item" data-fecha-inicio="2026-03-14" data-fecha-fin="2026-03-15">
+      <a href="eventos/evento7/visitante.html">🇦🇷 QSL 60 aniv Inst AeroNaval  </a>
+      <span class="badge"></span>
+      <span class="fecha">14 mar 2026</span>
+    </div>
     <div class="evento-item" data-fecha-inicio="2026-03-03" data-fecha-fin="2026-03-08">
       <a href="eventos/evento6/visitante.html">🇦🇷 Qsl conmemorativa 169 Aniv fallecimiento
       Almirante Brown </a>
@@ -397,7 +405,7 @@ window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 function cerrarModal() { modal.style.display = "none"; }
 function verificarClave() {
   const clave = document.getElementById("clavePrivada").value.trim();
-  const CLAVE_REAL = "sara1";
+  const CLAVE_REAL = "sara2";
   if (clave === CLAVE_REAL) {
     window.location.href = "cargas.html";
   } else { alert("Clave incorrecta ❌"); }
