@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grupo Radio Operadores Históricos Militares</title>
+
+<style>
+/* --- ESTILO GENERAL SOBRIO --- */
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #d6d6d6;
+  background: linear-gradient(180deg, #2b2f2b 0%, #1c1f1c 100%);
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 80px; /* espacio para el botón en móvil */
+}
+
+/* --- LOGO DE FONDO (TIPO GRABADO) --- */
+/* Se mantiene pero se mueve a la derecha e inferior */
+.logo-fondo {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 320px;
+  opacity: 0.56;
+  filter: grayscale(50%) contrast(120%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* --- CONTENIDO --- */
+.contenido {
+  position: relative;
+  z-index: 1;
+  text-align: LEFT;
+  padding: 60px 20px;
+}
+
+/* --- TITULO --- */
+h1 {
+  font-size: 2em;
+  font-weight: normal;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.subtitulo {
+  font-size: 0.9em;
+  color: #9aa09a;
+  margin-bottom: 40px;
+}
+
+/* --- BOTONES ESTILO EQUIPO MILITAR --- */
+.botones {
+  margin: 40px 0;
+}
+
+.boton {
+  display: inline-block;
+  margin: 10px;
+  padding: 12px 25px;
+  border: 1px solid #7a807a;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #d6d6d6;
+  background: #3a3f3a;
+  transition: 0.2s;
+  font-size: 0.95em;
+}
+
+.boton:hover {
+  background: #4a514a;
+  border-color: #aab0aa;
+}
+/* --- PANEL TECNICO --- */
+.panel {
+  margin-top: 40px;
+  display: inline-block;
+  padding: 20px 30px;
+  border: 1px solid #6f756f;
+  background: #2a2e2a;
+  font-size: 0.85em;
+  text-align: left;
+  line-height: 1.6em;
+  min-width: 900px;
+
+  /* ESTO DIVIDE EL TEXTO EN 2 COLUMNAS */
+  column-count: 1;
+  column-gap: 40px;
+  column-fill: auto;    /* Obliga a llenar la primera columna antes de pasar a la otra */
+  height: 680px;        /* Ajustá esta altura para que Maximiliano entre en la 1ra */
+  
+  /* ESTO RESPETA LOS SALTOS DE LÍNEA */
+  white-space: pre-line; 
+}
+/* --- LINEA SEPARADORA --- */
+.linea {
+  width: 60%;
+  height: 1px;
+  background: #555;
+  margin: 30px auto;
+}
+
+/* --- BOTÓN DE ACCESO (Clave) --- */
+.btn-acceso {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 6px;
+  background: #1b1f1b;
+  color: #d6d6d6;
+  border: 1px solid #6f756f;
+  text-decoration: none;
+  font-weight: normal;
+  z-index: 2;
+  cursor: pointer;
+}
+.btn-acceso:hover {
+  background: #2a2f2a;
+  border-color: #aab0aa;
+}
+@media (min-width: 700px) {
+  /* Mismo comportamiento en pantallas grandes */
+  .btn-acceso { left: calc(50%); }
+}
+
+/* --- FOOTER --- */
+footer {
+  margin-top: 60px;
+  font-size: 0.8em;
+  color: #8c918c;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGO DE FONDO -->
+<img src="logos/logo.png" class="logo-fondo" alt="Logo fondo">
+
+<div class="contenido">
+
+  <h1>GRUPO RADIO OPERADORES HISTÓRICOS MILITARES</h1>
+  <div class="subtitulo">web para descargar qsl de eventos realizados por el grupo radio operadores historico militares </div>
+
+  <div class="linea"></div>
+
+  <!-- BOTONES -->
+  <div class="botones">
+    <a href="eventos/historicos/evento4/visitante.html" class="boton">Granaderos cerro de la gloria 2025 </a>
+    <a href="eventos/historicos/evento9/visitante.html" class="boton">Malvinas QRP 2026</a>
+    <a href="carpeta3.html" class="boton">ACTIVIDADES</a>
+    <a href="carpeta3.html" class="boton">ACTIVIDADES</a>
+    <a href="carpeta3.html" class="boton">ACTIVIDADES</a>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel">
+
+El Grupo Radio Operadores Históricos Militares es un grupo de radio aficionados 
+creado en el 2024, con el objetivo de preservar la historia de la comunicación 
+radioeléctrica militar y promover la radioafición.
+
+- Objetivos:
+- Preservar la historia de la comunicación radioeléctrica militar
+- Promover la radioafición y la experimentación con equipos históricos
+- Fomentar la camaradería entre los miembros y con otros grupos de radioaficionados
+- Actividades:
+- Operaciones de radio en eventos históricos y conmemoraciones
+- Concursos y ejercicios de comunicación de emergencia
+- Charlas y talleres sobre equipos y técnicas de comunicación histórica
+- Proyectos de restauración de equipos antiguos
+
+Operadores 
+Carlos Avila     LU2MHP   
+Marcos Carnaghi  LU8HMC
+Adrian Chmit     LU9MAH
+Maximiliano      LU3DMB
+
+
+
+Equipos usados en tx/rx  
+trc 300 thomson - clasman RT 321 mel
+collins prc515 - Racal MA4054 - Mel RT 321
+rockwell collins 280  - prc 10  
+
+  </div>
+
+  <footer>
+    ©  Histórico de Comunicaciones Militares lu9mah@gmail.com 
+  </footer>
+
+</div>
+
+<!-- BOTÓN DE ACCESO CON CLAVE (A NIVEL CLIENTE) -->
+<a href="#" class="btn-acceso" id="btnAcceso" title="Acceso restringido">Acceso restringido</a>
+
+<!-- Script simple para pedir clave y redirigir (A) -->
+<script>
+(function() {
+  const btn = document.getElementById('btnAcceso');
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    // Prompt sencillo de clave. En producción, usar autenticación real.
+    const clave = prompt('Ingrese la clave de acceso:');
+    // CLAVE DE PRUEBA (CAMBIAR EN PRODUCCIÓN)
+    const claveCorrecta = 'prc10';
+    if (clave === claveCorrecta) {
+      window.location.href = 'eventos/historicos/cargas.html';
+    } else {
+      alert('Clave incorrecta. Acceso denegado.');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
