@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ver QSL – braun</title>
+<style>
+body {
+  font-family: "Courier New", monospace;
+  background: #e5ebf0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 20px;
+}
+h1 {
+  color: #002b5c;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+input, button {
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 80%;
+  max-width: 300px;
+  font-family: "Courier New", monospace;
+}
+button {
+  cursor: pointer;
+  background: #003366;
+  color: white;
+  border: none;
+  text-transform: uppercase;
+  transition: 0.2s;
+}
+button:hover { background: #0056b3; }
+canvas { 
+  margin-top: 10px; 
+  border: 2px solid #003366; 
+  display: block;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 530px;
+  height: auto;
+}
+.qslCard {
+  margin-bottom: 20px;
+  text-align: center;
+}
+.qslCard button {
+  margin-top: 8px;
+  background: #004c99;
+  font-size: 0.9em;
+  padding: 6px 10px;
+}
+.qslCard button:hover {
+  background: #0070cc;
+}
+#accionesDescarga {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<h1>🔎 Ver QSL Malvinas entregad por el Grupo radiooperadores historico militar  ”</h1>
+
+<input type="text" id="sdVisitante" placeholder="Ingrese su SD (ej: lu9mah)">
+<button onclick="verQSL()">Ver mis QSLs</button>
+
+<div id="accionesDescarga" style="display:none;">
+  <button onclick="descargarTodas()">📦 Descargar ZIP</button>
+  <button onclick="descargarActual()">🖼️ Descargar imagen</button>
+  <button onclick="copiarActual()">📋 Copiar imagen</button>
+</div>
+
+<div id="qslContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxlbvzDPW2rf5D37OD2T1-fy91kLxbiZ04W7hVq5YBs3VfXvykEbmmYXpp313aWk8qZ-w/exec";
+const IMG_QSL = "qsl6.png"; // fondo de la QSL
+let canvasesGenerados = [];
+
+// 🧩 Generar QSL (con descarga individual)
+function generarQSL(activador, contacto) {
+  return new Promise((resolve) => {
+    const card = document.createElement('div');
+    card.className = 'qslCard';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 340;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = IMG_QSL;
+
+    img.onload = () => {
+      // Fondo
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+     // Activador destacado estilo bandera argentina (corregido)
+ctx.save();
+
+ctx.translate(60, 200); // Ajustar según tu imagen
+ctx.rotate(-Math.PI / 2);
+
+ctx.font = 'bold 56px "Arial Black", sans-serif';
+ctx.textAlign = 'center';
+
+// Medir altura aproximada del texto
+const fontSize = 38;
+let grad = ctx.createLinearGradient(0, -fontSize/2, 0, fontSize/2);
+
+grad.addColorStop(0, "#74ACDF");   // celeste arriba
+grad.addColorStop(0.45, "#FFFFFF"); // blanco
+grad.addColorStop(0.55, "#FFFFFF"); // blanco
+grad.addColorStop(1, "#74ACDF");   // celeste abajo
+
+// Sombra
+ctx.shadowColor = "rgba(0,0,0,0.4)";
+ctx.shadowBlur = 6;
+ctx.shadowOffsetX = 2;
+ctx.shadowOffsetY = 2;
+
+// Contorno
+ctx.lineWidth = 4;
+ctx.strokeStyle = "#002244";
+ctx.strokeText(activador, 0, 0);
+
+// Relleno bandera
+ctx.fillStyle = grad;
+ctx.fillText(activador, 0, 0);
+
+ctx.restore();
+
+ctx.font = 'bold 17px "Arial Black", sans-serif';
+ctx.fillStyle = "#90D5FF"; 
+
+// Sombra más fuerte para que funcione en zonas claras
+ctx.shadowColor = "rgba(0,0,0,3.8)";
+ctx.shadowBlur = 4;
+ctx.shadowOffsetX = 2;
+ctx.shadowOffsetY = 2;
+ 
+// 👉 Formatear fecha YYYY/MM/DD
+let fechaFormateada = contacto.date;
+if (fechaFormateada && fechaFormateada.length === 8) {
+  fechaFormateada = `${fechaFormateada.substring(0,4)}/${fechaFormateada.substring(4,6)}/${fechaFormateada.substring(6,8)}`;
+}
+
+const startY = 180;
+const lineHeight = 22;
+const posX = 90;
+
+const lineas = [
+  `CALL: ${contacto.call}`,
+  `FECHA: ${fechaFormateada}`,
+  `HORA UTC: ${contacto.time}`,
+     `BANDA: ${contacto.band}`,
+     `MODO: ${contacto.mode}`,
+     `RST: ${contacto.rst}`
+];
+
+for (let i = 0; i < lineas.length; i++) {
+  ctx.fillText(lineas[i], posX, startY + i * lineHeight);
+}
+
+      // Agregar canvas y botón
+      card.appendChild(canvas);
+      const btnDesc = document.createElement('button');
+      btnDesc.textContent = '⬇️ Descargar esta QSL';
+      btnDesc.onclick = () => descargarIndividual(canvas, activador, contacto.call);
+      card.appendChild(btnDesc);
+
+      document.getElementById('qslContainer').appendChild(card);
+      canvasesGenerados.push({canvas, activador, visitante: contacto.call});
+      resolve();
+    };
+
+    img.onerror = () => {
+      console.error("❌ No se pudo cargar la imagen de fondo:", IMG_QSL);
+      resolve();
+    };
+  });
+}
+
+
+// 🧩 Ver QSLs del visitante
+async function verQSL() {
+  const sdVisitante = document.getElementById('sdVisitante').value.trim().toUpperCase();
+  if (!sdVisitante) return alert("Ingrese su SD");
+
+  const container = document.getElementById('qslContainer');
+  container.innerHTML = "Cargando...";
+  canvasesGenerados = [];
+  document.getElementById('accionesDescarga').style.display = 'none';
+
+  try {
+    const res = await fetch(API_URL);
+    const allData = await res.json();
+
+    container.innerHTML = "";
+    let encontrados = 0;
+
+    for (const contacto of allData) {
+      if (contacto.call === sdVisitante) {
+        await generarQSL(contacto.owner, contacto);
+        encontrados++;
+      }
+    }
+
+    if (encontrados === 0) {
+      container.textContent = "No se encontraron QSLs para este SD.";
+    } else {
+      document.getElementById('accionesDescarga').style.display = 'flex';
+    }
+
+  } catch (err) {
+    console.error(err);
+    container.textContent = "❌ Error al cargar datos del evento.";
+  }
+}
+
+// 📦 Descargar todas las QSLs como ZIP
+async function descargarTodas() {
+  if (!canvasesGenerados.length) return;
+  const zip = new JSZip();
+  canvasesGenerados.forEach((c) => {
+    const dataUrl = c.canvas.toDataURL('image/png');
+    const base64 = dataUrl.split(',')[1];
+    zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
+  });
+  const content = await zip.generateAsync({type:"blob"});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(content);
+  link.download = 'mis_qsls.zip';
+  link.click();
+}
+
+// 🖼️ Descargar imagen actual (primera QSL)
+function descargarActual(formato = 'jpg') {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const tipo = formato === 'png' ? 'image/png' : 'image/jpeg';
+  const link = document.createElement('a');
+  link.download = `mi_qsl.${formato}`;
+  link.href = canvas.toDataURL(tipo, 0.92);
+  link.click();
+}
+
+// 🖼️ Descargar una QSL específica
+function descargarIndividual(canvas, activador, visitante) {
+  const link = document.createElement('a');
+  link.download = `${activador}_${visitante}.jpg`;
+  link.href = canvas.toDataURL('image/jpeg', 0.92);
+  link.click();
+}
+
+// 📋 Copiar imagen actual al portapapeles
+async function copiarActual() {
+  if (!canvasesGenerados.length) return alert('No hay QSL generada.');
+  const canvas = canvasesGenerados[0].canvas;
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+  alert('📋 Imagen copiada al portapapeles');
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
