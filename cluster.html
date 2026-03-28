@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE MONITOREO RADIAL - TÁCTICO</title>
+    <style>
+        /* Estilo Base Militar */
+        body { 
+            background-color: #050a05; 
+            color: #00ff41; 
+            font-family: 'Courier New', Courier, monospace; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            text-transform: uppercase;
+        }
+
+        h2 { 
+            border-bottom: 2px solid #00ff41; 
+            padding-bottom: 10px; 
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        .status-bar { 
+            font-size: 0.8em; 
+            margin-bottom: 20px; 
+            color: #008f11;
+        }
+
+        /* Tabla Táctica */
+        table { 
+            width: 100%; 
+            max-width: 700px; 
+            border-collapse: collapse; 
+            border: 1px solid #008f11;
+            background: rgba(0, 20, 0, 0.9);
+        }
+
+        th { 
+            background: #003300; 
+            color: #00ff41; 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 2px solid #00ff41;
+            font-size: 0.9em;
+        }
+
+        td { 
+            padding: 12px; 
+            border-bottom: 1px solid #004400; 
+            font-size: 1.1em;
+        }
+
+        tr:hover { background: rgba(0, 255, 65, 0.1); }
+
+        .frec-highlight { 
+            color: #fff; 
+            background: #004400; 
+            padding: 2px 8px;
+            font-weight: bold;
+            box-shadow: 0 0 5px #00ff41;
+        }
+
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 65, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100vh; }
+        }
+
+        .estacion-id { color: #fff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="scan-line"></div>
+    <h2>[ COMANDO DE OPERACIONES RADIALES ]</h2>
+    <div class="status-bar" id="status">INICIALIZANDO ESCANEO...</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>SD IDENTIFICADA</th>
+                <th>BANDA</th>
+                <th>FRECUENCIA detectada </th>
+                <th>HORA LU de OP.</th>
+            </tr>
+        </thead>
+        <tbody id="tablaBody">
+            <!-- DATOS ENCRIPTADOS -->
+        </tbody>
+    </table>
+
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxgLCVZCCJinXqgc9BW7i6I7Z3QqxRS3ulVvDf10kNCWzjUb3UOl6GaEL29zzu9rEan/exec";
+
+        function cargarDatos() {
+            const status = document.getElementById('status');
+            status.innerText = "> ACTUALIZANDO BASE DE DATOS...";
+
+            fetch(WEB_APP_URL)
+                .then(res => res.json())
+                .then(data => {
+                    let html = "";
+                    data.reverse().slice(0, 15).forEach(fila => {
+                        let hora = "-";
+                        if (fila[3]) {
+                            let d = new Date(fila[3]);
+                            hora = d.getHours().toString().padStart(2, '0') + ":" + 
+                                   d.getMinutes().toString().padStart(2, '0');
+                        }
+
+                        html += `<tr>
+                            <td class="estacion-id">${fila[0]}</td>
+                            <td>[ ${fila[1]} ]</td>
+                            <td><span class="frec-highlight">${fila[2]} MHZ</span></td>
+                            <td>${hora} Z</td>
+                        </tr>`;
+                    });
+                    document.getElementById('tablaBody').innerHTML = html;
+                    status.innerText = "> ÚLTIMO REPORTE RECIBIDO: " + new Date().toLocaleTimeString();
+                })
+                .catch(() => {
+                    status.innerText = "> ERROR: FALLO EN EL ENLACE DE DATOS";
+                });
+        }
+
+        cargarDatos();
+        setInterval(cargarDatos, 20000); // Actualiza cada 20 segundos
+    </script>
+</body>
+</html>
+
