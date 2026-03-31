@@ -1,0 +1,286 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ver QSL – braun</title>
+
+<style>
+body {
+  font-family: "Courier New", monospace;
+  background: #e5ebf0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 20px;
+}
+h1 {
+  color: #002b5c;
+  text-align: center;
+}
+input, button {
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+button {
+  cursor: pointer;
+  background: #003366;
+  color: white;
+  border: none;
+}
+canvas {
+  margin-top: 10px;
+  border: 2px solid #003366;
+  max-width: 530px;
+  width: 100%;
+}
+.qslCard {
+  text-align: center;
+  margin-bottom: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔎 bases navales por malvinas </h1>
+
+<input type="text" id="sdVisitante" placeholder="Ingrese su SD">
+<button onclick="verQSL()">Ver mis QSLs</button>
+
+<div id="accionesDescarga" style="display:none;">
+  <button onclick="descargarTodas()">📦 Descargar ZIP</button>
+  <button onclick="descargarActual()">🖼️ Descargar 1°</button>
+  <button onclick="copiarActual()">📋 Copiar</button>
+</div>
+
+<div id="qslContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyCxHK-QatFCZfAbWYt63oLoEd2fc8T9ygHx48Q9SH5szB6r3fJ14TtAJN_bz25xw0uig/exec";
+const IMG_QSL = "qsl6.png";
+
+let canvasesGenerados = [];
+const FRASES = {
+  "LU9DAV": "BASE NAVAL PUERTO BELGRANO",
+  "LU5XR": "BATALLÓN DE INFANTERIA DE MARINA N° 5",
+  "LU9XP": "BASE NAVAL USHUAIA ALMIRANTE BERISSO"
+};
+const ESCUDOS = {
+  "LU9DAV": "escudo1.png",
+  "LU5XR": "escudo2.png",
+  "LU9XP": "escudo3.png"
+}
+// 🧩 Generar QSL
+function generarQSL(activador, contacto) {
+  return new Promise((resolve) => {
+
+    const card = document.createElement('div');
+    card.className = 'qslCard';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 380;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = IMG_QSL;
+
+    img.onload = () => {
+
+      // Fondo
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Texto activador vertical
+      ctx.save();
+      ctx.translate(60, 190);
+      ctx.rotate(-Math.PI / 2);
+
+     ctx.font = 'bold 62px "Arial Black", sans-serif';
+ctx.textAlign = 'center';
+
+// 🎨 degradado celeste - blanco - celeste
+const grad = ctx.createLinearGradient(0, -40, 0, 40);
+grad.addColorStop(0, "#74ACDF");   // celeste arriba
+grad.addColorStop(0.45, "#FFFFFF");
+grad.addColorStop(0.55, "#FFFFFF");
+grad.addColorStop(1, "#74ACDF");   // celeste abajo
+
+// 🌑 sombra
+ctx.shadowColor = "rgba(0,0,0,0.5)";
+ctx.shadowBlur = 6;
+ctx.shadowOffsetX = 2;
+ctx.shadowOffsetY = 2;
+
+// 🔲 borde oscuro
+ctx.lineWidth = 4;
+ctx.strokeStyle = "#002244";
+ctx.strokeText(activador, 0, 0);
+
+// ✨ relleno con bandera
+ctx.fillStyle = grad;
+ctx.fillText(activador, 0, 0);
+
+      ctx.restore();
+
+// 🛡️ Escudo arriba a la derecha
+const escudoSrc = ESCUDOS[activador];
+
+if (escudoSrc) {
+  const escudo = new Image();
+  escudo.src = escudoSrc;
+
+  escudo.onload = () => {
+    const size = 70;
+
+    ctx.drawImage(
+      escudo,
+      canvas.width - size - 10,
+      10,
+      size,
+      size
+    );
+  };
+}
+
+      // Texto inferior
+      ctx.font = 'bold 18px Arial';
+      ctx.fillStyle ='#ffffff';
+      ctx.textAlign = 'center';
+
+  const linea1 = `QSO con ${contacto.call}  Fecha: ${contacto.date}`;
+const linea2 = `Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`;
+
+// 🔎 Ver si el activador tiene frase
+const frase = FRASES[activador];
+
+// 📍 Si existe frase, dibujarla una línea arriba
+if (frase) {
+  ctx.font = 'bold 16px Arial';
+  ctx.fillStyle = '#ffff99'; // color distinto para destacar
+  ctx.fillText(frase, canvas.width / 2, canvas.height - 80);
+}
+
+// Texto normal
+ctx.font = 'bold 18px Arial';
+ctx.fillStyle = '#ffffff';
+
+ctx.fillText(linea1, canvas.width / 2, canvas.height - 35);
+ctx.fillText(linea2, canvas.width / 2, canvas.height - 10);
+      // Botón individual
+      const btn = document.createElement('button');
+      btn.textContent = "⬇️ Descargar esta QSL";
+      btn.onclick = () => descargarIndividual(canvas, activador, contacto.call);
+
+      card.appendChild(canvas);
+      card.appendChild(btn);
+
+      document.getElementById('qslContainer').appendChild(card);
+
+      canvasesGenerados.push({canvas, activador, visitante: contacto.call});
+
+      resolve();
+    };
+
+    img.onerror = () => {
+      console.error("Error cargando imagen");
+      resolve();
+    };
+  });
+}
+
+// 🔎 Buscar QSLs
+async function verQSL() {
+  const sd = document.getElementById('sdVisitante').value.trim().toUpperCase();
+  if (!sd) return alert("Ingrese su SD");
+
+  const container = document.getElementById('qslContainer');
+  container.innerHTML = "Cargando...";
+  canvasesGenerados = [];
+
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    container.innerHTML = "";
+    let encontrados = 0;
+
+    for (const c of data) {
+      if (c.call === sd) {
+        await generarQSL(c.owner, c);
+        encontrados++;
+      }
+    }
+
+    document.getElementById('accionesDescarga').style.display =
+      encontrados ? 'block' : 'none';
+
+    if (!encontrados) {
+      container.textContent = "No se encontraron QSLs.";
+    }
+
+  } catch (e) {
+    container.textContent = "Error cargando datos.";
+  }
+}
+
+// 📦 ZIP
+async function descargarTodas() {
+  const zip = new JSZip();
+
+  canvasesGenerados.forEach(c => {
+    const base64 = c.canvas.toDataURL().split(',')[1];
+    zip.file(`${c.activador}_${c.visitante}.png`, base64, {base64:true});
+  });
+
+  const blob = await zip.generateAsync({type:"blob"});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = "qsls.zip";
+  link.click();
+}
+
+// 🖼️ Descargar primera
+function descargarActual() {
+  if (!canvasesGenerados.length) return;
+  const link = document.createElement('a');
+  link.download = "qsl.jpg";
+  link.href = canvasesGenerados[0].canvas.toDataURL("image/jpeg");
+  link.click();
+}
+
+// 🖼️ Descargar individual
+function descargarIndividual(canvas, activador, visitante) {
+  const link = document.createElement('a');
+  link.download = `${activador}_${visitante}.jpg`;
+  link.href = canvas.toDataURL("image/jpeg");
+  link.click();
+}
+
+// 📋 Copiar
+async function copiarActual() {
+  if (!canvasesGenerados.length) return;
+
+  const blob = await new Promise(r =>
+    canvasesGenerados[0].canvas.toBlob(r)
+  );
+
+  await navigator.clipboard.write([
+    new ClipboardItem({ 'image/png': blob })
+  ]);
+
+  alert("Imagen copiada");
+}
+</script>
+
+</body>
+</html>
+
+
+
+
