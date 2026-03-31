@@ -495,14 +495,12 @@ function verificarClave() {
   } else { alert("Clave incorrecta ❌"); }
 }
 
-<script>
 // --- Badges ---
 document.querySelectorAll('.evento-item').forEach(item => {
   const inicio = new Date(item.dataset.fechaInicio);
   const fin = new Date(item.dataset.fechaFin);
   const hoy = new Date();
   const badge = item.querySelector('.badge');
-
   if (hoy < inicio) {
     badge.textContent = "Próximamente";
     badge.className = "badge badge-proximo";
@@ -513,14 +511,10 @@ document.querySelectorAll('.evento-item').forEach(item => {
     badge.textContent = "Finalizada";
     badge.className = "badge badge-finalizado";
   }
-});
 
-// --- Botón izquierdo ---
 document.getElementById("btnIzquierdo").onclick = () => {
   window.open("cluster.html", "_blank");
-}
-
-// --- Eventos para búsqueda ---
+ }
 const EVENTOS_BUSQUEDA = [
   { nombre: "Malvinas 3 bases", pagina: "eventos/evento10/visitante.html" },
   { nombre: "Cacería Armada", pagina: "eventos/evento8/visitante.html" },
@@ -532,10 +526,14 @@ const EVENTOS_BUSQUEDA = [
   { nombre: "ZAR 2026", pagina: "eventos/evento5/visitante.html" }
 ];
 
-// --- Función de búsqueda global ---
 function buscarGlobal() {
   const sd = document.getElementById("sdGlobal").value.trim().toUpperCase();
   if (!sd) return alert("Ingrese una señal");
+
+  // 🔥 ACA DEFINÍ TU HTML BUSCADOR REAL
   window.open(`verqsl1.html?sd=${sd}`, '_blank');
 }
+});
 </script>
+</body>
+</html>
