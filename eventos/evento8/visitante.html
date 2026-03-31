@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA - Evento Malvinas</title>
+    <style>
+        body { font-family: "Courier New", monospace; background: #e5ebf0; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        h1 { color: #002b5c; text-align: center; text-transform: uppercase; }
+        input, button { padding: 10px; margin: 6px 0; border-radius: 6px; border: 1px solid #ccc; width: 80%; max-width: 300px; font-family: inherit; }
+        button { cursor: pointer; background: #003366; color: white; border: none; text-transform: uppercase; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        
+        #panelProgreso { 
+            background: #003566; color: white; padding: 15px; border-radius: 10px; 
+            margin-bottom: 20px; width: 100%; max-width: 530px; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none;
+        }
+        .palabra { display: inline-block; margin: 5px 10px; font-weight: bold; padding: 5px 10px; border-radius: 4px; border: 1px solid #555; }
+        .lograda { background: #00ff99; color: #003366; border-color: #00ff99; }
+        
+        canvas { margin-top: 10px; border: 2px solid #003366; width: 100%; max-width: 800px; height: auto; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+        .qslCard { margin-bottom: 30px; text-align: center; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; width: 100%; max-width: 820px; }
+        #accionesDescarga { display: none; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        
+        .input-nombre { background: #fff; color: #000; border: 2px solid #d4af37 !important; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>⚓ ARMADA EN MALVINAS Y ATLANTICO SUR </h1>
+    <p>Cacería de Palabras - SARA</p>
+
+    <input type="text" id="sdVisitante" placeholder="INGRESE SU SEÑAL (EJ: LU9MAH)">
+    <button onclick="verQSL()">🔍 BUSCAR CONTACTOS</button>
+
+    <div id="panelProgreso">
+        <strong>TU PROGRESO DE FRASE:</strong>
+        <div id="listaPalabras"></div>
+        <div id="mensajeDiploma"></div>
+    </div>
+
+    <div id="accionesDescarga">
+        <button onclick="descargarTodas()" style="background:#28a745;">📦 DESCARGAR TODO (.ZIP)</button>
+    </div>
+
+    <div id="qslContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxxcB2mHc9KWkf9CNKUoN4a8lTf8ykduxY8EFOgCDCSsuTuZdzbn_Bw6xCLEiDXNGqLwQ/exec"; 
+        const IMG_QSL = "qsl6.png";      
+        const IMG_DIPLOMA = "diploma_malvinas.png"; 
+
+        const ASIGNACION = {
+            "LW6DIV": "ARMADA", "LU4WAC": "ARMADA","LU3AFJ": "ARMADA","LU1DAS": "ARMADA",
+            "LU4XYL": "MALVINAS", "LU9FWM": "MALVINAS","LU5ETK": "MALVINAS","LU9DEW": "MALVINAS","LU1CBQ": "MALVINAS",
+            "LU9MAH": "ATLANTICO SUR", "LU7XZ": "ATLANTICO SUR","LW1DPS": "ATLANTICO SUR", "LU4EGP": "ATLANTICO SUR",
+           
+        };
+        const FRASE_OBJETIVO = ["ARMADA", "MALVINAS", "ATLANTICO SUR"];
+        
+        let canvasesGenerados = [];
+        let certNumberAsignado = ""; 
+
+        async function verQSL() {
+            const sd = document.getElementById('sdVisitante').value.trim().toUpperCase();
+            if (!sd) return alert("Ingrese su señal");
+
+            const container = document.getElementById('qslContainer');
+            container.innerHTML = "Escaneando el horizonte...";
+            document.getElementById('panelProgreso').style.display = 'none';
+            canvasesGenerados = [];
+            certNumberAsignado = ""; 
+
+            try {
+                const res = await fetch(API_URL);
+                const allData = await res.json();
+                container.innerHTML = "";
+
+                let encontrados = 0;
+                let palabrasLogradas = new Set();
+                let misContactos = [];
+
+                for (const contacto of allData) {
+                    if (contacto.call.toUpperCase() === sd) {
+                        encontrados++;
+                        misContactos.push(contacto); // Guardamos para el comodín
+                        if (!certNumberAsignado && contacto.certNumber) certNumberAsignado = contacto.certNumber;
+                        if (ASIGNACION[contacto.owner.toUpperCase()]) {
+                            palabrasLogradas.add(ASIGNACION[contacto.owner.toUpperCase()]);
+                        }
+                        await generarQSL(contacto.owner, contacto);
+                    }
+                }
+
+                if (encontrados === 0) {
+                    container.innerHTML = "No se encontraron contactos para " + sd;
+                } else {
+                    // AQUÍ PASAMOS LOS CONTACTOS PARA QUE EL COMODÍN FUNCIONE
+                    mostrarProgreso(palabrasLogradas, sd, misContactos);
+                    document.getElementById('accionesDescarga').style.display = 'flex';
+                }
+            } catch (err) {
+                container.innerHTML = "Error al conectar con el servidor.";
+            }
+        }
+
+        function mostrarProgreso(logradas, visitante, misContactos) {
+            const panel = document.getElementById('panelProgreso');
+            const lista = document.getElementById('listaPalabras');
+            const mensaje = document.getElementById('mensajeDiploma');
+            panel.style.display = 'block';
+            lista.innerHTML = "";
+
+            // Lógica Comodín LU7WH
+            const tieneComodin = misContactos.some(c => c.owner.toUpperCase() === "LU7WH");
+            if (tieneComodin && logradas.size < FRASE_OBJETIVO.length) {
+                const faltante = FRASE_OBJETIVO.find(p => !logradas.has(p));
+                if (faltante) logradas.add(faltante);
+            }
+            
+            FRASE_OBJETIVO.forEach(p => {
+                const span = document.createElement('span');
+                const ok = logradas.has(p);
+                span.className = 'palabra ' + (ok ? 'lograda' : '');
+                span.textContent = (ok ? '✅ ' : '⬜ ') + p;
+                lista.appendChild(span);
+            });
+
+            if (logradas.size === FRASE_OBJETIVO.length) {
+                mensaje.innerHTML = `
+                    <br>⭐ <strong>¡FRASE COMPLETA!</strong> ${tieneComodin ? "(Comodín LU7WH Activo)" : ""}<br>
+                    <small>Ingresá tu nombre para el diploma:</small><br>
+                    <input type="text" id="nombreOperador" class="input-nombre" placeholder="Nombre y Apellido">
+                    <button onclick="prepararDiploma('${visitante}')" style="background:#d4af37; color:#000;">🏆 GENERAR DIPLOMA</button>
+                `;
+            } else {
+                mensaje.innerHTML = `<br>Te faltan ${FRASE_OBJETIVO.length - logradas.size} palabras.`;
+            }
+        }
+
+        function prepararDiploma(visitante) {
+            const nombre = document.getElementById('nombreOperador').value.trim();
+            if (!nombre) return alert("Por favor, ingresá tu nombre.");
+            generarDiploma(nombre, visitante, certNumberAsignado);
+        }
+
+        async function generarQSL(activador, contacto) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 600; canvas.height = 420;
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.src = IMG_QSL;
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    ctx.save();
+                    ctx.translate(60, 200); ctx.rotate(-Math.PI / 2);
+                    ctx.font = 'bold 70px Arial'; ctx.textAlign = 'center';
+                    ctx.fillStyle = "#fcfafb"; 
+                    ctx.fillText(activador, 0, 0);
+                    ctx.restore();
+                    ctx.font = 'bold 18px Arial';
+                    ctx.fillStyle = '#fcfafb'; ctx.textAlign = 'center';
+                    ctx.fillText(`QSO con ${contacto.call}  Fecha: ${contacto.date}`, canvas.width / 1.7, canvas.height - 65);
+                    ctx.fillText(`Hora UTC: ${contacto.time}  Banda: ${contacto.band}  Modo: ${contacto.mode}`, canvas.width / 1.7, canvas.height - 45);
+                    const card = document.createElement('div');
+                    card.className = 'qslCard'; card.appendChild(canvas);
+                    const btn = document.createElement('button');
+                    btn.textContent = "⬇️ DESCARGAR QSL";
+                    btn.onclick = () => descargarIndividual(canvas, activador, contacto.call);
+                    card.appendChild(btn);
+                    document.getElementById('qslContainer').appendChild(card);
+                    canvasesGenerados.push({canvas, name: `${activador}_${contacto.call}`});
+                    resolve();
+                };
+            });
+        }
+
+        async function generarDiploma(nombre, visitante, certificado) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1280; canvas.height = 850; 
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = IMG_DIPLOMA; 
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'center';
+                
+                // Nombre
+                ctx.font = 'bold 45px Georgia'; ctx.fillStyle = "#000000";
+                ctx.fillText(nombre.toUpperCase(), 640, 640); 
+
+                // Señal
+                ctx.font = 'bold 60px Arial'; 
+                ctx.fillText(visitante.toUpperCase(), 740, 695);
+
+                // Registro
+                ctx.textAlign = 'right';
+                ctx.font = 'bold 16px "Courier New", monospace';
+                const hoy = new Date().toLocaleDateString();
+                ctx.fillText(`Reg N°: ${certificado || "SARA-MAL-001"} | Fecha: ${hoy}`, 1010, 750); 
+
+                const card = document.createElement('div');
+                card.id = 'diplomaFinal'; card.className = 'qslCard';
+                card.style.border = "4px double #d4af37";
+                card.innerHTML = "<h2 style='color:#002b5c;'>🥇 TU DIPLOMA DE HONOR 🥇</h2>";
+                canvas.style.maxWidth = "100%"; canvas.style.height = "auto";
+                card.appendChild(canvas);
+                const btn = document.createElement('button');
+                btn.style.background = "#d4af37"; btn.style.color = "#000"; btn.style.width = "100%";
+                btn.textContent = "💾 DESCARGAR DIPLOMA";
+                btn.onclick = () => descargarIndividual(canvas, "DIPLOMA", visitante);
+                card.appendChild(btn);
+                const viejo = document.getElementById('diplomaFinal');
+                if (viejo) viejo.remove();
+                document.getElementById('qslContainer').prepend(card);
+                card.scrollIntoView({behavior: 'smooth'});
+            };
+        }
+
+        function descargarIndividual(canvas, act, vis) {
+            const link = document.createElement('a');
+            link.download = `${act}_${vis}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.95); link.click();
+        }
+
+        async function descargarTodas() {
+            const zip = new JSZip();
+            canvasesGenerados.forEach(c => {
+                const imgData = c.canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                zip.file(c.name + ".jpg", imgData, {base64: true});
+            });
+            const content = await zip.generateAsync({type:"blob"});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = 'mis_qsls_malvinas.zip';
+            link.click();
+        }
+    </script>
+</body>
+</html>
