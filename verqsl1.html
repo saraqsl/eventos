@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscador Global de QSLs</title>
+<style>
+body { font-family: "Courier New", monospace; background: #e5ebf0; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+h1 { color: #002b5c; text-align: center; }
+input, button { padding: 10px; margin: 6px 0; border-radius: 6px; border: 1px solid #ccc; width: 80%; max-width: 300px; font-family: inherit; }
+button { cursor: pointer; background: #003366; color: white; border: none; text-transform: uppercase; font-weight: bold; }
+button:hover { background: #0056b3; }
+#resultados { margin-top: 20px; width: 100%; max-width: 800px; }
+.resultado { background: white; padding: 10px 15px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
+.resultado button { width: auto; padding: 6px 10px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<h1>🔎 Buscador Global de QSLs</h1>
+<input type="text" id="sd" placeholder="Ingrese su señal (ej: LU9MAH)">
+<button onclick="buscar()">Buscar QSLs</button>
+
+<div id="resultados"></div>
+
+<script>
+// 🔥 CONFIGURÁ TUS EVENTOS ACA
+const EVENTOS = [
+  { nombre: "zar 2025", api: "https://script.google.com/macros/s/AKfycbysRnXsh6QUwgGlIPltyj8EnoeQTtoNnx3fe1Mf5hwQcWQp3m5P8ZSRUKKn-lw1Zy30Vg/exec", pagina: "/eventos/evento2/visitante.html" },
+  { nombre: "aniv zar2026", api: "https://script.google.com/macros/s/AKfycbzBDE0rhV8qPB8FefZAbrmzhECwdoC6A5xUH3KY1qFP2lLEyxoXYxEyQBE4DAF5RIeuxQ/exec", pagina: "/eventos/evento5/visitante.html" },
+  { nombre: "Noche de los museos ARA Sarmiento", api: "https://script.google.com/macros/s/AKfycbzj-2MqYOph8tBrj4M2mg0L4-omSiijacWzX-xP_3M763vdWxGtID05CR0RertnOweYKg/exec", pagina: "/eventos/evento3/visitante.html" },
+  { nombre: "Olimpiadas VGM CMM 2025", api: "https://script.google.com/macros/s/AKfycbwGheoFenZr8EfbrZ3H2SNwHX0lgKe45xF_3WIQ-0FL1Q5qc03H_2onSTlD76RHmFxMUA/exec", pagina: "/eventos/2025_EV07-25/visitante.html" },
+  { nombre: "169 aniv Brown", api: "https://script.google.com/macros/s/AKfycbzzDZEE_PIHEmwLrO8UghPxCcUMKn6E2Whko_KBH27tzWNCdY81jmQCMcZnMQ0l1xKknQ/exec", pagina: "/eventos/evento6/visitante.html" },
+  { nombre: "60 aniv Inst AeroNaval", api: "https://script.google.com/macros/s/AKfycbxs8gMkkmT7_fqDcozm7sbuqOgAjnBpptz4Fo6_WJKDJpmhmE-2jX6depBM8zCwyfWeHA/exec", pagina: "/eventos/evento3/visitante.html" },
+  { nombre: "Cacería de palabras Armada en el Atlántico Sur", api: "https://script.google.com/macros/s/AKfycbxxcB2mHc9KWkf9CNKUoN4a8lTf8ykduxY8EFOgCDCSsuTuZdzbn_Bw6xCLEiDXNGqLwQ/exec", pagina: "/eventos/evento8/visitante.html" },
+  { nombre: "Malvinas 3 bases al aire", api: "https://script.google.com/macros/s/AKfycbyCxHK-QatFCZfAbWYt63oLoEd2fc8T9ygHx48Q9SH5szB6r3fJ14TtAJN_bz25xw0uig/exec", pagina: "/eventos/evento10/visitante.html" }
+];
+
+// 🔎 BUSCADOR GLOBAL
+async function buscar() {
+  const sd = document.getElementById("sd").value.trim().toUpperCase();
+  if (!sd) return alert("Ingrese su señal");
+
+  const cont = document.getElementById("resultados");
+  cont.innerHTML = "⏳ Buscando en todos los eventos...";
+
+  try {
+    // 🔹 Fetchs en paralelo
+    const promesas = EVENTOS.map(evento =>
+      fetch(evento.api)
+        .then(res => res.json())
+        .then(data => ({ evento, contactos: data.filter(c => c.call && c.call.toUpperCase() === sd) }))
+        .catch(err => ({ evento, contactos: [], error: err }))
+    );
+
+    const resultados = await Promise.all(promesas);
+
+    cont.innerHTML = "";
+    let encontrados = 0;
+
+    resultados.forEach(r => {
+      if (r.contactos.length > 0) {
+        encontrados++;
+        const div = document.createElement("div");
+        div.className = "resultado";
+        div.innerHTML = `<span><strong>${r.evento.nombre}</strong> - ${r.contactos.length} QSL(s)</span>
+                         <button onclick="window.open('${r.evento.pagina}?sd=${sd}','_blank')">Ver QSL</button>`;
+        cont.appendChild(div);
+      }
+    });
+
+    if (encontrados === 0) cont.innerHTML = "No se encontraron QSLs para esa señal.";
+
+  } catch (err) {
+    console.error(err);
+    cont.innerHTML = "Error al buscar QSLs.";
+  }
+}
+</script>
+
+</body>
+</html>
