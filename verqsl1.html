@@ -76,6 +76,12 @@ async function buscar() {
     cont.innerHTML = "Error al buscar QSLs.";
   }
 }
+  const urlParams = new URLSearchParams(window.location.search);
+const sd = urlParams.get('sd');
+if(sd) {
+  document.getElementById('sdVisitante').value = sd;
+  verQSL(); // tu función que genera QSLs
+}
 </script>
 
 </body>
