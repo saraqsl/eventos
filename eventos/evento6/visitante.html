@@ -284,13 +284,6 @@ if (sdURL) {
   document.getElementById("sdVisitante").value = sdURL;
   verQSL(); // 🔥 ejecuta automáticamente la búsqueda
 }
-  // 🔹 Tomar SD desde la URL y auto ejecutar
-const sdURL = new URLSearchParams(window.location.search).get("sd");
-
-if (sdURL) {
-  document.getElementById("sdVisitante").value = sdURL;
-  verQSL(); // 🔥 ejecuta automáticamente la búsqueda
-}
 </script>
 
 </body>
