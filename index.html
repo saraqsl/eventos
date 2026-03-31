@@ -233,13 +233,22 @@ footer {
 </header>
 
 <main>
-  <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs registradas por los activadores de los eventos ⚓</p>
+  <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs registradas por los activadores de los eventos o realice una busqueda globla de sus QSLs ⚓</p>
 <!-- 🕒 Reloj UTC Limpio y Portable -->
 <div class="reloj-utc">
   <div class="fecha" id="fecha"></div>
   <div class="hora" id="hora"></div>
 </div>
+<!-- 🔎 BUSCADOR GLOBAL NAVAL -->
+<div class="buscador-radar">
+  <h2>🔎 Central de Búsqueda de QSL con estaciones SARA </h2>
+  <p>Ingrese su señal para localizar contactos en todos los eventos de SARA</p>
 
+  <input type="text" id="sdGlobal" placeholder="Ej: LU9MAH">
+  <button onclick="buscarGlobal()">Buscar en todos los eventos</button>
+
+  <div id="resultadosGlobal"></div>
+</div>
 <script>
 function actualizarRelojUTC() {
   const ahora = new Date();
@@ -294,6 +303,61 @@ setInterval(actualizarRelojUTC, 1000);
   font-size: 2.4em;
   font-weight: bold;
   letter-spacing: 0.08em;
+}
+.buscador-radar {
+  margin: 40px auto;
+  padding: 25px;
+  max-width: 700px;
+  background: rgba(0, 20, 40, 0.85);
+  border-radius: 14px;
+  border: 1px solid rgba(0,255,150,0.3);
+  box-shadow: 0 0 20px rgba(0,255,150,0.15);
+  backdrop-filter: blur(4px);
+}
+
+.buscador-radar h2 {
+  color: #00ffcc;
+  margin-bottom: 10px;
+  text-shadow: 0 0 6px #00ffcc;
+}
+
+.buscador-radar input {
+  width: 60%;
+  max-width: 300px;
+  padding: 10px;
+  margin-top: 10px;
+  background: #001d3d;
+  border: 1px solid #00ffcc;
+  color: #00ffcc;
+  border-radius: 6px;
+  text-align: center;
+  font-family: "Courier New", monospace;
+}
+
+.buscador-radar button {
+  margin-top: 10px;
+  background: #00b4d8;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.buscador-radar button:hover {
+  background: #00ffcc;
+}
+
+.resultado-global {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #00ffcc;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
 
@@ -451,14 +515,28 @@ document.querySelectorAll('.evento-item').forEach(item => {
 document.getElementById("btnIzquierdo").onclick = () => {
   window.open("cluster.html", "_blank");
  }
+const EVENTOS_BUSQUEDA = [
+  { nombre: "Malvinas 3 bases", pagina: "eventos/evento10/visitante.html" },
+  { nombre: "Cacería Armada", pagina: "eventos/evento8/visitante.html" },
+  { nombre: "Inst Aeronaval", pagina: "eventos/evento7/visitante.html" },
+  { nombre: "Brown", pagina: "eventos/evento6/visitante.html" },
+  { nombre: "Olimpiadas", pagina: "eventos/2025_EV07-25/visitante.html" },
+  { nombre: "ARA Sarmiento", pagina: "eventos/evento3/visitante.html" },
+  { nombre: "ZAR 2025", pagina: "eventos/evento2/visitante.html" },
+  { nombre: "ZAR 2026", pagina: "eventos/evento5/visitante.html" }
+];
+
+function buscarGlobal() {
+  const sd = document.getElementById("sdGlobal").value.trim().toUpperCase();
+  if (!sd) return alert("Ingrese una señal");
+
+  // 🔥 ACA DEFINÍ TU HTML BUSCADOR REAL
+  window.open(`verqsl1.html?sd=${sd}`, '_blank');
+}
 });
 </script>
 </body>
 </html>
-
-
-
-
 
 
 
