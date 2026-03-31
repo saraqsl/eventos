@@ -233,7 +233,7 @@ footer {
 </header>
 
 <main>
-  <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs registradas por los activadores de los eventos o realice una busqueda globla de sus QSLs ⚓</p>
+  <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs registradas por los activadores de los eventos ⚓</p>
 <!-- 🕒 Reloj UTC Limpio y Portable -->
 <div class="reloj-utc">
   <div class="fecha" id="fecha"></div>
@@ -241,8 +241,8 @@ footer {
 </div>
 <!-- 🔎 BUSCADOR GLOBAL NAVAL -->
 <div class="buscador-radar">
-  <h2>🔎 Central de Búsqueda de QSL con estaciones SARA </h2>
-  <p>Ingrese su señal para localizar contactos en todos los eventos de SARA</p>
+  <h2>🔎 Central de Búsqueda de QSL</h2>
+  <p>Ingrese su señal para localizar contactos en todos los eventos</p>
 
   <input type="text" id="sdGlobal" placeholder="Ej: LU9MAH">
   <button onclick="buscarGlobal()">Buscar en todos los eventos</button>
@@ -511,7 +511,6 @@ document.querySelectorAll('.evento-item').forEach(item => {
     badge.textContent = "Finalizada";
     badge.className = "badge badge-finalizado";
   }
-  }); 
 
 document.getElementById("btnIzquierdo").onclick = () => {
   window.open("cluster.html", "_blank");
