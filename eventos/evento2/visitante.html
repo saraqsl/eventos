@@ -232,6 +232,13 @@ async function copiarActual() {
   await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
   alert('📋 Imagen copiada al portapapeles');
 }
+  // 🔹 Tomar SD desde la URL y auto ejecutar
+const sdURL = new URLSearchParams(window.location.search).get("sd");
+
+if (sdURL) {
+  document.getElementById("sdVisitante").value = sdURL;
+  verQSL(); // 🔥 ejecuta automáticamente la búsqueda
+}
 </script>
 
 </body>
