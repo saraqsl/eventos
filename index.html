@@ -60,6 +60,32 @@ header h1 {
 }
 header p { font-size: 0.9em; margin: 0; opacity: 0.85; }
 
+/* --- ESTILO BOTÓN QSL --- */
+.btn-qsl-acceso {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 25px;
+  background: rgba(0, 29, 61, 0.9); /* Azul más oscuro y profundo */
+  color: #00ffcc;
+  text-decoration: none;
+  border: 1px solid rgba(0, 255, 204, 0.4); /* Borde más fino y transparente */
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 1em;
+  width: fit-content;
+  box-shadow: none; /* <--- AQUÍ MATAMOS EL BRILLO FUERTE */
+  transition: 0.3s;
+  text-transform: uppercase;
+}
+
+.btn-qsl-acceso:hover {
+  background: #001d3d;
+  color: #00ffcc;
+  border: 1px solid #00ffcc; /* Solo brilla un poquito cuando pasas el mouse */
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); 
+  transform: translateY(-2px);
+}
+
 /* --- LISTA DE EVENTOS --- */
 .evento-lista {
   display: inline-block;
@@ -215,6 +241,7 @@ footer {
 }
 #btnBases:hover { background: #00b4d8; }
 </style>
+
 </head>
 <body>
 
@@ -233,22 +260,15 @@ footer {
 </header>
 
 <main>
-  <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs registradas por los activadores de los eventos ⚓</p>
+  <p style="margin-top:40px;">Seleccione el evento para ver sus QSLs o acceda a todas sus qsl con el boton   ⚓</p>
 <!-- 🕒 Reloj UTC Limpio y Portable -->
 <div class="reloj-utc">
   <div class="fecha" id="fecha"></div>
   <div class="hora" id="hora"></div>
 </div>
-<!-- 🔎 BUSCADOR GLOBAL NAVAL -->
-<div class="buscador-radar">
-  <h2>🔎 Central de Búsqueda de QSL</h2>
-  <p>Ingrese su señal para localizar contactos en todos los eventos</p>
-
-  <input type="text" id="sdGlobal" placeholder="Ej: LU9MAH">
-  <button onclick="buscarGlobal()">Buscar en todos los eventos</button>
-
-  <div id="resultadosGlobal"></div>
-</div>
+<a href="verqsl.html" class="btn-qsl-acceso">
+  acceso a todas sus qsl con estaciones sara ⚓
+</a>
 <script>
 function actualizarRelojUTC() {
   const ahora = new Date();
@@ -510,30 +530,11 @@ document.querySelectorAll('.evento-item').forEach(item => {
   } else {
     badge.textContent = "Finalizada";
     badge.className = "badge badge-finalizado";
-  }
-
-document.getElementById("btnIzquierdo").onclick = () => {
-  window.open("cluster.html", "_blank");
- }
-const EVENTOS_BUSQUEDA = [
-  { nombre: "Malvinas 3 bases", pagina: "eventos/evento10/visitante.html" },
-  { nombre: "Cacería Armada", pagina: "eventos/evento8/visitante.html" },
-  { nombre: "Inst Aeronaval", pagina: "eventos/evento7/visitante.html" },
-  { nombre: "Brown", pagina: "eventos/evento6/visitante.html" },
-  { nombre: "Olimpiadas", pagina: "eventos/2025_EV07-25/visitante.html" },
-  { nombre: "ARA Sarmiento", pagina: "eventos/evento3/visitante.html" },
-  { nombre: "ZAR 2025", pagina: "eventos/evento2/visitante.html" },
-  { nombre: "ZAR 2026", pagina: "eventos/evento5/visitante.html" }
-];
-
-function buscarGlobal() {
-  const sd = document.getElementById("sdGlobal").value.trim().toUpperCase();
-  if (!sd) return alert("Ingrese una señal");
-
-  // 🔥 ACA DEFINÍ TU HTML BUSCADOR REAL
-  window.open(`verqsl1.html?sd=${sd}`, '_blank');
+ 
 }
 });
 </script>
 </body>
 </html>
+
+
