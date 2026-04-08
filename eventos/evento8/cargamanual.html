@@ -66,7 +66,7 @@ table th {
 
 <!-- 🔐 LOGIN -->
 <div id="login" class="card">
-  <h2>Ingreso activador</h2>
+  <h2>Ingreso clave</h2>
   <input type="password" id="clave" placeholder="Clave de acceso">
   <br>
   <button onclick="verificarClave()">Ingresar</button>
@@ -244,7 +244,7 @@ function agregarQSO() {
   const mode = document.getElementById("mode").value;
   const rst = document.getElementById("rst").value.trim();
 
-  if (!owner || !call || !date || !time || !band || !mode) {
+  if (!owner || !call || !date || !time || !band || !mode || !rst) {
     alert("Complete todos los campos.");
     return;
   }
