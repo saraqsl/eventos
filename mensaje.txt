@@ -1,11 +1,34 @@
 DE: SARA eventos
 A: TODOS LOS OPERADORES Radioaficinados 
 BT
-Gracias por utilizar la plataforma para descargar sus qsl , 
-creada por integrantes voluntarios para brindar servicio a las actividades 
-radiales 73 y buenos contactos 
-TAREA A REALIZAR:
-divertirse , contactar y pasarla bien 
+Fecha y Horario:
+La entrega de contactos será entre el 10 de Abril del 2026 y el 1 de Mayo del 2026 
+Los horarios serán según disponibilidad de operadores 
+Bandas y modos: se utilizarán todas las posibles con preferencia 40 – 20 – 10 Mts.
+Y los modos SSB – CW – FT8 – FM - DV
+REQUISITOS PARA LA OBTENCIÓN DE LA QSL
+Las Estaciones de Radioaficionados (argentinas y extranjeras):
+• Deberán contactar con las estaciones otorgante de palabras para obtener las tres palabras que 
+forman la frase ¨ Armada en Malvinas y atlántico sur ¨
+Las siguientes estaciones entregaran la palabra 
+•LW6DIV • LU4WAC • LU3AFJ • LU1DAS ARMADA
+•LU4XYL • LU9FWM • LU5ETK • LU9DEW • LU1CBQ MALVINAS
+•LU9MAH • LU7XZ • LW1DPS • LU4EGP ATLANTICO SUR
+Actividad Búsqueda de Palabras
+Armada en Malvinas y Atlántico Sur
+• 
+La estación oficial LU7WH (estación comodín ) en caso de faltarle al participante una palabra
+cualquiera este contacto se la otorgará automáticamente . los últimos días de activación 
+Descarga de QSL y Certificado:
+Las QSL y el certificado se podrán descargar ingresando a: http://www.saraqsl.com en la sección 
+correspondiente al evento. 🇦🇷 Casería de palabras Armada en el atlántico sur. en la web podrá hacer un 
+seguimiento de avance y cantidad de palabras encontradas. 
+Verificación de QSO: 
+En caso de que el corresponsal no vea reflejada su QSL, deberá contactarse con “lu3ia@hotmail.com” 
+(Manager – Armada Argentina)
+Para estaciones SWL (radio escuchas):
+Las estaciones Radioescuchas podrán confirmar las recepciones cargando todos los datos escuchados 
+en la web
 
 Agradecemos la colaboración y participación.
 en los evento del Servicio Auxiliar de Radioaficionados de la Armada (SARA)
