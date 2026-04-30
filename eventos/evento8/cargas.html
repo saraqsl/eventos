@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA - Centro de Carga de Contactos</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --bg: #f3f6fa;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); text-align: center; padding: 20px; margin: 0; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; margin: 10px auto; max-width: 800px; }
+        
+        .nav-buttons { margin-bottom: 20px; display: flex; justify-content: center; gap: 15px; }
+        .btn-nav { padding: 12px 24px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-nav.active { background: var(--primary); color: white; }
+
+        input, select, button { margin: 8px; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
+        .btn-action { background: var(--success); color: white; border: none; cursor: pointer; font-weight: bold; width: 200px; }
+        .btn-action:hover { filter: brightness(1.1); }
+        
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; background: white; font-size: 13px; }
+        table th, table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        table th { background: #e9ecef; color: #333; }
+        
+        .hidden { display: none; }
+        #ultimoRST { font-size: 14px; color: #666; margin: 10px 0; font-style: italic; }
+        .status { font-weight: bold; margin-top: 15px; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <h1>⚓ Centro de Carga SARA malvinas </h1>
+
+    <!-- 📂 PANEL PRINCIPAL (Ahora visible por defecto) -->
+    <div id="panel">
+        
+        <div class="nav-buttons">
+            <button id="btnModoManual" class="btn-nav active" onclick="switchModo('manual')">✍ CARGA MANUAL</button>
+            <button id="btnModoAdif" class="btn-nav" onclick="switchModo('adif')">📁 SUBIR ADIF</button>
+        </div>
+
+        <!-- SECCIÓN MANUAL -->
+        <div id="seccionManual" class="card">
+            <h3>Registro de Contactos en Tiempo Real</h3>
+            <input type="text" id="owner" placeholder="Tu Indicativo (Ej: LU9MAH)">
+            <br>
+            <input type="text" id="call" placeholder="Indicativo Corresponsal" style="font-weight:bold; font-size: 18px; border-color: var(--primary);">
+            <br>
+            <input type="date" id="date">
+            <input type="time" id="time">
+            <br>
+            <select id="band">
+                <option value="">Banda</option>
+                <option>40M</option><option>20M</option><option>10M</option><option>2M</option>
+            </select>
+            <select id="mode">
+                <option value="">Modo</option>
+                <option>SSB</option><option>CW</option><option>FM</option><option>FT8</option><option>DIGI</option>
+            </select>
+            <input type="text" id="rst" placeholder="RST (Ej: 59)" style="width: 80px;">
+            <br>
+            <div id="ultimoRST">Esperando primer contacto...</div>
+            <button class="btn-action" onclick="agregarQSO()">AGREGAR A LA LISTA</button>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th><th>CALL</th><th>Fecha</th><th>Hora</th><th>Banda</th><th>Modo</th><th>RST</th><th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaBody"></tbody>
+            </table>
+            <br>
+            <button class="btn-action" style="background: var(--primary);" onclick="enviarManual()">📤 ENVIAR TODO A DRIVE</button>
+            <p id="statusManual" class="status"></p>
+        </div>
+
+        <!-- SECCIÓN ADIF -->
+        <div id="seccionAdif" class="card hidden">
+            <h3>Importar Archivo ADIF (.adi)</h3>
+            <p>Carga masiva de logs desde WSJT-X, N1MM, Logger32, etc.</p>
+            <input type="text" id="indicativoAdif" placeholder="Tu Indicativo (Ej: LU9MAH)">
+            <br>
+            <input type="file" id="archivoAdif" accept=".adi,.adif">
+            <br>
+            <button class="btn-action" onclick="subirAdif()">📤 PROCESAR Y SUBIR</button>
+            <p id="statusAdif" class="status"></p>
+        </div>
+    </div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxcB2mHc9KWkf9CNKUoN4a8lTf8ykduxY8EFOgCDCSsuTuZdzbn_Bw6xCLEiDXNGqLwQ/exec";
+    let qsosManuales = [];
+
+    // Al cargar la página, configurar la fecha de hoy automáticamente
+    window.onload = function() {
+        document.getElementById('date').valueAsDate = new Date();
+    };
+
+    function switchModo(modo) {
+        document.getElementById('seccionManual').classList.toggle('hidden', modo !== 'manual');
+        document.getElementById('seccionAdif').classList.toggle('hidden', modo !== 'adif');
+        document.getElementById('btnModoManual').classList.toggle('active', modo === 'manual');
+        document.getElementById('btnModoAdif').classList.toggle('active', modo === 'adif');
+    }
+
+    function agregarQSO() {
+        const fields = ['owner', 'call', 'date', 'time', 'band', 'mode', 'rst'];
+        let data = {};
+        fields.forEach(f => data[f] = document.getElementById(f).value.trim());
+
+        if (Object.values(data).some(v => v === "")) return alert("Faltan datos");
+
+        qsosManuales.push({
+            owner: data.owner.toUpperCase(),
+            call: data.call.toUpperCase(),
+            date: data.date.replace(/-/g, ""),
+            time: data.time.replace(":", ""),
+            band: data.band,
+            mode: data.mode,
+            rst: data.rst
+        });
+
+        document.getElementById('ultimoRST').innerText = `Último RST enviado a ${data.call}: ${data.rst}`;
+        document.getElementById('call').value = "";
+        document.getElementById('call').focus();
+        actualizarTabla();
+    }
+
+    function actualizarTabla() {
+        const tbody = document.getElementById('tablaBody');
+        tbody.innerHTML = qsosManuales.map((q, i) => `
+            <tr>
+                <td>${i+1}</td><td>${q.call}</td><td>${q.date}</td><td>${q.time}</td>
+                <td>${q.band}</td><td>${q.mode}</td><td>${q.rst}</td>
+                <td><button onclick="qsosManuales.splice(${i},1);actualizarTabla()">❌</button></td>
+            </tr>`).join('');
+    }
+
+    async function enviarManual() {
+        if (!qsosManuales.length) return alert("No hay datos");
+        await ejecutarEnvio(qsosManuales, "manual", document.getElementById('statusManual'));
+        qsosManuales = [];
+        actualizarTabla();
+    }
+
+    async function subirAdif() {
+        const file = document.getElementById('archivoAdif').files[0];
+        const owner = document.getElementById('indicativoAdif').value.trim().toUpperCase();
+        if (!file || !owner) return alert("Seleccione archivo e ingrese indicativo");
+
+        const text = await file.text();
+        const data = parseADIF(text, owner);
+        await ejecutarEnvio(data, "adif", document.getElementById('statusAdif'));
+    }
+
+    function parseADIF(texto, activador) {
+        return texto.split(/<eor>/i).filter(x => x.trim().length).map(qso => {
+            const get = (tag) => {
+                const r = new RegExp(`<${tag}:\\d+>(.*?)($|<)`, 'i');
+                const m = qso.match(r);
+                return m ? m[1].trim() : '';
+            };
+            return {
+                owner: activador,
+                call: get('CALL').toUpperCase(),
+                date: get('QSO_DATE'),
+                time: get('TIME_ON'),
+                band: get('BAND'),
+                mode: get('MODE'),
+                rst: get('RST_SENT') || '59'
+            };
+        }).filter(x => x.call);
+    }
+
+    async function ejecutarEnvio(data, tipo, statusElement) {
+        statusElement.innerText = "⏳ Enviando datos...";
+        const nombre = `${tipo}_${new Date().getTime()}.json`;
+        const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+        
+        try {
+            const r = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: new URLSearchParams({ name: nombre, data: base64 })
+            });
+            statusElement.innerText = "✅ " + await r.text();
+        } catch (e) {
+            statusElement.innerText = "❌ Error en el envío";
+        }
+    }
+</script>
+</body>
+</html>
+
