@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Acceso Seguro SARA</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; transition: background 0.8s ease;
+            background-color: #1a1a1a; color: white;
+        }
+        .container { 
+            text-align: center; padding: 40px; border-radius: 20px; 
+            background: rgba(0, 0, 0, 0.75); 
+            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 400px; 
+        }
+        input { 
+            padding: 12px; margin-bottom: 15px; width: 85%; 
+            border-radius: 8px; border: none; background: #fff;
+            font-size: 16px; text-align: center; color: #333;
+        }
+        button { 
+            padding: 12px 30px; cursor: pointer; background-color: #d9534f; 
+            color: white; border: none; border-radius: 5px; font-weight: bold; 
+            text-transform: uppercase;
+        }
+        .hidden { display: none; }
+        #mensaje { margin-top: 20px; min-height: 40px; font-weight: 500; }
+        .btn-link { 
+            background-color: #5cb85c; margin-top: 15px; display: inline-block; 
+            text-decoration: none; color: white; padding: 12px 25px; 
+            border-radius: 5px; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 id="titulo">IDENTIFICACIÓN SARA</h2>
+    
+    <div id="paso1">
+        <input type="text" id="idIntegrante" placeholder="SEÑAL DE LLAMADA / ID">
+        <br>
+        <button onclick="validarIntegrante()">Siguiente</button>
+    </div>
+
+    <div id="paso2" class="hidden">
+        <p id="txtSaludo"></p>
+        <input type="text" id="claveActividad" placeholder="ACCIÓN (VER / CARGAR / TURNOS)">
+        <br>
+        <button onclick="validarActividad()">Validar Acceso</button>
+    </div>
+
+    <div id="mensaje"></div>
+    <a id="btnFinal" href="#" class="btn-link hidden" target="_blank">ACCEDER AHORA</a>
+</div>
+
+<script>
+    const integrantes = {
+        // --- RADIOAFICIONADOS ---
+        "lu1bcp": { nombre: "ALEJANDRO AFONSO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu1bw": { nombre: "OSCAR ATIENZA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu1cbq": { nombre: "LUIS ALBERTO POZZI", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu1cyf": { nombre: "FERNANDO BAUDRY", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu1das": { nombre: "SARA VIVIANA ARANGUREN", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu1dip": { nombre: "CARLOS AGUIRRE", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu1dka": { nombre: "JUAN CARLOS BAILO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu1dt": { nombre: "MARIO RODRIGUEZ", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu1ewj": { nombre: "PAOLA GIMENEZ", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu1hrg": { nombre: "RUBEN GODOY", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu2awj": { nombre: "EDUARDO SCANEGATTA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu2csg": { nombre: "JUAN MANUEL CASTELVI", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu2dep": { nombre: "EMILIO PEREYRA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu2dwr": { nombre: "ALEJANDRO BELIKOW", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "belgrano": "https://saraqsl.com/eventos/evento11/cargas.html?" } },
+        "lu3afj": { nombre: "DANIEL BILLIOT", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu3dgu": { nombre: "LUIS LA MANTIA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu3dz": { nombre: "MARTIN DIAZ", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu3ia": { nombre: "ALFREDO AMARO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu4daj": { nombre: "ADALVERTO OLIVERA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu4egp": { nombre: "CARLOS EDUARDO ALONSO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu4wac": { nombre: "ALBERTO CALLEJON", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu4xyl": { nombre: "MARIANA SONEIRA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "belgrano": "https://saraqsl.com/eventos/evento11/cargas.html?","sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu5ab": { nombre: "HECTOR FABIAN GOMEZ", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu5du": { nombre: "GUSTAVO ROMERO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu5eas": { nombre: "LUIS MARIO DEVICEENTI", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu5edg": { nombre: "MARIA ALEY GALUPPO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu5etk": { nombre: "MARCELO BASILE", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu5we": { nombre: "GUILLERMO LLORENS", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu6dkt": { nombre: "JORGE PEREZ", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu6dra": { nombre: "ABEL ROMERO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu6egf": { nombre: "FERNANDO ALMADA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu6eus": { nombre: "GUILLERMO TIBALDI", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu6ewr": { nombre: "ROLANDO RAMOS", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "belgrano": "https://saraqsl.com/eventos/evento11/cargas.html?" } },
+        "lu7dbc": { nombre: "JOSE WALTER FRIAS", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu7xz": { nombre: "VICTOR LEGNICK", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu8eb": { nombre: "MARCELO BLANCO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu8dip": { nombre: "DIEGO PENNENTE", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu8iez": { nombre: "VICTOR ARENHARDT", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu9czd": { nombre: "MIGUEL MARCHESE", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu9dd": { nombre: "FLORENCIO HEREDIA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu9dew": { nombre: "CLAUDIO PEIRANO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu9dpt": { nombre: "CARLOS BISCIONI", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu9eer": { nombre: "ROCIO DUARTE", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lu9fwm": { nombre: "LUIS RAIES", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lu9mah": { nombre: "ADRIAN CHMIT", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "malvinas": "https://web.com", "belgrano": "https://web.com" } },
+        "lw1dps": { nombre: "RAUL GREGORIO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lw1dqp": { nombre: "SILVIA DOTTI", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lw1duq": { nombre: "JAVIER MERELLO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lw3dqf": { nombre: "CARLOS DACOMO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lw5dk": { nombre: "HECTOR NAVARRO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lw6div": { nombre: "JOSE GRECO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "sara2": "https://saraqsl.com/eventos/evento8/cargas.html?" } },
+        "lw6ehd": { nombre: "JUAN MUCCIARELLI", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lw8el": { nombre: "RICARDO LEPRON", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "belgrano": "https://saraqsl.com/eventos/evento11/cargas.html?" } },
+        "lw9dtr": { nombre: "MARTIN SILVA", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+        "lw9elx": { nombre: "EDGARDO ZAPICO", fondo: "radial-gradient(circle, #001f3f 0%, #000 100%)", permisos: { "turnos": "https://web.com" } },
+
+        // --- INTEGRANTES S ---
+        "s101": { nombre: "INTEGRANTE S101", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s102": { nombre: "INTEGRANTE S102", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s103": { nombre: "INTEGRANTE S103", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s104": { nombre: "INTEGRANTE S104", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s105": { nombre: "INTEGRANTE S105", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s106": { nombre: "INTEGRANTE S106", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s107": { nombre: "INTEGRANTE S107", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s108": { nombre: "INTEGRANTE S108", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s109": { nombre: "INTEGRANTE S109", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s110": { nombre: "INTEGRANTE S110", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s111": { nombre: "INTEGRANTE S111", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s112": { nombre: "INTEGRANTE S112", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s113": { nombre: "INTEGRANTE S113", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s114": { nombre: "INTEGRANTE S114", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s115": { nombre: "INTEGRANTE S115", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s116": { nombre: "INTEGRANTE S116", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s118": { nombre: "INTEGRANTE S118", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s119": { nombre: "INTEGRANTE S119", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s120": { nombre: "INTEGRANTE S120", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s201": { nombre: "INTEGRANTE S201", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s203": { nombre: "INTEGRANTE S203", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s204": { nombre: "INTEGRANTE S204", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s205": { nombre: "INTEGRANTE S205", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s206": { nombre: "INTEGRANTE S206", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com", "cargar": "https://sites.google.com/view/saraturnos/inicio" } },
+    "s207": { nombre: "INTEGRANTE S207", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s208": { nombre: "INTEGRANTE S208", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s209": { nombre: "INTEGRANTE S209", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s210": { nombre: "INTEGRANTE S210", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s212": { nombre: "INTEGRANTE S212", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s213": { nombre: "INTEGRANTE S213", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s214": { nombre: "INTEGRANTE S214", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s215": { nombre: "INTEGRANTE S215", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s218": { nombre: "INTEGRANTE ecr S218", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "listado": "https://docs.google.com/spreadsheets/d/1pPsqXZQcgdXzD11ljHYjvkB0j73wEKggAYtNzr6hy4Q/edit?pli=1&gid=0#gid=0", "cargar": "https://sites.google.com/view/saraturnos/inicio" } },
+    "s219": { nombre: "INTEGRANTE ecr S219", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com", "cargar": "https://sites.google.com/view/saraturnos/inicio" } },
+    "s220": { nombre: "INTEGRANTE S220", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s221": { nombre: "INTEGRANTE S221", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s222": { nombre: "INTEGRANTE S222", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s224": { nombre: "INTEGRANTE S224", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s226": { nombre: "INTEGRANTE ecr S226", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com", "cargar": "https://sites.google.com/view/saraturnos/inicio" } },
+    "s227": { nombre: "INTEGRANTE S227", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s229": { nombre: "INTEGRANTE S229", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s230": { nombre: "INTEGRANTE ecr S230", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com", "cargar": "https://sites.google.com/view/saraturnos/inicio" } },
+    "s231": { nombre: "INTEGRANTE ecr S231", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s232": { nombre: "INTEGRANTE S232", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s233": { nombre: "INTEGRANTE S233", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s234": { nombre: "INTEGRANTE S234", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s235": { nombre: "INTEGRANTE S235", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s236": { nombre: "INTEGRANTE S236", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s237": { nombre: "INTEGRANTE S237", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s238": { nombre: "INTEGRANTE S238", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s240": { nombre: "INTEGRANTE S240", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s241": { nombre: "INTEGRANTE S241", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com", "cargar": "https://sites.google.com/view/saraturnos/inicio" } },
+    "s242": { nombre: "INTEGRANTE S242", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } },
+    "s243": { nombre: "INTEGRANTE ecr S243", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "listado": "https://docs.google.com/spreadsheets/d/1pPsqXZQcgdXzD11ljHYjvkB0j73wEKggAYtNzr6hy4Q/edit?pli=1&gid=0#gid=0", "cargar": "https://sites.google.com/view/saraturnos/inicio", "cargar": "https://sites.google.com/view/saraturnos/inicio" } },
+    "s244": { nombre: "INTEGRANTE S244", fondo: "radial-gradient(circle, #4b5320 0%, #000 100%)", permisos: { "ver": "https://web.com" } }
+};
+
+    let usuarioActual = null;
+
+    function validarIntegrante() {
+        const id = document.getElementById('idIntegrante').value.trim().toLowerCase();
+        const msg = document.getElementById('mensaje');
+
+        if (integrantes[id]) {
+            usuarioActual = integrantes[id];
+            document.getElementById('paso1').classList.add('hidden');
+            document.getElementById('paso2').classList.remove('hidden');
+            document.getElementById('txtSaludo').innerText = `HOLA ${usuarioActual.nombre}`;
+            document.body.style.background = usuarioActual.fondo;
+            msg.innerHTML = "";
+            document.getElementById('claveActividad').focus();
+        } else {
+            msg.innerHTML = "IDENTIDAD NO REGISTRADA";
+            msg.style.color = "#ff4d4d";
+        }
+    }
+
+    function validarActividad() {
+        const actividad = document.getElementById('claveActividad').value.trim().toLowerCase();
+        const msg = document.getElementById('mensaje');
+        const btn = document.getElementById('btnFinal');
+
+        if (usuarioActual && usuarioActual.permisos[actividad]) {
+            msg.innerHTML = "ACCESO AUTORIZADO";
+            msg.style.color = "#5cb85c";
+            btn.href = usuarioActual.permisos[actividad];
+            btn.classList.remove('hidden');
+            document.getElementById('paso2').classList.add('hidden');
+        } else {
+            msg.innerHTML = "USTED NO TIENE PERMISO PARA ESTA ACTIVIDAD";
+            msg.style.color = "#ff4d4d";
+        }
+    }
+</script>
+
+</body>
+</html>
+
