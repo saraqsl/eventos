@@ -114,23 +114,19 @@
             panel.style.display = 'block';
             lista.innerHTML = "";
 
-            // Lógica Comodín: LU7WH o LW6DIV
+  // Lógica Comodín: LU7WH o LW6DIV
 const tieneComodin = misContactos.some(c => 
     c.owner.toUpperCase() === "LU7WH" || c.owner.toUpperCase() === "LW6DIV"
 );
 
-if (tieneComodin && logradas.size < FRASE_OBJETIVO.length) {
-    const faltante = FRASE_OBJETIVO.find(p => !logradas.has(p));
-    if (faltante) logradas.add(faltante);
+// Si tiene comodín, completamos TODAS las palabras que falten hasta llenar la frase
+if (tieneComodin) {
+    FRASE_OBJETIVO.forEach(p => {
+        if (!logradas.has(p)) {
+            logradas.add(p);
+        }
+    });
 }
-            
-            FRASE_OBJETIVO.forEach(p => {
-                const span = document.createElement('span');
-                const ok = logradas.has(p);
-                span.className = 'palabra ' + (ok ? 'lograda' : '');
-                span.textContent = (ok ? '✅ ' : '⬜ ') + p;
-                lista.appendChild(span);
-            });
 
             if (logradas.size === FRASE_OBJETIVO.length) {
         mensaje.innerHTML = `
