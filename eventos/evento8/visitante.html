@@ -133,15 +133,15 @@ if (tieneComodin && logradas.size < FRASE_OBJETIVO.length) {
             });
 
             if (logradas.size === FRASE_OBJETIVO.length) {
-                mensaje.innerHTML = `
-                    <br>⭐ <strong>¡FRASE COMPLETA!</strong> ${tieneComodin ? "(Comodín LU7WH Activo)" : ""}<br>
-                    <small>Ingresá tu nombre para el diploma:</small><br>
-                    <input type="text" id="nombreOperador" class="input-nombre" placeholder="Nombre y Apellido">
-                    <button onclick="prepararDiploma('${visitante}')" style="background:#d4af37; color:#000;">🏆 GENERAR DIPLOMA</button>
-                `;
-            } else {
-                mensaje.innerHTML = `<br>Te faltan ${FRASE_OBJETIVO.length - logradas.size} palabras.`;
-            }
+        mensaje.innerHTML = `
+            <br>⭐ <strong>¡FRASE COMPLETA!</strong> ${tieneComodin ? "<br>(Beneficio de Comodín Activo)" : ""}<br>
+            <small>Ingresá tu nombre para el diploma:</small><br>
+            <input type="text" id="nombreOperador" class="input-nombre" placeholder="Nombre y Apellido">
+            <button onclick="prepararDiploma('${visitante}')" style="background:#d4af37; color:#000;">🏆 GENERAR DIPLOMA</button>
+        `;
+    } else {
+        mensaje.innerHTML = `<br>Te faltan ${FRASE_OBJETIVO.length - logradas.size} palabras para completar la frase.`;
+    }
         }
 
         function prepararDiploma(visitante) {
