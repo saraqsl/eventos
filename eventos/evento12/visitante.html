@@ -1,10 +1,11 @@
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SARA - armada 242 años</title>
+    <title>SARA - armada 212 años</title>
     <style>
         body { font-family: "Courier New", monospace; background: #e5ebf0; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
         h1 { color: #002b5c; text-align: center; text-transform: uppercase; }
@@ -164,44 +165,68 @@
         }
 
         async function generarDiploma(nombre, visitante, certificado) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1280; canvas.height = 850;
-            
-            // Tamaño AGRANDADO para el Diploma en pantalla
-            canvas.style.maxWidth = "950px";
-            canvas.style.width = "100%";
+    const canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 850; 
+    canvas.style.maxWidth = "950px";
+    canvas.style.width = "100%";
+    const ctx = canvas.getContext('2d');
+    
+    const img = new Image();
+    // Esto evita el bloqueo de seguridad en GitHub Pages
+    if (window.location.protocol.startsWith('http')) {
+        img.crossOrigin = "anonymous";
+    }
+    img.src = IMG_DIPLOMA;
+    
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        
+        ctx.font = 'bold 30px Georgia';
+        ctx.fillStyle = "#000000";
+        ctx.fillText(nombre.toUpperCase(), 900, 570);
+        
+        ctx.font = 'bold 30px Arial';
+        ctx.fillText(visitante.toUpperCase(), 1000, 595);
+        
+        ctx.textAlign = 'right';
+        ctx.font = 'bold 16px "Courier New", monospace';
+        ctx.fillText(`Reg N°: ${certificado || "SARA-001"} | Fecha: ${new Date().toLocaleDateString()}`, 1000, 800);
+        
+        // 1. PRIMERO: Si ya había un diploma en pantalla, lo borramos
+        const viejo = document.getElementById('diplomaFinal');
+        if (viejo) viejo.remove();
+        
+        // 2. SEGUNDO: Creamos el contenedor contenedor nuevo
+        const card = document.createElement('div');
+        card.id = 'diplomaFinal'; // El ID se asigna AQUÍ para que no se auto-borre
+        card.className = 'qslCard';
+        card.style.border = "4px double #d4af37";
+        card.style.maxWidth = "1000px"; 
+        card.innerHTML = "<h2 style='color:#002b5c;'>🥇 TU DIPLOMA DE HONOR 🥇</h2>";
+        card.appendChild(canvas);
+        
+        // 3. TERCERO: Creamos el botón de descarga
+        const btn = document.createElement('button');
+        btn.style.background = "#d4af37";
+        btn.style.color = "#000";
+        btn.style.width = "100%";
+        btn.textContent = "💾 DESCARGAR DIPLOMA";
+        btn.onclick = () => descargarIndividual(canvas, "DIPLOMA", visitante);
+        card.appendChild(btn);
+        
+        // 4. CUARTO: Lo mostramos al principio de la lista
+        document.getElementById('qslContainer').prepend(card);
+        card.scrollIntoView({behavior: 'smooth'});
+    };
+    
+    img.onerror = () => {
+        alert("No se pudo mostrar el diploma. Verifique que el archivo '" + IMG_DIPLOMA + "' esté en la carpeta eventos/evento12/ con el nombre exacto en minúsculas.");
+    };
+}
 
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            img.src = IMG_DIPLOMA;
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
-                ctx.font = 'bold 30px Georgia'; ctx.fillStyle = "#000000";
-                ctx.fillText(nombre.toUpperCase(), 900, 570);
-                ctx.font = 'bold 30px Arial'; ctx.fillText(visitante.toUpperCase(), 1000, 595);
-                ctx.textAlign = 'right'; ctx.font = 'bold 16px "Courier New", monospace';
-                ctx.fillText(`Reg N°: ${certificado || "SARA-001"} | Fecha: ${new Date().toLocaleDateString()}`, 1000, 800);
-
-                const card = document.createElement('div');
-                card.id = 'diplomaFinal'; card.className = 'qslCard';
-                card.style.border = "4px double #d4af37";
-                card.style.maxWidth = "1000px"; // Contenedor más ancho para el diploma
-                card.innerHTML = "<h2 style='color:#002b5c;'>🥇 TU DIPLOMA DE HONOR 🥇</h2>";
-                card.appendChild(canvas);
-
-                const btn = document.createElement('button');
-                btn.style.background = "#d4af37"; btn.style.color = "#000"; btn.style.width = "100%";
-                btn.textContent = "💾 DESCARGAR DIPLOMA";
-                btn.onclick = () => descargarIndividual(canvas, "DIPLOMA", visitante);
-                card.appendChild(btn);
-
-                const viejo = document.getElementById('diplomaFinal');
-                if (viejo) viejo.remove();
-                document.getElementById('qslContainer').prepend(card);
-                card.scrollIntoView({behavior: 'smooth'});
-            };
-        }
 
         function descargarIndividual(canvas, act, vis) {
             const link = document.createElement('a');
