@@ -225,35 +225,38 @@
         alert("No se pudo mostrar el diploma. Verifique que el archivo '" + IMG_DIPLOMA + "' esté en la carpeta eventos/evento12/ con el nombre exacto en minúsculas."); 
     }; 
 
-    // 4. ESTRICTAMENTE AL FINAL: Se asigna la ruta para iniciar la descarga en la web
+       // 4. ESTRICTAMENTE AL FINAL: Se asigna la ruta para iniciar la descarga en la web
     img.src = IMG_DIPLOMA; 
 } 
 
-function descarg
-Individual(canvas, act, vis) {
-            const link = document.createElement('a');
-            link.download = `${act}_${vis}.jpg`;
-            link.href = canvas.toDataURL('image/jpeg', 0.95);
-            link.click();
-        }
+// Corrección de espacio y nombre en la función de descarga
+function descargarIndividual(canvas, act, vis) { 
+    const link = document.createElement('a'); 
+    link.download = `${act}_${vis}.jpg`; 
+    link.href = canvas.toDataURL('image/jpeg', 0.95); 
+    link.click(); 
+} 
 
-        async function descargarTodas() {
-            if (typeof JSZip === 'undefined') return alert("La librería ZIP no ha cargado aún.");
-            const zip = new JSZip();
-            canvasesGenerados.forEach(c => {
-                const imgData = c.canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-                zip.file(c.name + ".jpg", imgData, {base64: true});
-            });
-            const content = await zip.generateAsync({type:"blob"});
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(content);
-            link.download = 'mis_qsls_malvinas.zip';
-            link.click();
-        }
+async function descargarTodas() { 
+    if (typeof JSZip === 'undefined') return alert("La librería ZIP no ha cargado aún."); 
+    const zip = new JSZip(); 
+    canvasesGenerados.forEach(c => { 
+        const imgData = c.canvas.toDataURL('image/jpeg', 0.8).split(',')[1]; 
+        zip.file(c.name + ".jpg", imgData, {base64: true}); 
+    }); 
+    const content = await zip.generateAsync({type:"blob"}); 
+    const link = document.createElement('a'); 
+    link.href = URL.createObjectURL(content); 
+    link.download = 'mis_qsls_malvinas.zip'; 
+    link.click(); 
+} 
 
-        // Auto-ejecución por URL
-        const sdURL = new URLSearchParams(window.location.search).get("sd");
-        if (sdURL) { document.getElementById("sdVisitante").value = sdURL; verQSL(); }
-    </script>
+// Auto-ejecución por URL reparada
+const sdURL = new URLSearchParams(window.location.search).get("sd"); 
+if (sdURL) { 
+    document.getElementById("sdVisitante").value = sdURL; 
+    verQSL(); 
+}
+</script>
 </body>
 </html>
