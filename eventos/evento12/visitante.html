@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA - armada 242 años</title>
+    <style>
+        body { font-family: "Courier New", monospace; background: #e5ebf0; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        h1 { color: #002b5c; text-align: center; text-transform: uppercase; }
+        input, button { padding: 10px; margin: 6px 0; border-radius: 6px; border: 1px solid #ccc; width: 80%; max-width: 300px; font-family: inherit; }
+        button { cursor: pointer; background: #003366; color: white; border: none; text-transform: uppercase; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        #panelProgreso { background: #003566; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; width: 100%; max-width: 530px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; }
+        
+        /* Estilo base para las tarjetas */
+        .qslCard { margin-bottom: 30px; text-align: center; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; width: 100%; max-width: 820px; }
+        
+        /* El canvas por defecto se ajusta al contenedor */
+        canvas { margin-top: 10px; border: 2px solid #003366; box-shadow: 0 3px 8px rgba(0,0,0,0.3); height: auto; }
+
+        #accionesDescarga { display: none; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .input-nombre { background: #fff; color: #000; border: 2px solid #d4af37 !important; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>⚓ Dia de la Armada </h1>
+    <p>Cacería de QSLs - SARA</p>
+
+    <input type="text" id="sdVisitante" placeholder="INGRESE SU SEÑAL (EJ: LU9MAH)">
+    <button onclick="verQSL()">🔍 BUSCAR CONTACTOS</button>
+
+    <div id="panelProgreso">
+        <strong>RESUMEN DE ACTIVIDAD:</strong>
+        <div id="estadisticas"></div>
+        <div id="mensajeDiploma"></div>
+    </div>
+
+    <div id="accionesDescarga">
+        <button onclick="descargarTodas()" style="background:#28a745;">📦 DESCARGAR TODO (.ZIP)</button>
+    </div>
+
+    <div id="qslContainer"></div>
+
+    <!-- Librería para el ZIP corregida -->
+    <script src="https://cloudflare.com"></script>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbzSvSqPrKrr_rnE1lwqq1LDIOOBVXXB18fCAzbrL6XXuV2TgNa6MwPaIv9mifpRXA5Z5Q/exec"; 
+        const IMG_DIPLOMA = "diploma_malvinas.png";
+
+        const MAPA_QSLS = {
+            "LW6DIV": "qsl1.png", "LU8DRQ/MM": "qsl2.png", "LU1XY/MM": "qsl3.png",
+            "LU2XRA": "qsl4.png", "LU7WH": "qsl5.png", "LU1ENM": "qsl6.png",
+            "LW1DSA": "qsl7.png", "LU2CN/A": "qsl8.png", "LU1ARA": "qsl9.png",
+            "LU7AHM": "qsl10.png", "LU9XP":  "qsl11.png", "LU9MAH": "qsl12.png"
+        };
+        const QSL_POR_DEFECTO = "qsl1.png"; 
+
+        let canvasesGenerados = [];
+        let certNumberAsignado = "";
+
+        async function verQSL() {
+            const sd = document.getElementById('sdVisitante').value.trim().toUpperCase();
+            if (!sd) return alert("Ingrese su señal");
+
+            const container = document.getElementById('qslContainer');
+            container.innerHTML = "Escaneando el horizonte...";
+            document.getElementById('panelProgreso').style.display = 'none';
+            canvasesGenerados = [];
+            certNumberAsignado = "";
+
+            try {
+                const res = await fetch(API_URL);
+                const allData = await res.json();
+                container.innerHTML = "";
+
+                let misContactos = allData.filter(c => c.call.toUpperCase() === sd);
+                
+                if (misContactos.length === 0) {
+                    container.innerHTML = "No se encontraron contactos para " + sd;
+                } else {
+                    const conCert = misContactos.find(c => c.certNumber);
+                    if (conCert) certNumberAsignado = conCert.certNumber;
+
+                    const estacionesDistintas = new Set(misContactos.map(c => c.owner.toUpperCase()));
+
+                    for (const contacto of misContactos) {
+                        const activador = contacto.owner.toUpperCase();
+                        const rutaImagen = MAPA_QSLS[activador] || QSL_POR_DEFECTO;
+                        await generarQSL(activador, contacto, rutaImagen);
+                    }
+
+                    mostrarProgreso(estacionesDistintas.size, misContactos.length, sd);
+                    document.getElementById('accionesDescarga').style.display = 'flex';
+                }
+            } catch (err) {
+                container.innerHTML = "Error al conectar con el servidor.";
+            }
+        }
+
+        function mostrarProgreso(cantidadSD, cantidadTotal, visitante) {
+            const panel = document.getElementById('panelProgreso');
+            panel.style.display = 'block';
+            document.getElementById('estadisticas').innerHTML = `<p>Estaciones Distintas: ${cantidadSD} de 5 para Diploma.<br>Total QSLs: ${cantidadTotal}</p>`;
+
+            const mensaje = document.getElementById('mensajeDiploma');
+            if (cantidadSD >= 5) {
+                mensaje.innerHTML = `
+                    <br>⭐ <strong>¡DIPLOMA DISPONIBLE!</strong><br>
+                    <input type="text" id="nombreOperador" class="input-nombre" placeholder="Nombre y Apellido">
+                    <button onclick="prepararDiploma('${visitante}')" style="background:#d4af37; color:#000;">🏆 GENERAR DIPLOMA</button>
+                `;
+            } else {
+                mensaje.innerHTML = `<br>Te faltan ${5 - cantidadSD} estaciones distintas para el diploma.`;
+            }
+        }
+
+        async function generarQSL(activador, contacto, rutaImagen) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 600; canvas.height = 420;
+                
+                // Tamaño ACHICADO para la QSL en pantalla
+                canvas.style.maxWidth = "400px";
+                canvas.style.width = "100%";
+
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.src = rutaImagen;
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    ctx.save();
+                    ctx.translate(60, 200); ctx.rotate(-Math.PI / 2);
+                    ctx.font = 'bold 70px Arial'; ctx.textAlign = 'center'; ctx.fillStyle = "#fcfafb";
+                    ctx.fillText(activador, 0, 0); ctx.restore();
+
+                    ctx.font = 'bold 18px Arial'; ctx.fillStyle = '#fcfafb'; ctx.textAlign = 'center';
+                    ctx.fillText(`QSO con ${contacto.call} Fecha: ${contacto.date}`, 350, 355);
+                    ctx.fillText(`${contacto.time} UTC | ${contacto.band} | ${contacto.mode}`, 350, 375);
+
+                    const card = document.createElement('div');
+                    card.className = 'qslCard';
+                    card.appendChild(canvas);
+                    const btn = document.createElement('button');
+                    btn.textContent = "⬇️ DESCARGAR QSL";
+                    btn.onclick = () => descargarIndividual(canvas, activador, contacto.call);
+                    card.appendChild(btn);
+                    
+                    document.getElementById('qslContainer').appendChild(card);
+                    canvasesGenerados.push({canvas, name: `${activador}_${contacto.call}`});
+                    resolve();
+                };
+                img.onerror = () => resolve();
+            });
+        }
+
+        function prepararDiploma(visitante) {
+            const nombre = document.getElementById('nombreOperador').value.trim();
+            if (!nombre) return alert("Por favor, ingresá tu nombre.");
+            generarDiploma(nombre, visitante, certNumberAsignado);
+        }
+
+        async function generarDiploma(nombre, visitante, certificado) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1280; canvas.height = 850;
+            
+            // Tamaño AGRANDADO para el Diploma en pantalla
+            canvas.style.maxWidth = "950px";
+            canvas.style.width = "100%";
+
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = IMG_DIPLOMA;
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+                ctx.font = 'bold 30px Georgia'; ctx.fillStyle = "#000000";
+                ctx.fillText(nombre.toUpperCase(), 900, 570);
+                ctx.font = 'bold 30px Arial'; ctx.fillText(visitante.toUpperCase(), 1000, 595);
+                ctx.textAlign = 'right'; ctx.font = 'bold 16px "Courier New", monospace';
+                ctx.fillText(`Reg N°: ${certificado || "SARA-001"} | Fecha: ${new Date().toLocaleDateString()}`, 1000, 800);
+
+                const card = document.createElement('div');
+                card.id = 'diplomaFinal'; card.className = 'qslCard';
+                card.style.border = "4px double #d4af37";
+                card.style.maxWidth = "1000px"; // Contenedor más ancho para el diploma
+                card.innerHTML = "<h2 style='color:#002b5c;'>🥇 TU DIPLOMA DE HONOR 🥇</h2>";
+                card.appendChild(canvas);
+
+                const btn = document.createElement('button');
+                btn.style.background = "#d4af37"; btn.style.color = "#000"; btn.style.width = "100%";
+                btn.textContent = "💾 DESCARGAR DIPLOMA";
+                btn.onclick = () => descargarIndividual(canvas, "DIPLOMA", visitante);
+                card.appendChild(btn);
+
+                const viejo = document.getElementById('diplomaFinal');
+                if (viejo) viejo.remove();
+                document.getElementById('qslContainer').prepend(card);
+                card.scrollIntoView({behavior: 'smooth'});
+            };
+        }
+
+        function descargarIndividual(canvas, act, vis) {
+            const link = document.createElement('a');
+            link.download = `${act}_${vis}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+        }
+
+        async function descargarTodas() {
+            if (typeof JSZip === 'undefined') return alert("La librería ZIP no ha cargado aún.");
+            const zip = new JSZip();
+            canvasesGenerados.forEach(c => {
+                const imgData = c.canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                zip.file(c.name + ".jpg", imgData, {base64: true});
+            });
+            const content = await zip.generateAsync({type:"blob"});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = 'mis_qsls_malvinas.zip';
+            link.click();
+        }
+
+        // Auto-ejecución por URL
+        const sdURL = new URLSearchParams(window.location.search).get("sd");
+        if (sdURL) { document.getElementById("sdVisitante").value = sdURL; verQSL(); }
+    </script>
+</body>
+</html>
