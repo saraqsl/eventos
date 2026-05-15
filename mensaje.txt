@@ -1,35 +1,44 @@
 DE: SARA eventos
 A: TODOS LOS OPERADORES Radioaficinados 
 BT
-Fecha y Horario:
-La entrega de contactos será entre el 10 de Abril del 2026 y el 1 de Mayo del 2026 
-Los horarios serán según disponibilidad de operadores 
-Bandas y modos: se utilizarán todas las posibles con preferencia 40 – 20 – 10 Mts.
-Y los modos SSB – CW – FT8 – FM - DV
-REQUISITOS PARA LA OBTENCIÓN DE LA QSL
-Las Estaciones de Radioaficionados (argentinas y extranjeras):
-• Deberán contactar con las estaciones otorgante de palabras para obtener las tres palabras que 
-forman la frase ¨ Armada en Malvinas y atlántico sur ¨
-Las siguientes estaciones entregaran la palabra 
-•LW6DIV • LU4WAC • LU3AFJ • LU1DAS ARMADA
-•LU4XYL • LU9FWM • LU5ETK • LU9DEW • LU1CBQ MALVINAS
-•LU9MAH • LU7XZ • LW1DPS • LU4EGP ATLANTICO SUR
-Actividad Búsqueda de Palabras
-Armada en Malvinas y Atlántico Sur
-• 
-La estación oficial LU7WH (estación comodín ) en caso de faltarle al participante una palabra
-cualquiera este contacto se la otorgará automáticamente . los últimos días de activación 
-Descarga de QSL y Certificado:
-Las QSL y el certificado se podrán descargar ingresando a: http://www.saraqsl.com en la sección 
-correspondiente al evento. 🇦🇷 Casería de palabras Armada en el atlántico sur. en la web podrá hacer un 
-seguimiento de avance y cantidad de palabras encontradas. 
-Verificación de QSO: 
-En caso de que el corresponsal no vea reflejada su QSL, deberá contactarse con “lu3ia@hotmail.com” 
-(Manager – Armada Argentina)
-Para estaciones SWL (radio escuchas):
-Las estaciones Radioescuchas podrán confirmar las recepciones cargando todos los datos escuchados 
-en la web
+CERTIFICADO
 
+“212o ANIVERSARIO DEL COMBATE DE MONTEVIDEO”
+El 17 de mayo de 1814, la escuadra patriota al mando del Almirante Guillermo Brown
+logró una victoria decisiva en el Combate Naval de Montevideo, acabando con la
+dominación realista en el Río de la Plata. Esta gesta marcó el fin de tres siglos de
+dominio español en la región y es la fecha del Día de la Armada Argentina.
+Instituida oficialmente mediante por Decreto 5.304 el 12 de mayo de 1960.
+
+BASES
+
+Fecha: 15, 16, 17 – 23 y 24 de mayo.
+Horario Según disponibilidad de los operadores / Unidades.
+Bandas: TODAS
+Mods: SSB – CW – FT8 – FM - DV.
+UNIDADES PARTICIPANTES:
+15 – 16 – 17:
+LU1ENM ESCUELA NAVAL MILITAR – (solo CW)
+LU7WH EST PPAL DE COMUNIC NAVALES ALMIRANTE ZAR
+LW1DSA AGRUPACION BUZOS TÁCTICOS
+LU8DRQ/MM EST. PPAL DE COMUNICACIONES NAV MAR del PLATA
+
+(a bordo del Patrullero Oceánico ARA Bouchard)
+LU9XP BASE NAVAL USHUAIA ALMIRANTE BERISSO
+LU1XY/MM EST. PPAL COMUNICACIONES NAVALES USHUAIA
+(a bordo del Patrullero Oceánico ARA Almirante Cordero)
+
+LU2XRA LANCHA PATRULLERA ARA BARADERO
+23 y 24:
+LU2CN/A SERVICIO AUXILIAR DE RADIOAFICIONADOS DE LA ARMADA
+
+45o Aniversario del Hospital Naval “Pedro Mallo”
+
+LU7AHM BUQUE MUSEO FRAGATA ARA PTE. SARMIENTO (LU-006A)
+LU1ARA BUQUE MUSEO CORBETA A.R.A URUGUAY (LU-007A)
+REQUISITOS PARA LA OBTENCIÓN EL CERTIFICADO
+Las Estaciones de Radioaficionados (argentinas y extranjeros) deberán contactar con al menos 5
+(cinco)
 Agradecemos la colaboración y participación.
 en los evento del Servicio Auxiliar de Radioaficionados de la Armada (SARA)
 BT
