@@ -140,7 +140,7 @@
 
                     ctx.font = 'bold 18px Arial'; ctx.fillStyle = '#fcfafb'; ctx.textAlign = 'center';
                     ctx.fillText(`QSO con ${contacto.call} Fecha: ${contacto.date}`, 350, 355);
-                    ctx.fillText(`${contacto.time} UTC | ${contacto.band} | ${contacto.mode}`, 350, 375);
+                    ctx.fillText(`${contacto.time} UTC | ${contacto.band} | ${contacto.mode} | ${contacto.rst}`, 350, 375);
 
                     const card = document.createElement('div');
                     card.className = 'qslCard';
