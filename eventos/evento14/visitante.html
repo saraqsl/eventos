@@ -111,7 +111,8 @@
                     ctx.save();
                     ctx.translate(60, 200); ctx.rotate(-Math.PI / 2);
                     ctx.font = 'bold 60px Arial'; ctx.textAlign = 'center'; ctx.fillStyle = "#fcfafb";
-                    ctx.fillText(activador, 0, 0); ctx.restore();
+                    let activadorMostrar = activador.replace(/\/M$/i, "/m");
+ctx.fillText(activadorMostrar, 0, 0);
 
                     ctx.font = 'bold 18px Arial'; ctx.fillStyle = '#fcfafb'; ctx.textAlign = 'center';
                     ctx.fillText(`QSO con ${contacto.call}          Fecha: ${contacto.date}`, 350, 380);
