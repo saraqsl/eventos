@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -42,23 +42,23 @@
 
     <div id="qslContainer"></div>
 
-    <!-- Librerías requeridas para generar el archivo comprimido .ZIP de forma real -->
+    <!-- Librerías externas reales para empaquetar y descargar el archivo comprimido .ZIP -->
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
 
     <script>
         // --- CONFIGURACIÓN ---
-        const API_URL = "https://script.google.com/macros/s/AKfycbzSvSqPrKrr_rnE1lwqq1LDIOOBVXXB18fCAzbrL6XXuV2TgNa6MwPaIv9mifpRXA5Z5Q/exec"; 
+        const API_URL = "https://google.com"; 
         const IMG_DIPLOMA = "diploma_malvinas.png";
 
         const MAPA_QSLS = {
-            "LU2CN": "qsl1.png", "LU7WH": "qsl2.png", "LU9ESA": "qsl3.png",
             "LU1ENM": "qsl1.png", "LU1BCP": "qsl1.png", "LU1CBQ": "qsl1.png", 
             "LU3AFJ": "qsl1.png", "LU4EGP": "qsl1.png", "LU4XYL": "qsl1.png",
-            "LU5DU": "qsl1.png", "LU6EWR": "qsl1.png", "LU9FWM": "qsl1.png",
+            "LU5DU": "qsl1.png",  "LU6EWR": "qsl1.png", "LU9FWM": "qsl1.png",
             "LW1DPS": "qsl1.png", "LW3DQF": "qsl1.png", "LU5WGO": "qsl1.png",
-            "LW6DIV": "qsl1.png", "LW9DTR": "qsl1.png", "LU1DAS": "qsl1.png", "LU1WA": "qsl1.png", "LU2AWJ": "qsl1.png", 
-            "LU2DWR":  "qsl1.png", "LU9MAH": "qsl1.png"
+            "LW6DIV": "qsl1.png", "LW9DTR": "qsl1.png", "LU1DAS": "qsl1.png", 
+            "LU1WA": "qsl1.png",  "LU2AWJ": "qsl1.png", "LU2DWR": "qsl1.png", 
+            "LU9MAH": "qsl1.png"
         };
         const QSL_POR_DEFECTO = "qsl1.png"; 
 
@@ -81,7 +81,7 @@
                 const allData = await res.json();
                 container.innerHTML = "";
 
-                // Filtrar todos los contactos del visitante
+                // Filtrar todos los contactos del visitante buscado
                 let misContactos = allData.filter(c => c.call.toUpperCase() === sd);
                 
                 if (misContactos.length === 0) {
@@ -90,30 +90,27 @@
                     const conCert = misContactos.find(c => c.certNumber);
                     if (conCert) certNumberAsignado = conCert.certNumber;
 
-                    // Set para identificar las estaciones distintas contactadas
+                    // Set para registrar las estaciones distintas encontradas
                     const estacionesDistintas = new Set(misContactos.map(c => c.owner.toUpperCase()));
 
-                    // Generar una imagen QSL independiente por cada registro/QSO encontrado
+                    // Generar de manera secuencial una QSL por cada QSO individual
                     for (let i = 0; i < misContactos.length; i++) {
                         const contacto = misContactos[i];
                         const activador = contacto.owner.toUpperCase();
                         const rutaImagen = MAPA_QSLS[activador] || QSL_POR_DEFECTO;
-                        // Añadimos el índice para que no se pisen los nombres de archivos si repiten estación
                         await generarQSL(activador, contacto, rutaImagen, i + 1);
                     }
 
-                    // Evaluar reglas del certificado
+                    // Regla de certificación: Mínimo 6 en total incluyendo obligatoriamente a LU2CN
                     const tieneObligatoria = estacionesDistintas.has("LU2CN");
                     const totalEstaciones = estacionesDistintas.size;
-                    
-                    // Condición: Al menos 6 en total e incluyendo estrictamente a LU2CN
                     const calificaDiploma = tieneObligatoria && totalEstaciones >= 6;
 
                     mostrarProgreso(estacionesDistintas, calificaDiploma, sd);
                     document.getElementById('accionesDescarga').style.display = 'flex';
                 }
             } catch (err) {
-                container.innerHTML = "Error al conectar con el servidor.";
+                container.innerHTML = "Error al conectar con el servidor o procesar los datos.";
                 console.error(err);
             }
         }
@@ -145,7 +142,7 @@
                     faltantesTexto += "- Contactar obligatoriamente a LU2CN.<br>";
                 }
                 if (estacionesSet.size < 6) {
-                    faltantesTexto += `- Sumar ${6 - estacionesSet.size} estación(es) distinta(s) más.`;
+                    faltantesTexto += `- Sumar ${6 - estacionesSet.size} estación(es) distinta(s) más para alcanzar las 6 requeridas.`;
                 }
                 mensaje.innerHTML = `<br><span style="color:#ffc107;">Requisitos pendientes para el diploma:</span><br>${faltantesTexto}`;
             }
@@ -183,7 +180,6 @@
                     card.appendChild(btn);
                     
                     document.getElementById('qslContainer').appendChild(card);
-                    // Guardamos en el array global para la descarga masiva ZIP
                     canvasesGenerados.push({canvas, name: `QSL_${activador}_QSO_${index}_${contacto.call}`});
                     resolve();
                 };
@@ -195,3 +191,4 @@
         }
 
 
+       
