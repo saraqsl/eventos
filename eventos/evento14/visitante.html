@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -25,7 +25,7 @@
 <body>
 
     <h1>⚓ 65 aniversario </h1>
-    <p>Servicio Auxiliar de Radioaficionados de la Armada  - SARA</p>
+    <p>Servicio Auxiliar de Radioaficionados de la Armada - SARA</p>
 
     <input type="text" id="sdVisitante" placeholder="INGRESE SU SEÑAL (EJ: LU9MAH)">
     <button onclick="verQSL()">🔍 BUSCAR CONTACTOS</button>
@@ -42,7 +42,7 @@
 
     <div id="qslContainer"></div>
 
-    <!-- Librerías externas reales para empaquetar y descargar el archivo comprimido .ZIP -->
+    <!-- Librerías para manejar la descarga del archivo comprimido (.ZIP) sin cortes -->
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
 
@@ -55,7 +55,7 @@
             "LU1ENM": "qsl1.png", "LU1BCP": "qsl1.png", "LU1CBQ": "qsl1.png", 
             "LU3AFJ": "qsl1.png", "LU4EGP": "qsl1.png", "LU4XYL": "qsl1.png",
             "LU5DU": "qsl1.png",  "LU6EWR": "qsl1.png", "LU9FWM": "qsl1.png",
-            "LW1DPS": "qsl1.png", "LW3DQF": "qsl1.png", "LU5WGO": "qsl1.png",
+            "LW1DPS": "qsl1.png", "LW3DQF": "qsl1.png", "LU3WGO": "qsl1.png",
             "LW6DIV": "qsl1.png", "LW9DTR": "qsl1.png", "LU1DAS": "qsl1.png", 
             "LU1WA": "qsl1.png",  "LU2AWJ": "qsl1.png", "LU2DWR": "qsl1.png", 
             "LU9MAH": "qsl1.png"
@@ -81,8 +81,8 @@
                 const allData = await res.json();
                 container.innerHTML = "";
 
-                // Filtrar todos los contactos del visitante buscado
-                let misContactos = allData.filter(c => c.call.toUpperCase() === sd);
+                // Filtrar contactos del visitante
+                let misContactos = allData.filter(c => c.call && c.call.toUpperCase() === sd);
                 
                 if (misContactos.length === 0) {
                     container.innerHTML = "No se encontraron contactos para " + sd;
@@ -90,10 +90,10 @@
                     const conCert = misContactos.find(c => c.certNumber);
                     if (conCert) certNumberAsignado = conCert.certNumber;
 
-                    // Set para registrar las estaciones distintas encontradas
+                    // Identificar las estaciones distintas contactadas (los dueños/activadores)
                     const estacionesDistintas = new Set(misContactos.map(c => c.owner.toUpperCase()));
 
-                    // Generar de manera secuencial una QSL por cada QSO individual
+                    // Renderizar una QSL por cada QSO (Si hay 3 de la misma estación, se muestran 3 QSLs)
                     for (let i = 0; i < misContactos.length; i++) {
                         const contacto = misContactos[i];
                         const activador = contacto.owner.toUpperCase();
@@ -101,7 +101,7 @@
                         await generarQSL(activador, contacto, rutaImagen, i + 1);
                     }
 
-                    // Regla de certificación: Mínimo 6 en total incluyendo obligatoriamente a LU2CN
+                    // Regla de certificación: Mínimo 6 estaciones distintas incluyendo LU2CN
                     const tieneObligatoria = estacionesDistintas.has("LU2CN");
                     const totalEstaciones = estacionesDistintas.size;
                     const calificaDiploma = tieneObligatoria && totalEstaciones >= 6;
@@ -184,11 +184,6 @@
                     resolve();
                 };
                 img.onerror = () => {
-                    console.error("No se pudo cargar la imagen: " + rutaImagen);
+                    console.error("No se pudo cargar la imagen QSL: " + rutaImagen);
                     resolve();
                 };
-            });
-        }
-
-
-       
