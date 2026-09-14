@@ -683,41 +683,32 @@ function generarDiploma(
 
 
         // =====================================================
-        // NOMBRE Y APELLIDO
-        // =====================================================
+// NOMBRE Y LICENCIA EN LA MISMA LÍNEA
+// =====================================================
 
-        ctx.fillStyle =
-            "#000000";
+const centroY = 455;
 
-        ctx.textAlign =
-            "center";
+// NOMBRE
+ctx.fillStyle = "#000000";
+ctx.textAlign = "center";
+ctx.font = "bold 48px Arial";
 
-        ctx.font =
-            "bold 48px Arial";
+ctx.fillText(
+    nombre.toUpperCase(),
+    650,
+    centroY
+);
 
+// LICENCIA
+ctx.fillStyle = "#003366";
+ctx.textAlign = "center";
+ctx.font = "bold 52px Arial";
 
-        ctx.fillText(
-            nombre.toUpperCase(),
-            canvas.width / 2,
-            570
-        );
-
-
-        // =====================================================
-        // SEÑAL DISTINTIVA
-        // =====================================================
-
-        ctx.font =
-            "bold 60px Arial";
-
-        ctx.fillStyle =
-            "#003366";
-
-
-        ctx.fillText(
-            visitante.toUpperCase(),
-            canvas.width / 2,
-            650
+ctx.fillText(
+    visitante.toUpperCase(),
+    1000,
+    centroY
+);
         );
 
 
