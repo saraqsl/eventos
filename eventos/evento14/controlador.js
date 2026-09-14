@@ -3,15 +3,15 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwH1ix0sHFy571J_j-QODBM
 const IMG_DIPLOMA = "diploma_malvinas.png";
 
 const MAPA_QSLS = {
-    "LU1ENM": "qsl1.png", "LU1BCP": "qsl1.png", "LU1CBQ": "qsl1.png", 
-    "LU3AFJ": "qsl1.png", "LU4EGP": "qsl1.png", "LU4XYL": "qsl1.png",
-    "LU5DU": "qsl1.png",  "LU6EWR": "qsl1.png", "LU9FWM": "qsl1.png",
-    "LW1DPS": "qsl1.png", "LW3DQF": "qsl1.png", "LU3WGO": "qsl1.png",
-    "LW6DIV": "qsl1.png", "LW9DTR": "qsl1.png", "LU1DAS": "qsl1.png", 
-    "LU1WA": "qsl1.png",  "LU2AWJ": "qsl1.png", "LU2DWR": "qsl1.png", 
-    "LU9MAH": "qsl1.png"
+    "LU1ENM": "qsl1.png", "LU1BCP": "qsl2.png", "LU1CBQ": "qsl2.png", 
+    "LU3AFJ": "qsl2.png", "LU4EGP": "qsl2.png", "LU4XYL": "qsl2.png",
+    "LU5DU": "qsl2.png",  "LU6EWR": "qsl2.png", "LU9FWM": "qsl2.png",
+    "LW1DPS": "qsl2.png", "LW3DQF": "qsl2.png", "LU3WGO": "qsl2.png",
+    "LW6DIV": "qsl2.png", "LW9DTR": "qsl2.png", "LU1DAS": "qsl2.png", 
+    "LU1WA": "qsl2.png",  "LU2AWJ": "qsl2.png", "LU2DWR": "qsl2.png", 
+    "LU9MAH": "qsl1.png", "LU2CN": "qsl1.png", "LU7WH": "qsl1.png", "LU9ESA": "qsl1.png"
 };
-const QSL_POR_DEFECTO = "qsl1.png"; 
+const QSL_POR_DEFECTO = "qsl2.png"; 
 
 let canvasesGenerados = [];
 let certNumberAsignado = "";
@@ -112,12 +112,12 @@ async function generarQSL(activador, contacto, rutaImagen, index) {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             ctx.save();
             ctx.translate(60, 200); ctx.rotate(-Math.PI / 2);
-            ctx.font = 'bold 45px Arial'; ctx.textAlign = 'center'; ctx.fillStyle = "#fcfafb";
+            ctx.font = 'bold 70px Arial'; ctx.textAlign = 'center'; ctx.fillStyle = "#fcfafb";
             ctx.fillText(activador, 0, 0); ctx.restore();
 
             ctx.font = 'bold 16px Arial'; ctx.fillStyle = '#fcfafb'; ctx.textAlign = 'center';
-            ctx.fillText(`QSO con ${contacto.call} | Fecha: ${contacto.date || ''}`, 350, 355);
-            ctx.fillText(`${contacto.time || ''} UTC | ${contacto.band || ''} | ${contacto.mode || ''} | ${contacto.rst || ''}`, 350, 385);
+            ctx.fillText(`QSO con ${contacto.call} | Fecha: ${contacto.date || ''}`, 350, 385);
+            ctx.fillText(`${contacto.time || ''} UTC | ${contacto.band || ''} | ${contacto.mode || ''} | ${contacto.rst || ''}`, 350, 415);
 
             const card = document.createElement('div');
             card.className = 'qslCard';
