@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -44,7 +42,8 @@
 
     <div id="qslContainer"></div>
 
-    <!-- Librería para el ZIP corregida -->
+    <!-- Librerías requeridas para generar el archivo comprimido .ZIP de forma real -->
+    <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
 
     <script>
@@ -53,10 +52,13 @@
         const IMG_DIPLOMA = "diploma_malvinas.png";
 
         const MAPA_QSLS = {
-            "LU2CN": "qsl1.png", "LU7WH": "qsl2.png", "LU1XY": "qsl3.png",
-            "LU2XRA": "qsl4.png", "LU7WH": "qsl5.png", "LU1ENM": "qsl6.png",
-            "LW1DSA": "qsl7.png", "LU2CN/A": "qsl8.png", "LU1ARA": "qsl9.png",
-            "LU7AHM": "qsl10.png", "LU9XP":  "qsl11.png", "LU9MAH": "qsl12.png"
+            "LU2CN": "qsl1.png", "LU7WH": "qsl2.png", "LU9ESA": "qsl3.png",
+            "LU1ENM": "qsl1.png", "LU1BCP": "qsl1.png", "LU1CBQ": "qsl1.png", 
+            "LU3AFJ": "qsl1.png", "LU4EGP": "qsl1.png", "LU4XYL": "qsl1.png",
+            "LU5DU": "qsl1.png", "LU6EWR": "qsl1.png", "LU9FWM": "qsl1.png",
+            "LW1DPS": "qsl1.png", "LW3DQF": "qsl1.png", "LU5WGO": "qsl1.png",
+            "LW6DIV": "qsl1.png", "LW9DTR": "qsl1.png", "LU1DAS": "qsl1.png", "LU1WA": "qsl1.png", "LU2AWJ": "qsl1.png", 
+            "LU2DWR":  "qsl1.png", "LU9MAH": "qsl1.png"
         };
         const QSL_POR_DEFECTO = "qsl1.png"; 
 
@@ -70,6 +72,7 @@
             const container = document.getElementById('qslContainer');
             container.innerHTML = "Escaneando el horizonte...";
             document.getElementById('panelProgreso').style.display = 'none';
+            document.getElementById('accionesDescarga').style.display = 'none';
             canvasesGenerados = [];
             certNumberAsignado = "";
 
@@ -78,6 +81,7 @@
                 const allData = await res.json();
                 container.innerHTML = "";
 
+                // Filtrar todos los contactos del visitante
                 let misContactos = allData.filter(c => c.call.toUpperCase() === sd);
                 
                 if (misContactos.length === 0) {
@@ -86,45 +90,72 @@
                     const conCert = misContactos.find(c => c.certNumber);
                     if (conCert) certNumberAsignado = conCert.certNumber;
 
+                    // Set para identificar las estaciones distintas contactadas
                     const estacionesDistintas = new Set(misContactos.map(c => c.owner.toUpperCase()));
 
-                    for (const contacto of misContactos) {
+                    // Generar una imagen QSL independiente por cada registro/QSO encontrado
+                    for (let i = 0; i < misContactos.length; i++) {
+                        const contacto = misContactos[i];
                         const activador = contacto.owner.toUpperCase();
                         const rutaImagen = MAPA_QSLS[activador] || QSL_POR_DEFECTO;
-                        await generarQSL(activador, contacto, rutaImagen);
+                        // Añadimos el índice para que no se pisen los nombres de archivos si repiten estación
+                        await generarQSL(activador, contacto, rutaImagen, i + 1);
                     }
 
-                    mostrarProgreso(estacionesDistintas.size, misContactos.length, sd);
+                    // Evaluar reglas del certificado
+                    const tieneObligatoria = estacionesDistintas.has("LU2CN");
+                    const totalEstaciones = estacionesDistintas.size;
+                    
+                    // Condición: Al menos 6 en total e incluyendo estrictamente a LU2CN
+                    const calificaDiploma = tieneObligatoria && totalEstaciones >= 6;
+
+                    mostrarProgreso(estacionesDistintas, calificaDiploma, sd);
                     document.getElementById('accionesDescarga').style.display = 'flex';
                 }
             } catch (err) {
                 container.innerHTML = "Error al conectar con el servidor.";
+                console.error(err);
             }
         }
 
-        function mostrarProgreso(cantidadSD, cantidadTotal, visitante) {
+        function mostrarProgreso(estacionesSet, calificaDiploma, visitante) {
             const panel = document.getElementById('panelProgreso');
             panel.style.display = 'block';
-            document.getElementById('estadisticas').innerHTML = `<p>Estaciones Distintas: ${cantidadSD} de 5 para Diploma.<br>Total QSLs: ${cantidadTotal}</p>`;
+            
+            const listaEstaciones = Array.from(estacionesSet).join(", ");
+            const tieneLu2cn = estacionesSet.has("LU2CN") ? "✅ Contactada" : "❌ Falta LU2CN (Obligatoria)";
+
+            document.getElementById('estadisticas').innerHTML = `
+                <p>Estaciones válidas logradas: ${estacionesSet.size}<br>
+                <small>(${listaEstaciones})</small><br>
+                Estación Obligatoria LU2CN: ${tieneLu2cn}</p>
+            `;
 
             const mensaje = document.getElementById('mensajeDiploma');
-            if (cantidadSD >= 5) {
+            if (calificaDiploma) {
                 mensaje.innerHTML = `
                     <br>⭐ <strong>¡DIPLOMA DISPONIBLE!</strong><br>
+                    <small>Cumple con las 5 estaciones + la obligatoria (Total: ${estacionesSet.size} estaciones)</small><br>
                     <input type="text" id="nombreOperador" class="input-nombre" placeholder="Nombre y Apellido">
                     <button onclick="prepararDiploma('${visitante}')" style="background:#d4af37; color:#000;">🏆 GENERAR DIPLOMA</button>
                 `;
             } else {
-                mensaje.innerHTML = `<br>Te faltan ${5 - cantidadSD} estaciones distintas para el diploma.`;
+                let faltantesTexto = "";
+                if (!estacionesSet.has("LU2CN")) {
+                    faltantesTexto += "- Contactar obligatoriamente a LU2CN.<br>";
+                }
+                if (estacionesSet.size < 6) {
+                    faltantesTexto += `- Sumar ${6 - estacionesSet.size} estación(es) distinta(s) más.`;
+                }
+                mensaje.innerHTML = `<br><span style="color:#ffc107;">Requisitos pendientes para el diploma:</span><br>${faltantesTexto}`;
             }
         }
 
-        async function generarQSL(activador, contacto, rutaImagen) {
+        async function generarQSL(activador, contacto, rutaImagen, index) {
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
                 canvas.width = 600; canvas.height = 420;
                 
-                // Tamaño ACHICADO para la QSL en pantalla
                 canvas.style.maxWidth = "400px";
                 canvas.style.width = "100%";
 
@@ -135,128 +166,32 @@
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     ctx.save();
                     ctx.translate(60, 200); ctx.rotate(-Math.PI / 2);
-                    ctx.font = 'bold 70px Arial'; ctx.textAlign = 'center'; ctx.fillStyle = "#fcfafb";
+                    ctx.font = 'bold 45px Arial'; ctx.textAlign = 'center'; ctx.fillStyle = "#fcfafb";
                     ctx.fillText(activador, 0, 0); ctx.restore();
 
-                    ctx.font = 'bold 18px Arial'; ctx.fillStyle = '#fcfafb'; ctx.textAlign = 'center';
-                    ctx.fillText(`QSO con ${contacto.call} Fecha: ${contacto.date}`, 350, 355);
-                    ctx.fillText(`${contacto.time} UTC | ${contacto.band} | ${contacto.mode} | ${contacto.rst}`, 350, 375);
+                    ctx.font = 'bold 16px Arial'; ctx.fillStyle = '#fcfafb'; ctx.textAlign = 'center';
+                    ctx.fillText(`QSO con ${contacto.call} | Fecha: ${contacto.date || ''}`, 350, 355);
+                    ctx.fillText(`${contacto.time || ''} UTC | ${contacto.band || ''} | ${contacto.mode || ''} | ${contacto.rst || ''}`, 350, 385);
 
                     const card = document.createElement('div');
                     card.className = 'qslCard';
                     card.appendChild(canvas);
+                    
                     const btn = document.createElement('button');
                     btn.textContent = "⬇️ DESCARGAR QSL";
-                    btn.onclick = () => descargarIndividual(canvas, activador, contacto.call);
+                    btn.onclick = () => descargarIndividual(canvas, `${activador}_QSO_${index}`, contacto.call);
                     card.appendChild(btn);
                     
                     document.getElementById('qslContainer').appendChild(card);
-                    canvasesGenerados.push({canvas, name: `${activador}_${contacto.call}`});
+                    // Guardamos en el array global para la descarga masiva ZIP
+                    canvasesGenerados.push({canvas, name: `QSL_${activador}_QSO_${index}_${contacto.call}`});
                     resolve();
                 };
-                img.onerror = () => resolve();
+                img.onerror = () => {
+                    console.error("No se pudo cargar la imagen: " + rutaImagen);
+                    resolve();
+                };
             });
         }
 
-        function prepararDiploma(visitante) {
-            const nombre = document.getElementById('nombreOperador').value.trim();
-            if (!nombre) return alert("Por favor, ingresá tu nombre.");
-            generarDiploma(nombre, visitante, certNumberAsignado);
-        }
 
-        async function generarDiploma(nombre, visitante, certificado) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1280;
-        canvas.height = 850; 
-    canvas.style.maxWidth = "950px"; 
-    canvas.style.width = "100%"; 
-    const ctx = canvas.getContext('2d'); 
-    
-    const img = new Image(); 
-
-    // 1. Configurar la seguridad CORS antes de iniciar cualquier descarga
-    if (window.location.protocol.startsWith('http')) { 
-        img.crossOrigin = "anonymous"; 
-    } 
-
-    // 2. Definir primero qué hacer cuando la imagen cargue correctamente
-    img.onload = () => { 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height); 
-        ctx.textBaseline = 'middle'; 
-        ctx.textAlign = 'center'; 
-        ctx.font = 'bold 30px Georgia'; 
-        ctx.fillStyle = "#000000"; 
-        ctx.fillText(nombre.toUpperCase(), 900, 570); 
-        ctx.font = 'bold 30px Arial'; 
-        ctx.fillText(visitante.toUpperCase(), 1000, 595); 
-        ctx.textAlign = 'right'; 
-        ctx.font = 'bold 16px "Courier New", monospace'; 
-        ctx.fillText(`Reg N°: ${certificado || "SARA-001"} | Fecha: ${new Date().toLocaleDateString()}`, 1000, 800); 
-        
-        // Primero eliminamos el diploma viejo si existiera
-        const viejo = document.getElementById('diplomaFinal'); 
-        if (viejo) viejo.remove(); 
-        
-        // Creamos el contenedor nuevo
-        const card = document.createElement('div'); 
-        card.id = 'diplomaFinal'; 
-        card.className = 'qslCard'; 
-        card.style.border = "4px double #d4af37"; 
-        card.style.maxWidth = "1000px"; 
-        card.innerHTML = "<h2 style='color:#002b5c;'>🥇 TU DIPLOMA DE HONOR 🥇</h2>"; 
-        card.appendChild(canvas); 
-        
-        // Creamos el botón de descarga
-        const btn = document.createElement('button'); 
-        btn.style.background = "#d4af37"; 
-        btn.style.color = "#000"; 
-        btn.style.width = "100%"; 
-        btn.textContent = "💾 DESCARGAR DIPLOMA"; 
-        btn.onclick = () => descargarIndividual(canvas, "DIPLOMA", visitante); 
-        card.appendChild(btn); 
-        
-        // Lo mostramos en pantalla
-        document.getElementById('qslContainer').prepend(card); 
-        card.scrollIntoView({behavior: 'smooth'}); 
-    }; 
-
-    // 3. Definir el control de errores antes de iniciar la descarga
-    img.onerror = () => { 
-        alert("No se pudo mostrar el diploma. Verifique que el archivo '" + IMG_DIPLOMA + "' esté en la carpeta eventos/evento12/ con el nombre exacto en minúsculas."); 
-    }; 
-
-       // 4. ESTRICTAMENTE AL FINAL: Se asigna la ruta para iniciar la descarga en la web
-    img.src = IMG_DIPLOMA; 
-} 
-
-// Corrección de espacio y nombre en la función de descarga
-function descargarIndividual(canvas, act, vis) { 
-    const link = document.createElement('a'); 
-    link.download = `${act}_${vis}.jpg`; 
-    link.href = canvas.toDataURL('image/jpeg', 0.95); 
-    link.click(); 
-} 
-
-async function descargarTodas() { 
-    if (typeof JSZip === 'undefined') return alert("La librería ZIP no ha cargado aún."); 
-    const zip = new JSZip(); 
-    canvasesGenerados.forEach(c => { 
-        const imgData = c.canvas.toDataURL('image/jpeg', 0.8).split(',')[1]; 
-        zip.file(c.name + ".jpg", imgData, {base64: true}); 
-    }); 
-    const content = await zip.generateAsync({type:"blob"}); 
-    const link = document.createElement('a'); 
-    link.href = URL.createObjectURL(content); 
-    link.download = 'mis_qsls_malvinas.zip'; 
-    link.click(); 
-} 
-
-// Auto-ejecución por URL reparada
-const sdURL = new URLSearchParams(window.location.search).get("sd"); 
-if (sdURL) { 
-    document.getElementById("sdVisitante").value = sdURL; 
-    verQSL(); 
-}
-</script>
-</body>
-</html>
