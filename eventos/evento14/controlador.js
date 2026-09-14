@@ -6,7 +6,7 @@ const MAPA_QSLS = {
     "LU1ENM": "qsl1.png", "LU1BCP": "qsl1.png", "LU1CBQ": "qsl1.png", 
     "LU3AFJ": "qsl1.png", "LU4EGP": "qsl1.png", "LU4XYL": "qsl1.png",
     "LU5DU": "qsl1.png",  "LU6EWR": "qsl1.png", "LU9FWM": "qsl1.png",
-    "LW1DPS": "qsl1.png", "LW3DQF": "qsl1.png", "LU5WGO": "qsl1.png",
+    "LW1DPS": "qsl1.png", "LW3DQF": "qsl1.png", "LU3WGO": "qsl1.png",
     "LW6DIV": "qsl1.png", "LW9DTR": "qsl1.png", "LU1DAS": "qsl1.png", 
     "LU1WA": "qsl1.png",  "LU2AWJ": "qsl1.png", "LU2DWR": "qsl1.png", 
     "LU9MAH": "qsl1.png"
