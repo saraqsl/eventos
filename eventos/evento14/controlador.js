@@ -691,23 +691,7 @@ ctx.fillText(
 );
 
 
-        // =====================================================
-        // NÚMERO DE CERTIFICADO
-        // =====================================================
-
-        ctx.font =
-            "bold 25px Arial";
-
-        ctx.fillStyle =
-            "#000000";
-
-
-        ctx.fillText(
-            `Certificado Nº ${certNumberAsignado || "S/N"}`,
-            canvas.width / 2,
-            1040
-        );
-
+    
 
         // =====================================================
         // CREAR TARJETA DEL DIPLOMA
