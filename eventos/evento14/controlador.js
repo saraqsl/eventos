@@ -592,10 +592,12 @@ function descargarTodas() {
 // =====================================================
 // PREPARAR DIPLOMA
 // =====================================================
-async function prepararDiploma(visitante) {
+function prepararDiploma(visitante) {
 
     const campoNombre =
-        document.getElementById("nombreOperador");
+        document.getElementById(
+            "nombreOperador"
+        );
 
     if (!campoNombre) {
         return alert(
@@ -612,64 +614,10 @@ async function prepararDiploma(visitante) {
         );
     }
 
-    try {
-
-        const datos = new URLSearchParams();
-
-        datos.append(
-            "action",
-            "certificado"
-        );
-
-        datos.append(
-            "call",
-            visitante.toUpperCase()
-        );
-
-        const respuesta =
-            await fetch(API_URL, {
-                method: "POST",
-                body: datos
-            });
-
-        const resultado =
-            await respuesta.json();
-
-        if (
-            !resultado.ok ||
-            !resultado.certNumber
-        ) {
-            throw new Error(
-                resultado.error ||
-                "No se pudo obtener el número."
-            );
-        }
-
-        certNumberAsignado =
-            resultado.certNumber;
-
-        console.log(
-            "Certificado asignado:",
-            certNumberAsignado
-        );
-
-        generarDiploma(
-            visitante,
-            nombre
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Error obteniendo certificado:",
-            error
-        );
-
-        alert(
-            "No se pudo asignar el número de certificado.\n\n" +
-            "Intentá nuevamente."
-        );
-    }
+    generarDiploma(
+        visitante,
+        nombre
+    );
 }
 
 
