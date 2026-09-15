@@ -6,7 +6,7 @@ const IMG_DIPLOMA = "diploma_malvinas.png";
 const MAPA_QSLS = {
     "LU1ENM": "qsl1.png",
     "LU1BCP": "qsl2.png",
-    "LU1CBQ": "qsl2.png",
+    "LU1CBQ": "qsl2.png",  
     "LU3AFJ": "qsl2.png",
     "LU4EGP": "qsl2.png",
     "LU4XYL": "qsl2.png",
@@ -87,19 +87,7 @@ async function verQSL() {
         }
 
 
-        // =====================================================
-        // BUSCAR NÚMERO DE CERTIFICADO
-        // =====================================================
-
-        const conCert = misContactos.find(c =>
-            c.certNumber &&
-            String(c.certNumber).trim() !== ""
-        );
-
-        if (conCert) {
-            certNumberAsignado = String(conCert.certNumber).trim();
-        }
-
+        
 
         // =====================================================
         // ESTACIONES DISTINTAS
