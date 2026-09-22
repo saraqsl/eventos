@@ -671,7 +671,7 @@ const centroY = 455;
 // NOMBRE
 ctx.fillStyle = "#000000";
 ctx.textAlign = "center";
-ctx.font = "bold 48px Arial";
+ctx.font = "bold 30px Arial";
 
 ctx.fillText(
     nombre.toUpperCase(),
@@ -682,7 +682,7 @@ ctx.fillText(
 // LICENCIA
 ctx.fillStyle = "#003366";
 ctx.textAlign = "center";
-ctx.font = "bold 52px Arial";
+ctx.font = "bold 42px Arial";
 
 ctx.fillText(
     visitante.toUpperCase(),
