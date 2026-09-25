@@ -62,21 +62,16 @@ async function verQSL() {
 
     try {
 
-        const res = await fetch(API_URL);
+     const res = await fetch(
+    API_URL + "?sd=" + encodeURIComponent(sd)
+);
 
         if (!res.ok) {
             throw new Error("Error HTTP: " + res.status);
         }
+const misContactos = await res.json();
 
-        const allData = await res.json();
-
-        container.innerHTML = "";
-
-        // Filtrar todos los contactos de la señal ingresada
-        let misContactos = allData.filter(c =>
-            c.call &&
-            c.call.toUpperCase() === sd
-        );
+container.innerHTML = "";
 
         if (misContactos.length === 0) {
 
