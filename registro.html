@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Registro SARA QSL</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #07182b;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.contenedor {
+    max-width: 550px;
+    margin: 35px auto;
+    background: #102942;
+    border: 1px solid #31516f;
+    border-radius: 14px;
+    padding: 30px;
+}
+
+h1 {
+    text-align: center;
+    color: #d4af37;
+    margin-bottom: 5px;
+}
+
+.subtitulo {
+    text-align: center;
+    color: #b9c8d8;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"] {
+
+    width: 100%;
+    padding: 13px;
+
+    border-radius: 7px;
+    border: 1px solid #56718c;
+
+    background: #07182b;
+    color: white;
+
+    font-size: 16px;
+}
+
+.sd {
+    text-transform: uppercase;
+}
+
+button {
+
+    width: 100%;
+
+    margin-top: 22px;
+    padding: 14px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: #d4af37;
+    color: #07182b;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+button.secundario {
+
+    background: transparent;
+    color: #d4af37;
+    border: 1px solid #d4af37;
+
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.consentimiento {
+
+    margin-top: 22px;
+    color: #d9e3ec;
+
+    line-height: 1.5;
+}
+
+#mensaje {
+
+    display: none;
+
+    margin-top: 20px;
+    padding: 15px;
+
+    border-radius: 8px;
+
+    text-align: center;
+    line-height: 1.5;
+}
+
+.correcto {
+
+    display: block !important;
+
+    background: #174d31;
+    color: #a7f3c2;
+}
+
+.error {
+
+    display: block !important;
+
+    background: #6e2525;
+    color: #ffd0d0;
+}
+
+.separador {
+
+    border-top: 1px solid #31516f;
+
+    margin: 30px 0 20px;
+}
+
+.oculto {
+    display: none;
+}
+
+.volver {
+
+    text-align: center;
+
+    margin-top: 20px;
+
+    color: #b9c8d8;
+
+    cursor: pointer;
+}
+
+.volver:hover {
+    color: white;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="contenedor">
+
+
+<h1>REGISTRO SARA QSL</h1>
+
+<div class="subtitulo">
+
+Servicio Auxiliar de Radioaficionados de la Armada
+
+<br>
+
+Registro para recepción de QSL electrónicas
+
+</div>
+
+
+<!-- ======================================== -->
+<!-- REGISTRO NUEVO -->
+<!-- ======================================== -->
+
+<div id="pantallaRegistro">
+
+
+<form id="formRegistro">
+
+
+<label>
+Señal Distintiva *
+</label>
+
+<input
+    type="text"
+    id="sdRegistro"
+    class="sd"
+    required
+    placeholder="Ej.: LU9MAH"
+>
+
+
+<label>
+Nombre y Apellido *
+</label>
+
+<input
+    type="text"
+    id="nombreRegistro"
+    required
+>
+
+
+<label>
+Correo electrónico *
+</label>
+
+<input
+    type="email"
+    id="emailRegistro"
+    required
+>
+
+
+<label>
+WhatsApp (opcional)
+</label>
+
+<input
+    type="tel"
+    id="whatsappRegistro"
+>
+
+
+<div class="consentimiento">
+
+<label>
+
+<input
+    type="checkbox"
+    id="consentimiento"
+    required
+>
+
+Autorizo al Servicio Auxiliar de
+Radioaficionados de la Armada a utilizar
+estos datos para el envío de QSL electrónicas
+y comunicaciones relacionadas con sus actividades.
+
+</label>
+
+</div>
+
+
+<button
+    type="submit"
+    id="botonRegistro"
+>
+REGISTRARME
+</button>
+
+
+</form>
+
+
+<div class="separador"></div>
+
+
+<button
+    type="button"
+    class="secundario"
+    onclick="mostrarActualizacion()"
+>
+
+¿YA ESTÁS REGISTRADO?
+<br>
+ACTUALIZAR MIS DATOS
+
+</button>
+
+
+</div>
+
+
+
+<!-- ======================================== -->
+<!-- VERIFICACIÓN -->
+<!-- ======================================== -->
+
+
+<div
+    id="pantallaVerificacion"
+    class="oculto"
+>
+
+
+<h2>Actualizar mis datos</h2>
+
+
+<label>
+Señal Distintiva
+</label>
+
+<input
+    type="text"
+    id="sdVerificar"
+    class="sd"
+>
+
+
+<label>
+Correo actualmente registrado
+</label>
+
+<input
+    type="email"
+    id="emailVerificar"
+>
+
+
+<button
+    type="button"
+    id="botonVerificar"
+    onclick="verificarUsuario()"
+>
+
+VERIFICAR
+
+</button>
+
+
+<div
+    class="volver"
+    onclick="volverRegistro()"
+>
+
+← Volver al registro
+
+</div>
+
+
+</div>
+
+
+
+<!-- ======================================== -->
+<!-- ACTUALIZAR -->
+<!-- ======================================== -->
+
+
+<div
+    id="pantallaActualizar"
+    class="oculto"
+>
+
+
+<h2>Mis datos</h2>
+
+
+<label>
+Señal Distintiva
+</label>
+
+<input
+    type="text"
+    id="sdActualizar"
+    class="sd"
+    readonly
+>
+
+
+<label>
+Nombre y Apellido
+</label>
+
+<input
+    type="text"
+    id="nombreActualizar"
+>
+
+
+<label>
+Correo electrónico
+</label>
+
+<input
+    type="email"
+    id="emailActualizar"
+>
+
+
+<label>
+WhatsApp
+</label>
+
+<input
+    type="tel"
+    id="whatsappActualizar"
+>
+
+
+<button
+    type="button"
+    id="botonActualizar"
+    onclick="actualizarUsuario()"
+>
+
+GUARDAR CAMBIOS
+
+</button>
+
+
+<div
+    class="volver"
+    onclick="volverRegistro()"
+>
+
+← Volver
+
+</div>
+
+
+</div>
+
+
+<div id="mensaje"></div>
+
+
+</div>
+
+
+
+<script>
+
+
+const API_REGISTRO =
+"https://script.google.com/macros/s/AKfycbxsZ-ClIsjM7oiWPAZjZ6DMHbz2iLjTvOZo4uHKwByFR4ymQQj0FzfiAbzw3Jej-6_2NA/exec";
+
+
+let emailValidado = "";
+
+
+// ===========================================
+// REGISTRAR
+// ===========================================
+
+
+document
+.getElementById("formRegistro")
+.addEventListener(
+"submit",
+async function(evento) {
+
+    evento.preventDefault();
+
+    limpiarMensaje();
+
+
+    const sd =
+        document
+        .getElementById("sdRegistro")
+        .value
+        .trim()
+        .toUpperCase();
+
+
+    const nombre =
+        document
+        .getElementById("nombreRegistro")
+        .value
+        .trim();
+
+
+    const email =
+        document
+        .getElementById("emailRegistro")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const whatsapp =
+        document
+        .getElementById("whatsappRegistro")
+        .value
+        .trim();
+
+
+    const consentimiento =
+        document
+        .getElementById("consentimiento")
+        .checked;
+
+
+    const boton =
+        document.getElementById(
+            "botonRegistro"
+        );
+
+
+    boton.disabled = true;
+
+    boton.textContent =
+        "REGISTRANDO...";
+
+
+    try {
+
+
+        const resultado =
+            await enviar({
+
+                accion: "registrar",
+
+                sd: sd,
+
+                nombre: nombre,
+
+                email: email,
+
+                whatsapp: whatsapp,
+
+                consentimiento:
+                    consentimiento
+
+            });
+
+
+        if (resultado.ok) {
+
+
+            mostrarCorrecto(
+
+                "✓ " +
+                sd +
+                " registrado correctamente." +
+
+                "<br><br>" +
+
+                "A partir de ahora podremos " +
+                "enviarte las QSL electrónicas " +
+                "de las actividades SARA."
+
+            );
+
+
+            document
+            .getElementById(
+                "formRegistro"
+            )
+            .reset();
+
+
+        } else {
+
+
+            mostrarError(
+                resultado.mensaje
+            );
+
+
+        }
+
+
+    } catch (error) {
+
+
+        mostrarError(
+            "No se pudo conectar con el sistema."
+        );
+
+
+    } finally {
+
+
+        boton.disabled = false;
+
+        boton.textContent =
+            "REGISTRARME";
+
+
+    }
+
+});
+
+
+
+// ===========================================
+// VERIFICAR
+// ===========================================
+
+
+async function verificarUsuario() {
+
+
+    limpiarMensaje();
+
+
+    const sd =
+        document
+        .getElementById("sdVerificar")
+        .value
+        .trim()
+        .toUpperCase();
+
+
+    const email =
+        document
+        .getElementById("emailVerificar")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    if (!sd || !email) {
+
+        mostrarError(
+            "Completá la señal distintiva y el correo."
+        );
+
+        return;
+    }
+
+
+    const boton =
+        document.getElementById(
+            "botonVerificar"
+        );
+
+
+    boton.disabled = true;
+
+    boton.textContent =
+        "VERIFICANDO...";
+
+
+    try {
+
+
+        const resultado =
+            await enviar({
+
+                accion: "verificar",
+
+                sd: sd,
+
+                email: email
+
+            });
+
+
+        if (!resultado.ok) {
+
+            mostrarError(
+                resultado.mensaje
+            );
+
+            return;
+        }
+
+
+        // Guardamos el email con el que
+        // se realizó la verificación.
+
+        emailValidado = email;
+
+
+        document
+        .getElementById(
+            "pantallaVerificacion"
+        )
+        .classList
+        .add("oculto");
+
+
+        document
+        .getElementById(
+            "pantallaActualizar"
+        )
+        .classList
+        .remove("oculto");
+
+
+        document
+        .getElementById(
+            "sdActualizar"
+        )
+        .value =
+        resultado.sd;
+
+
+        document
+        .getElementById(
+            "nombreActualizar"
+        )
+        .value =
+        resultado.nombre || "";
+
+
+        document
+        .getElementById(
+            "emailActualizar"
+        )
+        .value =
+        resultado.email || "";
+
+
+        document
+        .getElementById(
+            "whatsappActualizar"
+        )
+        .value =
+        resultado.whatsapp || "";
+
+
+    } catch (error) {
+
+
+        mostrarError(
+            "No se pudo realizar la verificación."
+        );
+
+
+    } finally {
+
+
+        boton.disabled = false;
+
+        boton.textContent =
+            "VERIFICAR";
+
+
+    }
+
+}
+
+
+
+// ===========================================
+// ACTUALIZAR
+// ===========================================
+
+
+async function actualizarUsuario() {
+
+
+    limpiarMensaje();
+
+
+    const sd =
+        document
+        .getElementById("sdActualizar")
+        .value
+        .trim()
+        .toUpperCase();
+
+
+    const nombre =
+        document
+        .getElementById("nombreActualizar")
+        .value
+        .trim();
+
+
+    const email =
+        document
+        .getElementById("emailActualizar")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const whatsapp =
+        document
+        .getElementById("whatsappActualizar")
+        .value
+        .trim();
+
+
+    if (!nombre || !email) {
+
+        mostrarError(
+            "Nombre y correo son obligatorios."
+        );
+
+        return;
+    }
+
+
+    const boton =
+        document.getElementById(
+            "botonActualizar"
+        );
+
+
+    boton.disabled = true;
+
+    boton.textContent =
+        "GUARDANDO...";
+
+
+    try {
+
+
+        const resultado =
+            await enviar({
+
+                accion: "actualizar",
+
+                sd: sd,
+
+                emailActual:
+                    emailValidado,
+
+                nombre: nombre,
+
+                email: email,
+
+                whatsapp: whatsapp
+
+            });
+
+
+        if (resultado.ok) {
+
+
+            mostrarCorrecto(
+
+                "✓ Datos de <strong>" +
+                sd +
+                "</strong> actualizados correctamente."
+
+            );
+
+
+            // Si cambió el correo,
+            // este pasa a ser el correo actual.
+
+            emailValidado = email;
+
+
+        } else {
+
+
+            mostrarError(
+                resultado.mensaje
+            );
+
+
+        }
+
+
+    } catch (error) {
+
+
+        mostrarError(
+            "No se pudieron actualizar los datos."
+        );
+
+
+    } finally {
+
+
+        boton.disabled = false;
+
+        boton.textContent =
+            "GUARDAR CAMBIOS";
+
+
+    }
+
+}
+
+
+
+// ===========================================
+// ENVIAR A APPS SCRIPT
+// ===========================================
+
+
+async function enviar(datos) {
+
+
+    const respuesta =
+        await fetch(
+            API_REGISTRO,
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                    "text/plain;charset=utf-8"
+
+                },
+
+                body:
+                    JSON.stringify(datos)
+
+            }
+        );
+
+
+    return await respuesta.json();
+
+}
+
+
+
+// ===========================================
+// PANTALLAS
+// ===========================================
+
+
+function mostrarActualizacion() {
+
+
+    limpiarMensaje();
+
+
+    document
+    .getElementById(
+        "pantallaRegistro"
+    )
+    .classList
+    .add("oculto");
+
+
+    document
+    .getElementById(
+        "pantallaActualizar"
+    )
+    .classList
+    .add("oculto");
+
+
+    document
+    .getElementById(
+        "pantallaVerificacion"
+    )
+    .classList
+    .remove("oculto");
+
+}
+
+
+function volverRegistro() {
+
+
+    limpiarMensaje();
+
+
+    emailValidado = "";
+
+
+    document
+    .getElementById(
+        "pantallaVerificacion"
+    )
+    .classList
+    .add("oculto");
+
+
+    document
+    .getElementById(
+        "pantallaActualizar"
+    )
+    .classList
+    .add("oculto");
+
+
+    document
+    .getElementById(
+        "pantallaRegistro"
+    )
+    .classList
+    .remove("oculto");
+
+}
+
+
+
+// ===========================================
+// MENSAJES
+// ===========================================
+
+
+function limpiarMensaje() {
+
+    const mensaje =
+        document.getElementById(
+            "mensaje"
+        );
+
+    mensaje.className = "";
+
+    mensaje.style.display =
+        "none";
+
+}
+
+
+function mostrarCorrecto(texto) {
+
+    const mensaje =
+        document.getElementById(
+            "mensaje"
+        );
+
+    mensaje.className =
+        "correcto";
+
+    mensaje.innerHTML =
+        texto;
+
+}
+
+
+function mostrarError(texto) {
+
+    const mensaje =
+        document.getElementById(
+            "mensaje"
+        );
+
+    mensaje.className =
+        "error";
+
+    mensaje.textContent =
+        texto;
+
+}
+
+
+</script>
+
+
+</body>
+</html>
