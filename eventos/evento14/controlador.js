@@ -6,7 +6,7 @@ const IMG_DIPLOMA = "diploma_malvinas.png";
 const MAPA_QSLS = {
     "LU1ENM": "qsl1.png",
     "LU1BCP": "qsl2.png",
-    "LU1CBQ": "qsl2.png",  
+    "LU1CBQ": "qsl2.png",
     "LU3AFJ": "qsl2.png",
     "LU4EGP": "qsl2.png",
     "LU4XYL": "qsl2.png",
@@ -62,16 +62,22 @@ async function verQSL() {
 
     try {
 
-     const res = await fetch(
-    API_URL + "?sd=" + encodeURIComponent(sd)
-);
+        // Traemos todos los contactos como funcionaba originalmente
+        const res = await fetch(API_URL);
 
         if (!res.ok) {
             throw new Error("Error HTTP: " + res.status);
         }
-const misContactos = await res.json();
 
-container.innerHTML = "";
+        const allData = await res.json();
+
+        container.innerHTML = "";
+
+        // Filtrar SOLAMENTE los contactos de la señal ingresada
+        const misContactos = allData.filter(c =>
+            c.call &&
+            String(c.call).trim().toUpperCase() === sd
+        );
 
         if (misContactos.length === 0) {
 
@@ -82,8 +88,6 @@ container.innerHTML = "";
         }
 
 
-        
-
         // =====================================================
         // ESTACIONES DISTINTAS
         // =====================================================
@@ -91,7 +95,7 @@ container.innerHTML = "";
         const estacionesDistintas = new Set(
             misContactos
                 .filter(c => c.owner)
-                .map(c => c.owner.toUpperCase())
+                .map(c => String(c.owner).trim().toUpperCase())
         );
 
 
@@ -107,7 +111,8 @@ container.innerHTML = "";
                 continue;
             }
 
-            const activador = contacto.owner.toUpperCase();
+            const activador =
+                String(contacto.owner).trim().toUpperCase();
 
             const rutaImagen =
                 MAPA_QSLS[activador] || QSL_POR_DEFECTO;
@@ -157,7 +162,6 @@ container.innerHTML = "";
         console.error("ERROR:", err);
     }
 }
-
 
 
 // =====================================================
@@ -293,7 +297,6 @@ function mostrarProgreso(
         `;
     }
 }
-
 
 
 // =====================================================
@@ -465,7 +468,6 @@ async function generarQSL(
 }
 
 
-
 // =====================================================
 // DESCARGAR QSL INDIVIDUAL
 // =====================================================
@@ -490,7 +492,6 @@ function descargarIndividual(
 
     link.click();
 }
-
 
 
 // =====================================================
@@ -571,10 +572,10 @@ function descargarTodas() {
 }
 
 
-
 // =====================================================
 // PREPARAR DIPLOMA
 // =====================================================
+
 function prepararDiploma(visitante) {
 
     const campoNombre =
@@ -657,36 +658,34 @@ function generarDiploma(
         );
 
 
-// =====================================================
-// NOMBRE Y LICENCIA EN LA MISMA LÍNEA
-// =====================================================
+        // =====================================================
+        // NOMBRE Y LICENCIA EN LA MISMA LÍNEA
+        // =====================================================
 
-const centroY = 455;
+        const centroY = 455;
 
-// NOMBRE
-ctx.fillStyle = "#000000";
-ctx.textAlign = "center";
-ctx.font = "bold 30px Arial";
+        // NOMBRE
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "center";
+        ctx.font = "bold 30px Arial";
 
-ctx.fillText(
-    nombre.toUpperCase(),
-    650,
-    centroY
-);
+        ctx.fillText(
+            nombre.toUpperCase(),
+            650,
+            centroY
+        );
 
-// LICENCIA
-ctx.fillStyle = "#003366";
-ctx.textAlign = "center";
-ctx.font = "bold 42px Arial";
+        // LICENCIA
+        ctx.fillStyle = "#003366";
+        ctx.textAlign = "center";
+        ctx.font = "bold 42px Arial";
 
-ctx.fillText(
-    visitante.toUpperCase(),
-    1000,
-    centroY
-);
+        ctx.fillText(
+            visitante.toUpperCase(),
+            1000,
+            centroY
+        );
 
-
-    
 
         // =====================================================
         // CREAR TARJETA DEL DIPLOMA
