@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Agenda LU2CN/D</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #07182c;
+    color: #17202a;
+}
+
+.contenedor {
+    max-width: 850px;
+    margin: auto;
+}
+
+.cabecera {
+    background: #0d3157;
+    color: white;
+    text-align: center;
+    padding: 22px 15px;
+    border-radius: 12px 12px 0 0;
+}
+
+.cabecera h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.cabecera h2 {
+    margin: 8px 0 0;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.cabecera p {
+    margin: 8px 0 0;
+}
+
+.panel {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 0 0 12px 12px;
+}
+
+.panel-secundario {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+}
+
+h3 {
+    margin-top: 0;
+    color: #0d3157;
+}
+
+.estado {
+    text-align: center;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: #eef3f7;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.reserva {
+    border-left: 6px solid #0d3157;
+    background: #f5f7f9;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-radius: 7px;
+}
+
+.reserva.cancelada {
+    opacity: 0.55;
+    border-left-color: #888;
+}
+
+.horario {
+    font-size: 22px;
+    font-weight: bold;
+    color: #0d3157;
+}
+
+.operador {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 7px;
+}
+
+.detalle {
+    margin-top: 6px;
+}
+
+.cancelado {
+    color: #a00;
+    font-weight: bold;
+}
+
+.sin-reservas {
+    text-align: center;
+    padding: 25px;
+    background: #edf7ed;
+    border-radius: 8px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 14px;
+    margin-bottom: 5px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    font-size: 17px;
+    border: 1px solid #aaa;
+    border-radius: 7px;
+    background: white;
+}
+
+.fila {
+    display: flex;
+    gap: 12px;
+}
+
+.columna {
+    flex: 1;
+}
+
+button {
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 18px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-reservar {
+    background: #0d3157;
+    color: white;
+}
+
+.btn-actualizar {
+    background: #e7edf3;
+    color: #0d3157;
+    margin-top: 5px;
+}
+
+.btn-cancelar {
+    background: #b3261e;
+    color: white;
+    margin-top: 10px;
+    padding: 9px;
+    font-size: 14px;
+}
+
+.mensaje {
+    display: none;
+    padding: 14px;
+    margin-top: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.mensaje.ok {
+    display: block;
+    background: #dff3e4;
+    color: #17652d;
+}
+
+.mensaje.error {
+    display: block;
+    background: #f8dddd;
+    color: #9b1c1c;
+}
+
+.nota {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 8px;
+    }
+
+    .fila {
+        display: block;
+    }
+
+    .cabecera h1 {
+        font-size: 25px;
+    }
+
+    .horario {
+        font-size: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <div class="cabecera">
+
+        <h1>LU2CN/D</h1>
+
+        <h2>DÍA DEL COMUNICANTE NAVAL</h2>
+
+        <p>29 de septiembre de 2026</p>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h3>Agenda de operación</h3>
+
+        <div id="estado" class="estado">
+            Cargando agenda...
+        </div>
+
+        <div id="agenda"></div>
+
+        <button
+            class="btn-actualizar"
+            onclick="cargarAgenda()">
+            ↻ ACTUALIZAR AGENDA
+        </button>
+
+    </div>
+
+
+    <div class="panel-secundario">
+
+        <h3>Reservar horario</h3>
+
+
+        <label>Operador</label>
+
+        <input
+            type="text"
+            id="operador"
+            placeholder="Ej.: LU9MAH"
+            autocomplete="off">
+
+
+        <div class="fila">
+
+            <div class="columna">
+
+                <label>Desde</label>
+
+                <input
+                    type="time"
+                    id="desde">
+
+            </div>
+
+
+            <div class="columna">
+
+                <label>Hasta</label>
+
+                <input
+                    type="time"
+                    id="hasta">
+
+            </div>
+
+        </div>
+
+
+        <div class="fila">
+
+            <div class="columna">
+
+                <label>Banda</label>
+
+                <select id="banda">
+
+                    <option value="">
+                        Seleccionar
+                    </option>
+
+                    <option>80 m</option>
+                    <option>40 m</option>
+                    <option>20 m</option>
+                    <option>15 m</option>
+                    <option>10 m</option>
+                    <option>6 m</option>
+                    <option>2 m</option>
+                    <option>70 cm</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="columna">
+
+                <label>Modo</label>
+
+                <select id="modo">
+
+                    <option value="">
+                        Seleccionar
+                    </option>
+
+                    <option>SSB</option>
+                    <option>FM</option>
+                    <option>AM</option>
+                    <option>FT8</option>
+                    <option>FT4</option>
+                    <option>DIGITAL</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="btn-reservar"
+            id="btnReservar"
+            onclick="reservar()">
+
+            RESERVAR HORARIO
+
+        </button>
+
+
+        <div id="mensaje" class="mensaje"></div>
+
+
+        <div class="nota">
+
+            Los horarios ya reservados no pueden superponerse.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const API =
+"https://script.google.com/macros/s/AKfycbweDItjOB400yX4Oj5_-W-helZK2egX__045MxdjkMdl2TLH8Jj7H7ACJ__wPXA4QqvCw/exec";
+
+
+// ============================================================
+// CARGAR AGENDA
+// ============================================================
+
+async function cargarAgenda() {
+
+    const agenda =
+        document.getElementById("agenda");
+
+    const estado =
+        document.getElementById("estado");
+
+    estado.textContent =
+        "Actualizando agenda...";
+
+
+    try {
+
+        const respuesta =
+            await fetch(
+                API + "?t=" + Date.now()
+            );
+
+
+        const datos =
+            await respuesta.json();
+
+
+        if (!datos.ok) {
+
+            throw new Error(
+                datos.mensaje ||
+                "No se pudo cargar la agenda."
+            );
+        }
+
+
+        let reservas =
+            datos.reservas || [];
+
+
+        // Ordenar por hora de inicio.
+
+        reservas.sort(
+            (a, b) =>
+                a.desde.localeCompare(b.desde)
+        );
+
+
+        agenda.innerHTML = "";
+
+
+        if (reservas.length === 0) {
+
+            agenda.innerHTML = `
+                <div class="sin-reservas">
+                    🟢 No hay horarios reservados.
+                </div>
+            `;
+
+        } else {
+
+            reservas.forEach(reserva => {
+
+                mostrarReserva(
+                    reserva,
+                    agenda
+                );
+
+            });
+        }
+
+
+        const activas =
+            reservas.filter(
+                r =>
+                String(r.estado)
+                    .toUpperCase() !==
+                    "CANCELADO"
+            ).length;
+
+
+        estado.textContent =
+            activas +
+            " horario(s) reservado(s)";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        estado.textContent =
+            "No se pudo cargar la agenda.";
+
+        agenda.innerHTML = `
+            <div class="mensaje error"
+                 style="display:block">
+                ERROR: ${escapar(error.message)}
+            </div>
+        `;
+    }
+}
+
+
+// ============================================================
+// MOSTRAR UNA RESERVA
+// ============================================================
+
+function mostrarReserva(
+    reserva,
+    contenedor
+) {
+
+    const cancelada =
+        String(reserva.estado)
+            .toUpperCase() ===
+        "CANCELADO";
+
+
+    const div =
+        document.createElement("div");
+
+
+    div.className =
+        "reserva" +
+        (cancelada ? " cancelada" : "");
+
+
+    let html = `
+
+        <div class="horario">
+
+            ${escapar(reserva.desde)}
+            —
+            ${escapar(reserva.hasta)}
+
+        </div>
+
+
+        <div class="operador">
+
+            ${escapar(reserva.operador)}
+
+        </div>
+
+
+        <div class="detalle">
+
+            Banda:
+            <strong>
+                ${escapar(reserva.banda)}
+            </strong>
+
+            &nbsp; | &nbsp;
+
+            Modo:
+            <strong>
+                ${escapar(reserva.modo)}
+            </strong>
+
+        </div>
+    `;
+
+
+    if (cancelada) {
+
+        html += `
+            <div class="cancelado">
+                CANCELADO
+            </div>
+        `;
+
+    } else {
+
+        html += `
+
+            <button
+                class="btn-cancelar"
+                onclick="cancelar(
+                    ${Number(reserva.fila)},
+                    '${escaparJS(reserva.operador)}'
+                )">
+
+                CANCELAR RESERVA
+
+            </button>
+        `;
+    }
+
+
+    div.innerHTML = html;
+
+    contenedor.appendChild(div);
+}
+
+
+// ============================================================
+// RESERVAR
+// ============================================================
+
+async function reservar() {
+
+    const operador =
+        document
+            .getElementById("operador")
+            .value
+            .trim()
+            .toUpperCase();
+
+    const desde =
+        document
+            .getElementById("desde")
+            .value;
+
+    const hasta =
+        document
+            .getElementById("hasta")
+            .value;
+
+    const banda =
+        document
+            .getElementById("banda")
+            .value;
+
+    const modo =
+        document
+            .getElementById("modo")
+            .value;
+
+
+    if (
+        !operador ||
+        !desde ||
+        !hasta ||
+        !banda ||
+        !modo
+    ) {
+
+        mostrarMensaje(
+            "Complete todos los datos.",
+            false
+        );
+
+        return;
+    }
+
+
+    const boton =
+        document.getElementById(
+            "btnReservar"
+        );
+
+
+    boton.disabled = true;
+    boton.textContent =
+        "GUARDANDO...";
+
+
+    try {
+
+        const respuesta =
+            await fetch(API, {
+
+                method: "POST",
+
+                body: JSON.stringify({
+
+                    accion: "reservar",
+                    operador: operador,
+                    desde: desde,
+                    hasta: hasta,
+                    banda: banda,
+                    modo: modo
+
+                })
+
+            });
+
+
+        const datos =
+            await respuesta.json();
+
+
+        if (!datos.ok) {
+
+            mostrarMensaje(
+                datos.mensaje,
+                false
+            );
+
+            return;
+        }
+
+
+        mostrarMensaje(
+            datos.mensaje,
+            true
+        );
+
+
+        // Dejamos operador cargado
+        // para facilitar otra reserva.
+
+        document
+            .getElementById("desde")
+            .value = "";
+
+        document
+            .getElementById("hasta")
+            .value = "";
+
+        document
+            .getElementById("banda")
+            .value = "";
+
+        document
+            .getElementById("modo")
+            .value = "";
+
+
+        await cargarAgenda();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        mostrarMensaje(
+            "No se pudo guardar la reserva.",
+            false
+        );
+
+    } finally {
+
+        boton.disabled = false;
+        boton.textContent =
+            "RESERVAR HORARIO";
+    }
+}
+
+
+// ============================================================
+// CANCELAR
+// ============================================================
+
+async function cancelar(
+    fila,
+    operadorReserva
+) {
+
+    const operador =
+        prompt(
+            "Ingrese el operador que realizó esta reserva:"
+        );
+
+
+    if (!operador) {
+        return;
+    }
+
+
+    if (
+        operador
+            .trim()
+            .toUpperCase() !==
+        operadorReserva
+            .trim()
+            .toUpperCase()
+    ) {
+
+        alert(
+            "El operador ingresado no coincide."
+        );
+
+        return;
+    }
+
+
+    const confirmar =
+        confirm(
+            "¿Cancelar esta reserva?"
+        );
+
+
+    if (!confirmar) {
+        return;
+    }
+
+
+    try {
+
+        const respuesta =
+            await fetch(API, {
+
+                method: "POST",
+
+                body: JSON.stringify({
+
+                    accion: "cancelar",
+                    fila: fila,
+                    operador:
+                        operador
+                            .trim()
+                            .toUpperCase()
+
+                })
+
+            });
+
+
+        const datos =
+            await respuesta.json();
+
+
+        if (!datos.ok) {
+
+            alert(datos.mensaje);
+
+            return;
+        }
+
+
+        alert("Reserva cancelada.");
+
+        await cargarAgenda();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "No se pudo cancelar la reserva."
+        );
+    }
+}
+
+
+// ============================================================
+// MENSAJES
+// ============================================================
+
+function mostrarMensaje(
+    texto,
+    correcto
+) {
+
+    const mensaje =
+        document.getElementById(
+            "mensaje"
+        );
+
+
+    mensaje.className =
+        "mensaje " +
+        (correcto ? "ok" : "error");
+
+
+    mensaje.textContent = texto;
+}
+
+
+// ============================================================
+// SEGURIDAD HTML
+// ============================================================
+
+function escapar(valor) {
+
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function escaparJS(valor) {
+
+    return String(valor ?? "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'");
+}
+
+
+// ============================================================
+// INICIO
+// ============================================================
+
+cargarAgenda();
+
+
+// Actualización automática cada 30 segundos.
+
+setInterval(
+    cargarAgenda,
+    30000
+);
+
+</script>
+
+</body>
+</html>
