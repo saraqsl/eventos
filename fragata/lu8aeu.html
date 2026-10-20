@@ -10,7 +10,9 @@
 </main><footer><div class="wrap">LU8AEU/MM &nbsp; | &nbsp; 73</div></footer>
 <script>
 const API_URL='https://script.google.com/macros/s/AKfycbylXmz1N3ew0Vq8ZTq6fL-XKx1pNy3IItcc8yx5hf5ea9DQSBF9Pz_Lfc8rVxEcLkvrYQ/exec';
-const VIAJES={54:{nombre:'54º Viaje de Instrucción · 2026',imagen:'QSL54.PNG'}};
+const VIAJES={54:{nombre:'54º Viaje de Instrucción · 2026',imagen:'QSL54.png'},
+  55:{nombre:'55º Viaje de Instrucción · 2027',imagen:'QSL55.png'},
+  56:{nombre:'56º Viaje de Instrucción · 2028',imagen:'QSL56.png'}};
 const $ = id => document.getElementById(id);
 const norm = v => String(v == null ? '' : v).trim().toUpperCase();
 function clock(){$('clock').textContent=new Date().toISOString().slice(11,19)+' UTC';}clock();setInterval(clock,1000);
