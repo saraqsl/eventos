@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LU8AEU/MM · Fragata Libertad</title>
+<style>
+:root{--bg:#151914;--panel:#20261d;--line:#4b533f;--text:#eeeee5;--muted:#bcc1af;--accent:#c5b783}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,sans-serif}.wrap{max-width:940px;margin:auto;padding:0 24px}a{color:var(--accent)}header{border-top:5px solid var(--accent);border-bottom:1px solid var(--line)}nav{display:flex;align-items:center;justify-content:space-between;padding:19px 0;gap:20px;flex-wrap:wrap}nav a{text-decoration:none}.brand{font:700 18px monospace;letter-spacing:.15em}nav .links{display:flex;gap:22px;font-size:13px;text-transform:uppercase;letter-spacing:.09em}.hero{padding:62px 0 46px}.eyebrow,.number{font:12px/1.6 monospace;color:var(--accent);letter-spacing:.16em;text-transform:uppercase}h1{font:900 clamp(36px,9vw,88px)/1.05 'Arial Black',Impact,sans-serif;letter-spacing:.035em;margin:16px 0 25px}h2{font-size:23px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px}h3{font-size:20px;margin:12px 0}p,.muted{color:var(--muted)}.identity{border-left:3px solid var(--accent);padding-left:20px}.identity strong{font-size:20px;letter-spacing:.03em}.identity p{margin:5px 0}.locator{display:inline-block;background:#303727;border:1px solid #656c52;padding:3px 11px;margin-top:12px;font:700 18px monospace;letter-spacing:.15em}.clock{margin-top:26px;color:var(--muted);font:13px monospace}.grid{display:grid;grid-template-columns:1fr;gap:20px}.card{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-top:3px solid #8e9675;padding:27px}.card>p{margin:0 0 22px}.button,button{display:inline-block;border:1px solid var(--accent);background:var(--accent);color:#1c2118;padding:13px 18px;font:700 14px/1.5 system-ui,sans-serif;cursor:pointer;text-decoration:none;text-align:center}.card>a.button{margin-top:auto;align-self:flex-start}.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}section{padding:32px 0 46px;border-top:1px solid var(--line)}.qslintro{font-size:14px;margin-bottom:25px}form{display:flex;gap:10px;flex-wrap:wrap}label{display:block;font-size:14px;margin-bottom:7px}input{font:16px monospace;color:var(--text);background:#141a12;border:1px solid #727b61;padding:12px;flex:1;min-width:140px;max-width:100%;text-transform:uppercase}button:disabled{opacity:.5;cursor:wait}.status{font-size:14px;margin-top:15px;color:var(--muted);overflow-wrap:anywhere}.status:empty{display:none}.result{padding:15px 0;border-bottom:1px solid var(--line)}.result p{margin:5px 0}.result button{margin-top:8px;font-size:13px}:focus-visible{outline:3px solid #e1d5a1;outline-offset:4px}footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font:12px monospace;letter-spacing:.07em}@media(max-width:650px){.grid{grid-template-columns:1fr}.hero{padding-top:40px}nav .links{gap:15px}.card{padding:22px}.wrap{padding:0 19px}}
+.log-scroll{overflow-x:auto;margin-top:15px}table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:14px}caption{text-align:left;color:var(--text);font-weight:700;padding:0 0 12px}th{text-align:left;background:#303727;color:var(--accent);font:700 12px monospace;letter-spacing:.04em}th,td{padding:12px 10px;border-bottom:1px solid var(--line)}tbody tr:nth-child(even){background:#182015}td button{padding:7px 10px;font-size:12px}.log-summary{color:var(--accent)}
+</style></head><body>
+<header><div class="wrap"><nav aria-label="Principal"><span class="brand">LU8AEU/MM</span><div class="links"><a href="#qsl">Consulta de QSL</a><a href="https://saraqsl.com/" target="_blank" rel="noopener">SARA ↗</a></div></nav></div></header>
+<main class="wrap"><div class="hero"><div class="eyebrow">Fragata Libertad</div><h1>LU8AEU/MM</h1><div class="identity"><strong>FRAGATA LIBERTAD</strong><p>Estación marítima móvil</p></div><div class="clock" id="clock">HORA UTC</div></div>
+<section id="qsl"><h2>Contactos con LU8AEU/MM</h2><p class="qslintro">Ingresá una señal distintiva para consultar únicamente sus contactos con LU8AEU/MM, la Fragata Libertad.</p><article class="card"><h3>Buscar por señal distintiva</h3><form id="searchForm"><div style="width:100%"><label for="searchCall">SD del corresponsal</label></div><input id="searchCall" placeholder="Ej.: LU1ABC" maxlength="24" required autocomplete="off" pattern="[A-Za-z0-9/\-]+"><button id="searchButton">Buscar contactos</button></form><div id="personalResults" class="status" role="status" aria-live="polite"></div></article></section>
+</main><footer><div class="wrap">LU8AEU/MM &nbsp; | &nbsp; 73</div></footer>
+<script>
+const API_URL='https://script.google.com/macros/s/AKfycbylXmz1N3ew0Vq8ZTq6fL-XKx1pNy3IItcc8yx5hf5ea9DQSBF9Pz_Lfc8rVxEcLkvrYQ/exec';
+const VIAJES={54:{nombre:'54º Viaje de Instrucción · 2026',imagen:'QSL54.PNG'}};
+const $ = id => document.getElementById(id);
+const norm = v => String(v == null ? '' : v).trim().toUpperCase();
+function clock(){$('clock').textContent=new Date().toISOString().slice(11,19)+' UTC';}clock();setInterval(clock,1000);
+async function obtener(url){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),25000);try{const res=await fetch(url,{signal:controller.signal});if(!res.ok)throw Error('HTTP '+res.status);const data=await res.json();if(!Array.isArray(data))throw Error(data.error||'El registro no tiene el formato esperado');return data;}finally{clearTimeout(timer);}}
+function coincide(q,call){return !!q && norm(q.call)===call;}
+function unicos(qsos){const seen=new Set();return qsos.filter(q=>{const key=JSON.stringify(['viaje','archivo','owner','call','date','time','band','mode','rst'].map(k=>norm(q[k])));if(seen.has(key))return false;seen.add(key);return true;});}
+function fila(parent,titulo,detalle){const div=document.createElement('div');div.className='result';const strong=document.createElement('strong');strong.textContent=titulo;const p=document.createElement('p');p.textContent=detalle;div.append(strong,p);parent.append(div);return div;}
+$('searchForm').addEventListener('submit',async e=>{
+ e.preventDefault();const call=norm($('searchCall').value);$('searchCall').value=call;const out=$('personalResults');$('searchButton').disabled=true;out.textContent='Buscando contactos con LU8AEU/MM…';
+ try{
+  const datos=await obtener(API_URL);
+  const encontrados=unicos(datos.filter(q=>coincide(q,call)));
+  const respuestas=[{qsos:encontrados,fuente:{nombre:'Fragata Libertad'}}];
+  out.replaceChildren();const filas=[];for(const r of respuestas){if(r.qsos)for(const q of r.qsos)filas.push({q,fuente:{nombre:(VIAJES[q.viaje]||{}).nombre||('Viaje '+(q.viaje||'sin identificar'))}});}
+  const fallos=respuestas.filter(r=>r.error);if(filas.length)mostrarContactos(out,filas,call);else{const p=document.createElement('p');p.textContent=fallos.length?'No se encontraron contactos en las fuentes que respondieron. La búsqueda está incompleta.':'No se encontraron contactos con LU8AEU/MM para esa señal distintiva.';out.append(p);}
+  if(fallos.length){const p=document.createElement('p');p.textContent='No pudieron consultarse: '+fallos.map(r=>r.fuente.nombre).join(', ')+'. Volvé a intentar para completar la búsqueda.';out.append(p);}
+ }catch(error){out.textContent='No se pudo completar la búsqueda: '+error.message+'. Revisá el script y los archivos del viaje.';}finally{$('searchButton').disabled=false;}
+});
+function formatoFecha(v){const t=norm(v);return /^\d{8}$/.test(t)?t.slice(6,8)+'/'+t.slice(4,6)+'/'+t.slice(0,4):String(v||'—');}
+function formatoHora(v){const t=norm(v);return /^\d{4}(\d{2})?$/.test(t)?t.slice(0,2)+':'+t.slice(2,4)+(t.length===6?':'+t.slice(4):''):String(v||'—');}
+function mostrarContactos(out,filas,call){
+ filas.sort((a,b)=>(norm(b.q.date)+norm(b.q.time)).localeCompare(norm(a.q.date)+norm(a.q.time)));
+ const summary=document.createElement('p');summary.className='log-summary';summary.textContent=filas.length+' contacto(s) de '+call+' con LU8AEU/MM · Fragata Libertad';out.append(summary);
+ const scroll=document.createElement('div');scroll.className='log-scroll';scroll.tabIndex=0;scroll.setAttribute('role','region');scroll.setAttribute('aria-label','Resultados de contactos, desplazables horizontalmente');
+ const table=document.createElement('table'),caption=document.createElement('caption');caption.textContent='Contactos y actividades · más recientes primero';table.append(caption);
+ const head=document.createElement('thead'),hr=document.createElement('tr');for(const label of ['Fecha','Hora UTC','Corresponsal','Banda','Modo','Viaje','QSL']){const th=document.createElement('th');th.scope='col';th.textContent=label;hr.append(th);}head.append(hr);table.append(head);
+ const body=document.createElement('tbody');for(const {q,fuente} of filas){const tr=document.createElement('tr');for(const value of [formatoFecha(q.date),formatoHora(q.time),norm(q.call),q.band,q.mode,fuente.nombre]){const td=document.createElement('td');td.textContent=value||'—';tr.append(td);}const td=document.createElement('td');
+   const button=document.createElement('button');button.type='button';button.textContent='Bajar QSL';button.disabled=!VIAJES[q.viaje];if(button.disabled)button.title='Falta configurar la QSL de este viaje';button.addEventListener('click',()=>descargar(q,button));td.append(button);
+  tr.append(td);body.append(tr);
+ }table.append(body);scroll.append(table);out.append(scroll);
+}
+async function descargar(q,button){
+ const anterior=button.textContent;button.disabled=true;button.textContent='Preparando…';
+ try{
+  const img=await new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('No se pudo cargar qsl.png.'));image.src=VIAJES[q.viaje].imagen;});
+  const width=img.naturalWidth,height=img.naturalHeight;
+  if(!width||!height)throw new Error('La imagen QSL no es válida.');
+  const canvas=document.createElement('canvas');
+  canvas.width=width;canvas.height=height;const c=canvas.getContext('2d');c.drawImage(img,0,0,width,height);
+  // Recuadro dentro del espacio inferior de qsl.png, sin cambiar sus dimensiones.
+  const x=width*0.195,y=height*0.838,w=width*0.77,h=height*0.137;
+  c.fillStyle='rgba(48,57,35,0.96)';c.fillRect(x,y,w,h);
+  c.strokeStyle='#b2ad83';c.lineWidth=Math.max(1,width/1000);c.strokeRect(x,y,w,h);
+  const padding=w*0.025;
+  c.fillStyle='#ffffff';c.font='bold '+Math.round(h*0.22)+'px sans-serif';c.textBaseline='middle';
+  c.fillText('CONFIRMANDO CONTACTO CON '+norm(q.call),x+padding,y+h*0.23,w-padding*2);
+  const values=[['FECHA',formatoFecha(q.date)],['HORA UTC',formatoHora(q.time)],['BANDA',String(q.band||'—')],['MODO',String(q.mode||'—')],['RST',String(q.rst||'—')]];
+  const col=(w-padding*2)/values.length;
+  for(let i=0;i<values.length;i++){
+   const cx=x+padding+i*col;
+   c.fillStyle='#d4d8ca';c.font=Math.round(h*0.115)+'px sans-serif';c.fillText(values[i][0],cx,y+h*0.55,col-padding);
+   c.fillStyle='#ffffff';c.font='bold '+Math.round(h*0.19)+'px sans-serif';c.fillText(values[i][1],cx,y+h*0.79,col-padding);
+  }
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error('No se pudo generar la QSL.');
+  const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;
+  link.download=('QSL_'+('LU8AEU_MM_VIAJE'+q.viaje)+'_'+norm(q.call)+'_'+String(q.date||'')+'_'+String(q.time||'')+'_'+String(q.band||'')+'_'+String(q.mode||'')).replace(/[^A-Za-z0-9_-]/g,'_')+'.png';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ }catch(error){const out=$('personalResults');let notice=$('qslError');if(!notice){notice=document.createElement('p');notice.id='qslError';notice.setAttribute('role','alert');out.append(notice);}notice.textContent='No se pudo descargar la QSL. Comprobá que exista la imagen '+VIAJES[q.viaje].imagen+' y volvé a intentar.';}
+ finally{button.disabled=false;button.textContent=anterior;}
+}
+
+</script></body></html>
