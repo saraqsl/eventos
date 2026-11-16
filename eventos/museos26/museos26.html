@@ -10,7 +10,7 @@
 </head>
 <body>
 <h1>⚓ Noche de los Museos</h1>
-<p>LU2CN · LU7AMH · LU1ARA — SARA</p>
+<p>LU2CN · LU7AHM · LU1ARA — SARA</p>
 <input type="text" id="sdVisitante" placeholder="INGRESE SU SEÑAL (EJ: LU9MAH)" aria-label="Señal distintiva" autocomplete="off">
 <button id="buscar">🔍 BUSCAR CONTACTOS</button>
 <p id="estado" role="status" aria-live="polite"></p>
@@ -19,7 +19,7 @@
 <script>
 'use strict';
 const API_URL='https://script.google.com/macros/s/AKfycbxZsk3x1IAodL4mo1FxPLnCcz6z_Nc6KSdcHVKw5ZNwFkNI178rVrd9MVWoRqDjrdzA1g/exec';
-const MAPA_QSLS={LU7AMH:'qsl1.png',LU1ARA:'qsl2.png',LU2CN:'qsl3.png'};
+const MAPA_QSLS={LU7AHM:'qsl1.png',LU1ARA:'qsl2.png',LU2CN:'qsl3.png'};
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').trim().toUpperCase();
 const seguro=v=>String(v).replace(/[^A-Za-z0-9_-]/g,'_');
@@ -34,7 +34,7 @@ async function verQSL(){
   let data;try{data=await res.json()}catch(e){if(e.name==='AbortError')throw e;throw new Error('El servidor no devolvió un JSON válido. Revisá la publicación del Apps Script.')}
   if(!Array.isArray(data))throw new Error('Se esperaba una lista de contactos en el JSON.');
   const contactos=data.filter(c=>c&&norm(c.call)===sd&&Object.hasOwn(MAPA_QSLS,norm(c.owner)));
-  if(!contactos.length){estado('No se encontraron contactos con LU2CN, LU7AMH o LU1ARA para '+sd+'.');return}
+  if(!contactos.length){estado('No se encontraron contactos con LU2CN, LU7AHM o LU1ARA para '+sd+'.');return}
   let fallidas=0;
   for(const [i,c] of contactos.entries()){
    estado('Generando QSL '+(i+1)+' de '+contactos.length+'...');
